@@ -66,6 +66,8 @@ private:
 	float _timeToChangeDirection;
 
 	float _timeToExplode;
+
+	Texture2D _texture = LoadTexture("Assets/Sprites/Bomb.png");
 };
 
 #endif

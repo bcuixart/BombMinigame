@@ -34,7 +34,7 @@ void GameManager::Update(float deltaTime)
 
     timeToSpawnNextBomb -= deltaTime;
     if (timeToSpawnNextBomb <= 0 && !didGameOver) {
-        bombSpawnTime = max(bombSpawnTime - 0.25f, 1f);
+        bombSpawnTime = max(bombSpawnTime - 0.25f, 1.f);
         timeToSpawnNextBomb = bombSpawnTime;
 
         int spawnPos = rand() % 2;

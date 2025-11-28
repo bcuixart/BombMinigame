@@ -179,6 +179,9 @@ void Bomb::Render(const float deltaTime)
 	else if (_timeToExplode < 0.5 && _timeToExplode > 0.25f) {
 		col = _blowUpIndicatorColor;
 	}
+
+	DrawTextureEx(_texture, _position, _rotation, .1f, WHITE);
+	//DrawTexture(_texture, _position.x, _position.y, WHITE);
 	DrawCircleV(_position, _scale, col);
 }
 
