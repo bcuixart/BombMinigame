@@ -2,11 +2,12 @@
 
 #include "GameManager.hh"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 800
+#define SCREEN_WIDTH 500
+#define SCREEN_HEIGHT 500
 
 int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BOMB GAME");
+    SetTargetFPS(30);
 
     GameManager* gameManager = new GameManager();
 
@@ -16,6 +17,8 @@ int main() {
 
         gameManager->Update(deltaTime);
         gameManager->Render(deltaTime);
+
+        DrawFPS(10, 10);
     }
 
     delete gameManager;

@@ -10,17 +10,18 @@ using namespace std;
 
 class GameObject {
 public:
-	GameObject();
+	GameObject(const Vector2 p, const float r, const float s);
 
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
 
 protected:
-
-private:
 	Vector2 _position;
 	float _rotation;
-	Vector2 _scale;
+	float _scale;
+
+private:
+
 };
 
 #endif
