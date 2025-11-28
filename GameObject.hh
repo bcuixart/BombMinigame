@@ -15,6 +15,12 @@ public:
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
 
+	virtual void GameOver();
+
+	Vector2 GetPosition() const;
+	float GetRotation() const;
+	float GetScale() const;
+
 protected:
 	Vector2 _position;
 	float _rotation;

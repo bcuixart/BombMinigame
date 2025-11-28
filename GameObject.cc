@@ -16,3 +16,21 @@ void GameObject::Render(const float deltaTime)
 {
 
 }
+
+void GameObject::GameOver() 
+{
+
+}
+
+Vector2 GameObject::GetPosition() const 
+{
+	return _position;
+}
+float GameObject::GetRotation() const 
+{
+	return _rotation;
+}
+float GameObject::GetScale() const
+{
+	return _scale;
+}
