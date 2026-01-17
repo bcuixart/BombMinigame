@@ -4,13 +4,17 @@
 Bomb::Bomb(const Vector2 p, const float r, const float s) : 
 	GameObject(p, r, s)
 {
-	_timeToChangeDirection = 0; // Forces instant speed change
+	_radius = s / 2;
 
-	_type = (rand() % 2 == 0) ? BOMB_LEFT : BOMB_RIGHT;
-	_color = (_type == BOMB_LEFT) ? (Color){200,0,0,255} : (Color){55,55,55,255};
+	_movementDirection = { 1, 1 };
+
+	_type = (rand() % 2 == 0) ? BOMB_BLACK : BOMB_RED;
+	_color = (_type == BOMB_BLACK) ? (Color) { 55, 55, 55, 255 } : (Color) { 200, 0, 0, 255 };
 	_state = RANDOM_MOVEMENT;
 
-	_timeToExplode = 10;
+	_timeToExplode = 30;
+
+	_animationFrame = 0;
 }
 
 BombType Bomb::GetType() const {
@@ -19,6 +23,9 @@ BombType Bomb::GetType() const {
 
 void Bomb::Update(float deltaTime)
 {
+	_animationFrame += ANIMATION_SPEED * deltaTime;
+	if (int(_animationFrame) >= ANIMATION_FRAMES) _animationFrame = 0;
+
 	switch (_state) {
 		case RANDOM_MOVEMENT: {
 			Update_RandomMovement(deltaTime);
@@ -52,25 +59,26 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	_timeToExplode -= deltaTime;
 	if (_timeToExplode <= 0) GameManager::instance->GameOver();
 
-	_timeToChangeDirection -= deltaTime;
-	if (_timeToChangeDirection <= 0) {
-		_timeToChangeDirection = rand() % 5;
+	_position.x += _movementDirection.x * BOMB_MOVEMENT_SPEED * deltaTime;
+	_position.y += _movementDirection.y * BOMB_MOVEMENT_SPEED * deltaTime;
 
-		float speedX = (float) ((rand() % 200) - 100);
-		float speedY = (float) ((rand() % 200) - 100);
+	// Flip at bounds
+	if (_position.x < MAP_COORD_HOR_MIN) _movementDirection.x = 1;
+	else if (_position.x > MAP_COORD_HOR_MAX) _movementDirection.x = -1;	
+	if (_position.y < MAP_COORD_VER_MIN) _movementDirection.y = 1;
+	else if (_position.y > MAP_COORD_VER_MAX) _movementDirection.y = -1;
 
-		_movementSpeed = { speedX, speedY };
-	}
+	_animationIndex = BOMB_ANIM_INDEX_WALK_BOT_LEFT;
+	if (_movementDirection.x == 1 && _movementDirection.y == 1) _animationIndex = BOMB_ANIM_INDEX_WALK_BOT_RIGHT;
+	else if (_movementDirection.x == 1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_RIGHT;
+	else if (_movementDirection.x == -1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_LEFT;
 
-	_position.x += _movementSpeed.x * deltaTime;
-	_position.y += _movementSpeed.y * deltaTime;
-
-	_position = Vector2Clamp(_position, 
-		BOMB_POSITION_RANDOM_MOVEMENT_LIMIT_MIN, 
-		BOMB_POSITION_RANDOM_MOVEMENT_LIMIT_MAX);
-
-	if (IsMouseButtonPressed(0)) {
-		if (CheckCollisionPointCircle(GetMousePosition(), _position, _scale)) {
+	if (IsMouseButtonPressed(0)) 
+	{
+		if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(),
+			_position,
+			_radius * (float(BOMB_SPRITE_HITBOX_SIZE) / float(BOMB_SPRITE_SIZE))))
+		{
 			_state = GRABBED;
 		}
 	}
@@ -81,7 +89,9 @@ void Bomb::Update_Grabbed(const float deltaTime)
 	_timeToExplode -= deltaTime;
 	if (_timeToExplode <= 0) GameManager::instance->GameOver();
 
-	_position = GetMousePosition();
+	_animationIndex = BOMB_ANIM_INDEX_GRABBED;
+
+	_position = GameManager::instance->GetWorldMousePos();
 
 	if (!IsMouseButtonDown(0)) {
 		int releasedState = GameManager::instance->GetBombReleasedState(this);
@@ -108,6 +118,7 @@ void Bomb::Update_ReturnToCenter(const float deltaTime)
 
 void Bomb::Update_PlacedLeft(const float deltaTime) 
 {
+	/*
 	_timeToExplode = -1;
 
 	_timeToChangeDirection -= deltaTime;
@@ -126,10 +137,12 @@ void Bomb::Update_PlacedLeft(const float deltaTime)
 	_position = Vector2Clamp(_position, 
 		BOMB_POSITION_PLACED_LEFT_LIMIT_MIN, 
 		BOMB_POSITION_PLACED_LEFT_LIMIT_MAX);
+	*/
 }
 
 void Bomb::Update_PlacedRight(const float deltaTime) 
 {
+	/*
 	_timeToExplode = -1;
 
 	_timeToChangeDirection -= deltaTime;
@@ -148,6 +161,7 @@ void Bomb::Update_PlacedRight(const float deltaTime)
 	_position = Vector2Clamp(_position, 
 		BOMB_POSITION_PLACED_RIGHT_LIMIT_MIN, 
 		BOMB_POSITION_PLACED_RIGHT_LIMIT_MAX);
+	*/
 }
 
 void Bomb::Update_GameOver(const float deltaTime)
@@ -180,9 +194,32 @@ void Bomb::Render(const float deltaTime)
 		col = _blowUpIndicatorColor;
 	}
 
-	DrawTextureEx(_texture, _position, _rotation, .1f, WHITE);
-	//DrawTexture(_texture, _position.x, _position.y, WHITE);
-	DrawCircleV(_position, _scale, col);
+	// Body
+	DrawTexturePro(
+		GameManager::instance->sprBombBody,
+		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(int(_type) * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
+		{ _position.x, _position.y, _scale, _scale }, // DEST
+		{ _radius, _radius }, // ORIGIN
+		0, // ROTATION
+		WHITE // TINT
+	);
+
+	// Deco
+	DrawTexturePro(
+		GameManager::instance->sprBombDeco,
+		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(_animationIndex * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
+		{ _position.x, _position.y, _scale, _scale }, // DEST
+		{ _radius, _radius }, // ORIGIN
+		0, // ROTATION
+		WHITE // TINT
+	);
+
+
+	DrawCircleLinesV(
+		_position,
+		_radius * (float(BOMB_SPRITE_HITBOX_SIZE) / float(BOMB_SPRITE_SIZE)), // RADIUS
+		col
+	);
 }
 
 void Bomb::GameOver() 

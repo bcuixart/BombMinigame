@@ -9,20 +9,26 @@
 
 #include "GameObject.hh"
 
+#define BOMB_POSITION_PLACED_LEFT_LIMIT_MIN { 0, 200 }
+#define BOMB_POSITION_PLACED_LEFT_LIMIT_MAX { 100, 300 }
+#define BOMB_POSITION_PLACED_RIGHT_LIMIT_MIN { 400, 200 }
+#define BOMB_POSITION_PLACED_RIGHT_LIMIT_MAX { 500, 300 }
+
+#define BOMB_MOVEMENT_SPEED 100
+
+#define ANIMATION_FRAMES 30
+#define ANIMATION_SPEED 40
+
 using namespace std;
 
-enum BombType {
-	BOMB_LEFT,
-	BOMB_RIGHT
-};
-
-enum BombState {
-  RANDOM_MOVEMENT,
-  GRABBED,
-  RETURN_TO_CENTER,
-  PLACED_LEFT,
-  PLACED_RIGHT,
-  GAMEOVER
+enum BombState 
+{
+	RANDOM_MOVEMENT,
+	GRABBED,
+	RETURN_TO_CENTER,
+	PLACED_LEFT,
+	PLACED_RIGHT,
+	GAMEOVER
 };
 
 class Bomb : public GameObject {
@@ -50,24 +56,19 @@ private:
 	BombType _type;
 	BombState _state;
 
+	float _radius;
+
 	Color _color;
 	const Color _blowUpIndicatorColor = {200,200,200,255};
 
-	const Vector2 BOMB_POSITION_RANDOM_MOVEMENT_LIMIT_MIN = {150, 0};
-	const Vector2 BOMB_POSITION_RANDOM_MOVEMENT_LIMIT_MAX = {350, 500};	
-
-	const Vector2 BOMB_POSITION_PLACED_LEFT_LIMIT_MIN = {0, 200};
-	const Vector2 BOMB_POSITION_PLACED_LEFT_LIMIT_MAX = {100, 300};	
-	const Vector2 BOMB_POSITION_PLACED_RIGHT_LIMIT_MIN = {400, 200};
-	const Vector2 BOMB_POSITION_PLACED_RIGHT_LIMIT_MAX = {500, 300};
-
-	Vector2 _movementSpeed;
+	Vector2 _movementDirection;
 
 	float _timeToChangeDirection;
 
 	float _timeToExplode;
 
-	Texture2D _texture = LoadTexture("Assets/Sprites/Bomb.png");
+	float _animationFrame;
+	int _animationIndex;
 };
 
 #endif

@@ -6,6 +6,8 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include "Constants.hh"
+
 using namespace std;
 
 class GameObject {

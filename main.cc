@@ -2,8 +2,8 @@
 
 #include "GameManager.hh"
 
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH 600
+#define SCREEN_HEIGHT 600
 
 int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BOMB GAME");

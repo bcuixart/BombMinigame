@@ -3,8 +3,8 @@
 BombHouse::BombHouse(const Vector2 p, const float r, const float s, const BombHouseType t) : 
 	GameObject(p, r, s)
 {
-	_type = t;
-	_color = (_type == BOMBHOUSE_LEFT) ? RED : BLACK;
+	_houseType = t;
+	_bombType = (_houseType == BOMBHOUSE_BOTTOM) ? BOMB_BLACK : BOMB_RED;
 }
 
 void BombHouse::Update(float deltaTime)
@@ -14,7 +14,7 @@ void BombHouse::Update(float deltaTime)
 
 void BombHouse::Render(const float deltaTime) 
 {
-	DrawRectangleV(_position, {100, 100}, _color);
+	DrawRectangleV(_position, {100, 100}, ORANGE);
 }
 
 bool BombHouse::GetIsMouseInside(Bomb* obj) 

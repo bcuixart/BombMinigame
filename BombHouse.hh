@@ -13,8 +13,8 @@
 using namespace std;
 
 enum BombHouseType {
-	BOMBHOUSE_LEFT,
-	BOMBHOUSE_RIGHT
+	BOMBHOUSE_TOP,
+	BOMBHOUSE_BOTTOM
 };
 
 class BombHouse : public GameObject {
@@ -30,7 +30,8 @@ protected:
 
 private:
 	
-	BombHouseType _type;
+	BombHouseType _houseType;
+	BombType _bombType;
 
 	Color _color;
 };
