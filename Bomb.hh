@@ -25,10 +25,8 @@ enum BombState
 {
 	RANDOM_MOVEMENT,
 	GRABBED,
-	RETURN_TO_CENTER,
-	PLACED_LEFT,
-	PLACED_RIGHT,
-	GAMEOVER
+	PLACED_TOP,
+	PLACED_BOTTOM
 };
 
 class Bomb : public GameObject {
@@ -40,6 +38,8 @@ public:
 
 	virtual void GameOver();
 
+	static bool BombLayerSort(const Bomb* a, const Bomb* b);
+
 	BombType GetType() const;
 
 protected:
@@ -48,27 +48,26 @@ private:
 	
 	void Update_RandomMovement(const float deltaTime);
 	void Update_Grabbed(const float deltaTime);
-	void Update_ReturnToCenter(const float deltaTime);
-	void Update_PlacedLeft(const float deltaTime);
-	void Update_PlacedRight(const float deltaTime);
-	void Update_GameOver(const float deltaTime);
+	void Update_PlacedTop(const float deltaTime);
+	void Update_PlacedBottom(const float deltaTime);
 
 	BombType _type;
 	BombState _state;
 
 	float _radius;
+	float _grabbedScaleMultiplier;
 
 	Color _color;
 	const Color _blowUpIndicatorColor = {200,200,200,255};
 
 	Vector2 _movementDirection;
 
-	float _timeToChangeDirection;
-
 	float _timeToExplode;
 
 	float _animationFrame;
 	int _animationIndex;
+
+	bool _didGameOver = false;
 };
 
 #endif

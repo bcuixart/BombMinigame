@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector> 
+#include <algorithm> 
 
 #include <raylib.h>
 #include <raymath.h>
@@ -45,14 +46,14 @@ private:
 	Camera2D _cam = { 0 };
 
 	const float BOMB_SPAWN_TIME_START = 3;
-	float bombSpawnTime = 3;
+	float _bombSpawnTime = 3;
 
-	float timeToSpawnNextBomb = 0;
+	float _timeToSpawnNextBomb = 0;
 
 	BombHouse* _bombHouseTop;
 	BombHouse* _bombHouseBottom;
 
-	bool didGameOver;
+	bool _didGameOver;
 
 	Texture2D _sprMapBG = LoadTexture("Assets/Sprites/Spr_Map_BG.png");
 };

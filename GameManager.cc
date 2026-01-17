@@ -13,17 +13,17 @@ void GameManager::StartGame()
 {
     _bombGameObjects = vector<Bomb*>();
 
-    timeToSpawnNextBomb = BOMB_SPAWN_TIME_START;
+    _timeToSpawnNextBomb = BOMB_SPAWN_TIME_START;
 
     _bombHouseTop = new BombHouse({0,200},0,1, BOMBHOUSE_TOP);
     _bombHouseBottom = new BombHouse({0,200},0,1, BOMBHOUSE_BOTTOM);
 
-    didGameOver = false;
+    _didGameOver = false;
 }
 
 void GameManager::Update(float deltaTime)
 {
-    if (didGameOver) 
+    if (_didGameOver) 
     {
         if (IsKeyPressed(KEY_R)) 
         {
@@ -32,17 +32,16 @@ void GameManager::Update(float deltaTime)
         }
     }
 
-    timeToSpawnNextBomb -= deltaTime;
-    if (timeToSpawnNextBomb <= 0 && !didGameOver) {
-        bombSpawnTime = max(bombSpawnTime - 0.25f, 1.f);
-        timeToSpawnNextBomb = bombSpawnTime;
+    _timeToSpawnNextBomb -= deltaTime;
+    if (_timeToSpawnNextBomb <= 0 && !_didGameOver) 
+    {
+        _bombSpawnTime = max(_bombSpawnTime - 0.25f, 1.f);
+        _timeToSpawnNextBomb = _bombSpawnTime;
 
-        int spawnPos = rand() % 2;
-        if (spawnPos == 1) {
-            InstantiateBomb(new Bomb({-250,0}, 0, 150));
-        } else {
-            InstantiateBomb(new Bomb({250,0}, 0, 150));
-        }
+        int spawnPos = GetRandomValue(0, 1);
+        float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
+        if (spawnPos == 1) InstantiateBomb(new Bomb({ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150));
+        else InstantiateBomb(new Bomb({ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150));
     }
 
     for (GameObject* o : _bombGameObjects) o->Update(deltaTime);
@@ -74,22 +73,27 @@ void GameManager::Render(const float deltaTime)
         WHITE
     );
 
+    sort(_bombGameObjects.begin(), _bombGameObjects.end(), Bomb::BombLayerSort);
+
     for (GameObject* o : _bombGameObjects) o->Render(deltaTime);
 
     _bombHouseTop->Render(deltaTime);
     _bombHouseBottom->Render(deltaTime);
 
-    if (didGameOver) DrawText("Has mort :)", 190, 100, 20, RED);
+    if (_didGameOver) DrawText("Has mort :)", 190, 100, 20, RED);
 
     DrawRectangleLines(-250, -500, 500, 1000, GREEN);
     DrawRectangleLines(MAP_COORD_HOR_MIN, MAP_COORD_VER_MIN, (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
+    DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_BOT_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
+    DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_TOP_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
 
     EndDrawing();
 }
 
 void GameManager::GameOver()
 {
-    didGameOver = true;
+    if (_didGameOver) return;
+    _didGameOver = true;
 
     for (GameObject* o : _bombGameObjects) o->GameOver();
 
@@ -111,14 +115,20 @@ int GameManager::GetBombReleasedState(Bomb* obj)
 {
     BombType type = obj->GetType();
 
-    if (_bombHouseTop->GetIsMouseInside(obj)) {
-        //return (type == BOMB_LEFT) ? 1 : -1;
+    Vector2 mousePos = GetWorldMousePos();
+
+    if (mousePos.y >= BOMBHOUSE_COORD_BOT_VER_POS)
+    {
+        if (_bombHouseBottom->GetType() != type) GameOver();
+        return BOMB_RELEASED_BOT;
     }
-    if (_bombHouseBottom->GetIsMouseInside(obj)) {
-        //return (type == BOMB_RIGHT) ? 2 : -1;
+    else if (mousePos.y <= BOMBHOUSE_COORD_TOP_VER_POS)
+    {
+        if (_bombHouseTop->GetType() != type) GameOver();
+        return BOMB_RELEASED_TOP;
     }
 
-    return 3;
+    return BOMB_RELEASED_DEF;
 }
 
 Vector2 GameManager::GetWorldMousePos() const

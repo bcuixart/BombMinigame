@@ -4,7 +4,12 @@ BombHouse::BombHouse(const Vector2 p, const float r, const float s, const BombHo
 	GameObject(p, r, s)
 {
 	_houseType = t;
-	_bombType = (_houseType == BOMBHOUSE_BOTTOM) ? BOMB_BLACK : BOMB_RED;
+	_bombType = (_houseType == BOMBHOUSE_TOP) ? BOMB_BLACK : BOMB_RED;
+}
+
+BombType BombHouse::GetType() const
+{
+	return _bombType;
 }
 
 void BombHouse::Update(float deltaTime)

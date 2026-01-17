@@ -5,14 +5,16 @@
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
 
-int main() {
+int main() 
+{
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BOMB GAME");
     SetTargetFPS(30);
 
     GameManager* gameManager = new GameManager();
 
     float deltaTime = 0;
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose()) 
+    {
         deltaTime = GetFrameTime();
 
         gameManager->Update(deltaTime);

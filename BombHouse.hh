@@ -26,6 +26,8 @@ public:
 
 	bool GetIsMouseInside(Bomb* obj);
 
+	BombType GetType() const;
+
 protected:
 
 private:
