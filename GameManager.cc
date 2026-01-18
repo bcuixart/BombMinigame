@@ -115,27 +115,39 @@ void GameManager::InstantiateBomb(Bomb* obj)
 
 void GameManager::DestroyBomb(Bomb* obj)
 {
-    
+    auto it = std::find(_bombGameObjects.begin(), _bombGameObjects.end(), obj);
+
+    if (it != _bombGameObjects.end())
+    {
+        delete* it;
+        _bombGameObjects.erase(it);
+    }
 }
+
 
 int GameManager::GetBombReleasedState(Bomb* obj)
 {
-    BombType type = obj->GetType();
-
     Vector2 mousePos = GetWorldMousePos();
 
-    if (mousePos.y >= BOMBHOUSE_COORD_BOT_VER_POS)
-    {
-        if (_bombHouseBottom->GetType() != type) GameOver();
-        return BOMB_RELEASED_BOT;
-    }
-    else if (mousePos.y <= BOMBHOUSE_COORD_TOP_VER_POS)
-    {
-        if (_bombHouseTop->GetType() != type) GameOver();
-        return BOMB_RELEASED_TOP;
-    }
+    if (mousePos.y >= BOMBHOUSE_COORD_BOT_VER_POS) return BOMB_RELEASED_BOT;
+    if (mousePos.y <= BOMBHOUSE_COORD_TOP_VER_POS) return BOMB_RELEASED_TOP;
 
     return BOMB_RELEASED_DEF;
+}
+
+void GameManager::BombEntered(Bomb* obj, int _placedDirection)
+{
+    BombType type = obj->GetType();
+    if (_placedDirection == BOMB_PLACED_TOP)
+    {
+        if (_bombHouseTop->GetType() != type) GameOver();
+    }
+    else if (_placedDirection == BOMB_PLACED_BOT)
+    {
+        if (_bombHouseBottom->GetType() != type) GameOver();
+    }
+
+    DestroyBomb(obj);
 }
 
 Vector2 GameManager::GetWorldMousePos() const

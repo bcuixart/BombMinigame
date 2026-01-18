@@ -44,12 +44,8 @@ void Bomb::Update(float deltaTime)
 			Update_Grabbed(deltaTime);
 			break;
 		}		
-		case PLACED_TOP: {
-			Update_PlacedTop(deltaTime);
-			break;
-		}
-		case PLACED_BOTTOM: {
-			Update_PlacedBottom(deltaTime);
+		case PLACED: {
+			Update_Placed(deltaTime);
 			break;
 		}
 	}
@@ -93,41 +89,40 @@ void Bomb::Update_Grabbed(const float deltaTime)
 
 	_position = GameManager::instance->GetWorldMousePos();
 
-	if (!IsMouseButtonDown(0) || _didGameOver) {
+	if (!IsMouseButtonDown(0) || _didGameOver) 
+	{
 		int releasedState = GameManager::instance->GetBombReleasedState(this);
 
-		if (releasedState == BOMB_RELEASED_TOP) _state = PLACED_TOP;
-		else if (releasedState == BOMB_RELEASED_BOT) _state = PLACED_BOTTOM;
+		if (releasedState == BOMB_RELEASED_TOP) { _state = PLACED; _placedDirection = BOMB_PLACED_TOP; }
+		else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; }
 		else _state = RANDOM_MOVEMENT;
 	}
 }
 
-void Bomb::Update_PlacedTop(const float deltaTime) 
+void Bomb::Update_Placed(const float deltaTime) 
 {
-	_timeToExplode = -1;
-	_animationIndex = BOMB_ANIM_INDEX_PLACED_TOP;
+	_timeToExplode = max(_timeToExplode, 5.0f);
+	_animationIndex = (_placedDirection == BOMB_PLACED_TOP) ? BOMB_ANIM_INDEX_PLACED_TOP : BOMB_ANIM_INDEX_PLACED_BOT;
 
 	_grabbedScaleMultiplier = 1;
 
 	if (_position.x < BOMBHOUSE_COORD_HOR_MIN) _position.x = BOMBHOUSE_COORD_HOR_MIN;
 	else if (_position.x > BOMBHOUSE_COORD_HOR_MAX) _position.x = BOMBHOUSE_COORD_HOR_MAX;
 
-	_position.y -= BOMB_MOVEMENT_SPEED * deltaTime;
+	int _movement = BOMB_MOVEMENT_SPEED * deltaTime;
+	_position.y -= (_placedDirection == BOMB_PLACED_TOP) ? _movement : -_movement;
 
-	// TODO: DESTROY
-}
-
-void Bomb::Update_PlacedBottom(const float deltaTime) 
-{
-	_timeToExplode = -1;
-	_animationIndex = BOMB_ANIM_INDEX_PLACED_BOTTOM;
-
-	_grabbedScaleMultiplier = 1;
-
-	if (_position.x < BOMBHOUSE_COORD_HOR_MIN) _position.x = BOMBHOUSE_COORD_HOR_MIN;
-	else if (_position.x > BOMBHOUSE_COORD_HOR_MAX) _position.x = BOMBHOUSE_COORD_HOR_MAX;
-
-	_position.y += BOMB_MOVEMENT_SPEED * deltaTime;
+	if (_position.y < -MAP_COORD_RADIUS || _position.y > MAP_COORD_RADIUS) 
+	{
+		GameManager::instance->BombEntered(this, this->_placedDirection);
+	}
+	else 
+	{
+		if (!_didGameOver && IsMouseButtonPressed(0))
+		{
+			if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual)) _state = GRABBED;
+		}
+	}
 
 	// TODO: DESTROY
 }

@@ -25,13 +25,13 @@ enum BombState
 {
 	RANDOM_MOVEMENT,
 	GRABBED,
-	PLACED_TOP,
-	PLACED_BOTTOM
+	PLACED,
 };
 
 class Bomb : public GameObject {
 public:
 	Bomb(const Vector2 p, const float r, const float s);
+	virtual ~Bomb() {};
 
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
@@ -51,8 +51,7 @@ private:
 	
 	void Update_RandomMovement(const float deltaTime);
 	void Update_Grabbed(const float deltaTime);
-	void Update_PlacedTop(const float deltaTime);
-	void Update_PlacedBottom(const float deltaTime);
+	void Update_Placed(const float deltaTime);
 
 	BombType _type;
 	BombState _state;
@@ -74,6 +73,8 @@ private:
 	bool _collidedThisFrame;
 
 	bool _didGameOver;
+
+	int _placedDirection;
 };
 
 #endif

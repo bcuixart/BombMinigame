@@ -20,6 +20,7 @@ enum BombHouseType {
 class BombHouse : public GameObject {
 public:
 	BombHouse(const Vector2 p, const float r, const float s, BombHouseType t);
+	virtual ~BombHouse() {};
 
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);

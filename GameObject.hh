@@ -13,6 +13,7 @@ using namespace std;
 class GameObject {
 public:
 	GameObject(const Vector2 p, const float r, const float s);
+	virtual ~GameObject() {};
 
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);

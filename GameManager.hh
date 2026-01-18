@@ -28,6 +28,7 @@ public:
 	void DestroyBomb(Bomb* obj);
 
 	int GetBombReleasedState(Bomb* obj);
+	void BombEntered(Bomb* obj, int _placedDirection);
 
 	Vector2 GetWorldMousePos() const;
 
