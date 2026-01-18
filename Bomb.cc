@@ -5,6 +5,7 @@ Bomb::Bomb(const Vector2 p, const float r, const float s) :
 	GameObject(p, r, s)
 {
 	_radius = s / 2;
+	_radiusVisual = _radius * (float(BOMB_SPRITE_HITBOX_SIZE) / float(BOMB_SPRITE_SIZE));
 	_grabbedScaleMultiplier = 1;
 
 	_movementDirection = { 1, 1 };
@@ -16,6 +17,9 @@ Bomb::Bomb(const Vector2 p, const float r, const float s) :
 	_timeToExplode = 30;
 
 	_animationFrame = 0;
+
+	_didGameOver = false;
+	_collidedThisFrame = false;
 }
 
 BombType Bomb::GetType() const 
@@ -27,6 +31,8 @@ void Bomb::Update(float deltaTime)
 {
 	_animationFrame += ANIMATION_SPEED * deltaTime;
 	if (int(_animationFrame) >= ANIMATION_FRAMES) _animationFrame = 0;
+
+	_collidedThisFrame = false;
 
 	switch (_state) 
 	{
@@ -72,12 +78,7 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 
 	if (!_didGameOver && IsMouseButtonPressed(0))
 	{
-		if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(),
-			_position,
-			_radius * (float(BOMB_SPRITE_HITBOX_SIZE) / float(BOMB_SPRITE_SIZE))))
-		{
-			_state = GRABBED;
-		}
+		if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual)) _state = GRABBED;
 	}
 }
 
@@ -168,7 +169,7 @@ void Bomb::Render(const float deltaTime)
 	if (DEBUG_BOMB_HITBOX_DRAW)
 	{
 		DrawCircleLinesV ( _position,
-			_radius * (float(BOMB_SPRITE_HITBOX_SIZE) / float(BOMB_SPRITE_SIZE)), // RADIUS
+			_radiusVisual, // RADIUS
 			col
 		);
 	}
@@ -179,6 +180,45 @@ void Bomb::GameOver()
 {
 	_didGameOver = true;
 }
+
+void Bomb::CheckCollisionWith(Bomb& b)
+{
+	if (b._state != RANDOM_MOVEMENT || _state != RANDOM_MOVEMENT) return;
+	if (b._collidedThisFrame || _collidedThisFrame) return;
+
+	Vector2 delta = Vector2Subtract(_position, b._position);
+	float dist = delta.x * delta.x + delta.y * delta.y;
+	float minDist = _radiusVisual + b._radiusVisual;
+
+	if (dist < minDist * minDist)
+	{
+		ResolveCollisionWith(b, delta, sqrt(dist), minDist);
+	}
+}
+
+void Bomb::ResolveCollisionWith(Bomb& b, Vector2 delta, float dist, float minDist)
+{
+	if (dist < 0.0001f)
+	{
+		delta = { 1.0f, 0.0f };
+		dist = 1.0f;
+	}
+
+	_collidedThisFrame = true;
+	b._collidedThisFrame = true;
+
+	Vector2 normal = Vector2Scale(delta, 1.0f / dist);
+	float overlap = minDist - dist;
+
+	_position = Vector2Add(_position, Vector2Scale(normal, overlap * 0.5f));
+	b._position = Vector2Subtract(b._position, Vector2Scale(normal, overlap * 0.5f));
+
+	_movementDirection.x *= -1;
+	b._movementDirection.x *= -1;
+	_movementDirection.y *= -1;
+	b._movementDirection.y *= -1;
+}
+
 
 bool Bomb::BombLayerSort(const Bomb* a, const Bomb* b)
 {

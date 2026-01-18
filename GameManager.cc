@@ -44,7 +44,14 @@ void GameManager::Update(float deltaTime)
         else InstantiateBomb(new Bomb({ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150));
     }
 
-    for (GameObject* o : _bombGameObjects) o->Update(deltaTime);
+    for (Bomb* o : _bombGameObjects) o->Update(deltaTime);
+
+    unsigned int size = _bombGameObjects.size();
+    for (unsigned int i = 0; i < size; ++i) {
+        for (unsigned int j = i + 1; j < size; ++j) {
+            _bombGameObjects[i]->CheckCollisionWith(*_bombGameObjects[j]);
+        }
+    }
 
     _bombHouseTop->Update(deltaTime);
     _bombHouseBottom->Update(deltaTime);

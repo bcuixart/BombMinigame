@@ -38,6 +38,9 @@ public:
 
 	virtual void GameOver();
 
+	void CheckCollisionWith(Bomb& b);
+	void ResolveCollisionWith(Bomb& b, Vector2 delta, float dist, float minDist);
+
 	static bool BombLayerSort(const Bomb* a, const Bomb* b);
 
 	BombType GetType() const;
@@ -55,6 +58,7 @@ private:
 	BombState _state;
 
 	float _radius;
+	float _radiusVisual;
 	float _grabbedScaleMultiplier;
 
 	Color _color;
@@ -67,7 +71,9 @@ private:
 	float _animationFrame;
 	int _animationIndex;
 
-	bool _didGameOver = false;
+	bool _collidedThisFrame;
+
+	bool _didGameOver;
 };
 
 #endif

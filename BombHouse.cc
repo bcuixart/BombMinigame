@@ -19,7 +19,7 @@ void BombHouse::Update(float deltaTime)
 
 void BombHouse::Render(const float deltaTime) 
 {
-	DrawRectangleV(_position, {100, 100}, ORANGE);
+	//DrawRectangleV(_position, {100, 100}, ORANGE);
 }
 
 bool BombHouse::GetIsMouseInside(Bomb* obj) 
