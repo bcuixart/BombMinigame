@@ -41,3 +41,5 @@ game
 
 # debug information files
 *.dwo
+
+Assets/Bomb/Renders/

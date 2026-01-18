@@ -36,15 +36,18 @@ void Bomb::Update(float deltaTime)
 
 	switch (_state) 
 	{
-		case RANDOM_MOVEMENT: {
+		case RANDOM_MOVEMENT: 
+		{
 			Update_RandomMovement(deltaTime);
 			break;
 		}
-		case GRABBED: {
+		case GRABBED: 
+		{
 			Update_Grabbed(deltaTime);
 			break;
 		}		
-		case PLACED: {
+		case PLACED: 
+		{
 			Update_Placed(deltaTime);
 			break;
 		}
@@ -129,46 +132,31 @@ void Bomb::Update_Placed(const float deltaTime)
 
 void Bomb::Render(const float deltaTime) 
 {
-	Color col = _color;
-	if (_timeToExplode < 5 && _timeToExplode > 4.5f) col = _blowUpIndicatorColor;
-	else if (_timeToExplode < 4 && _timeToExplode > 3.5f) col = _blowUpIndicatorColor;
-	else if (_timeToExplode < 3 && _timeToExplode > 2.5f) col = _blowUpIndicatorColor;
-	else if (_timeToExplode < 2 && _timeToExplode > 1.75f) col = _blowUpIndicatorColor;
-	else if (_timeToExplode < 1.5f && _timeToExplode > 1.25f) col = _blowUpIndicatorColor;
-	else if (_timeToExplode < 1.f && _timeToExplode > 0.75f) col = _blowUpIndicatorColor;
-	else if (_timeToExplode < 0.5 && _timeToExplode > 0.25f) col = _blowUpIndicatorColor;
+	bool aboutToExplode = (_timeToExplode < 5 && _timeToExplode > 4.5f) ||
+	(_timeToExplode < 4 && _timeToExplode > 3.5f) ||
+	(_timeToExplode < 3 && _timeToExplode > 2.5f) ||
+	(_timeToExplode < 2 && _timeToExplode > 1.75f) ||
+	(_timeToExplode < 1.5f && _timeToExplode > 1.25f) ||
+	(_timeToExplode < 1.f && _timeToExplode > 0.75f) ||
+	(_timeToExplode < 0.5 && _timeToExplode > 0.25f);
 	
+	Rectangle dest = { _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier };
+	Vector2 origin = { _radius * _grabbedScaleMultiplier, _radius * _grabbedScaleMultiplier };
 	// Body
 	DrawTexturePro
-	(
-		GameManager::instance->sprBombBody,
-		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(int(_type) * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
-		{ _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier }, // DEST
-		{ _radius * _grabbedScaleMultiplier, _radius * _grabbedScaleMultiplier }, // ORIGIN
-		0, // ROTATION
-		WHITE // TINT
+	(	GameManager::instance->sprBombBody,
+		{ float(int((_state == RANDOM_MOVEMENT) ? _animationFrame : 0) * BOMB_SPRITE_SIZE), float(int((aboutToExplode) ? BOMB_ABOUT_TO_EXPLODE : _type) * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
+		dest, origin, 0, WHITE
 	);
 
 	// Deco
 	DrawTexturePro
-	(
-		GameManager::instance->sprBombDeco,
+	(	GameManager::instance->sprBombDeco,
 		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(_animationIndex * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
-		{ _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier }, // DEST
-		{ _radius * _grabbedScaleMultiplier, _radius * _grabbedScaleMultiplier }, // ORIGIN
-		0, // ROTATION
-		WHITE // TINT
+		dest, origin, 0, WHITE
 	);
 
-
-	if (DEBUG_BOMB_HITBOX_DRAW)
-	{
-		DrawCircleLinesV ( _position,
-			_radiusVisual, // RADIUS
-			col
-		);
-	}
-
+	if (DEBUG_BOMB_HITBOX_DRAW) DrawCircleLinesV(_position, _radiusVisual, _color);
 }
 
 void Bomb::GameOver() 
