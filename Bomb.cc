@@ -74,11 +74,6 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	if (_movementDirection.x == 1 && _movementDirection.y == 1) _animationIndex = BOMB_ANIM_INDEX_WALK_BOT_RIGHT;
 	else if (_movementDirection.x == 1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_RIGHT;
 	else if (_movementDirection.x == -1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_LEFT;
-
-	if (!_didGameOver && IsMouseButtonPressed(0))
-	{
-		if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX)) _state = GRABBED;
-	}
 }
 
 void Bomb::Update_Grabbed(const float deltaTime) 
@@ -91,15 +86,6 @@ void Bomb::Update_Grabbed(const float deltaTime)
 	_animationIndex = BOMB_ANIM_INDEX_GRABBED;
 
 	_position = GameManager::instance->GetWorldMousePos();
-
-	if (!IsMouseButtonDown(0) || _didGameOver) 
-	{
-		int releasedState = GameManager::instance->GetBombReleasedState(this);
-
-		if (releasedState == BOMB_RELEASED_TOP) { _state = PLACED; _placedDirection = BOMB_PLACED_TOP; }
-		else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; }
-		else _state = RANDOM_MOVEMENT;
-	}
 }
 
 void Bomb::Update_Placed(const float deltaTime) 
@@ -121,10 +107,12 @@ void Bomb::Update_Placed(const float deltaTime)
 	}
 	else 
 	{
+		/*
 		if (!_didGameOver && IsMouseButtonPressed(0))
 		{
 			if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX)) _state = GRABBED;
 		}
+		*/
 	}
 }
 
@@ -154,12 +142,46 @@ void Bomb::Render(const float deltaTime)
 		dest, origin, 0, WHITE
 	);
 
-	if (DEBUG_BOMB_HITBOX_DRAW) DrawCircleLinesV(_position, _radiusVisual, _color);
+	if (DEBUG_BOMB_HITBOX_DRAW) {
+		DrawCircleLinesV(_position, _radiusVisual, _color);
+
+		DrawRectangleLines(
+			_position.x - _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX,
+			_position.y - _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX,
+			_radiusVisual * 2 * BOMB_GRAB_MOUSE_SCALE_INDEX,
+			_radiusVisual * 2 * BOMB_GRAB_MOUSE_SCALE_INDEX + BOMB_GRAB_MOUSE_HITBOX_OFFSET_Y,
+			BLUE);
+	}
 }
 
 void Bomb::GameOver() 
 {
 	_didGameOver = true;
+}
+
+bool Bomb::WasClicked(const Vector2 mousePos) const
+{
+	if (_state == GRABBED) return false;
+
+	return CheckCollisionPointRec(mousePos,
+	{	_position.x - _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX,
+		_position.y - _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX,
+		_radiusVisual * 2 * BOMB_GRAB_MOUSE_SCALE_INDEX,
+		_radiusVisual * 2 * BOMB_GRAB_MOUSE_SCALE_INDEX + BOMB_GRAB_MOUSE_HITBOX_OFFSET_Y 
+	});
+	//return CheckCollisionPointCircle(mousePos, _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX);
+}
+
+void Bomb::Grab() 
+{
+	_state = GRABBED;
+}
+
+void Bomb::LetGo(int releasedState)
+{
+	if (releasedState == BOMB_RELEASED_TOP) { _state = PLACED; _placedDirection = BOMB_PLACED_TOP; }
+	else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; }
+	else _state = RANDOM_MOVEMENT;
 }
 
 void Bomb::CheckCollisionWith(Bomb& b)

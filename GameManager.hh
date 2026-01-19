@@ -27,7 +27,6 @@ public:
 	void InstantiateBomb(Bomb* obj);
 	void DestroyBomb(Bomb* obj);
 
-	int GetBombReleasedState(Bomb* obj);
 	void BombEntered(Bomb* obj, int _placedDirection);
 
 	Vector2 GetWorldMousePos() const;
@@ -42,6 +41,9 @@ protected:
 private:
 	void StartGame();
 
+	void TryGrabBomb(const Vector2 mousePos);
+	int GetBombReleasedState(Bomb* obj);
+
 	vector<Bomb*> _bombGameObjects;
 
 	Camera2D _cam = { 0 };
@@ -53,6 +55,8 @@ private:
 
 	BombHouse* _bombHouseTop;
 	BombHouse* _bombHouseBottom;
+
+	Bomb* _grabbedBomb;
 
 	bool _didGameOver;
 

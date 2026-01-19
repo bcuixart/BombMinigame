@@ -18,18 +18,17 @@ void GameManager::StartGame()
     _bombHouseTop = new BombHouse({0,200},0,1, BOMBHOUSE_TOP);
     _bombHouseBottom = new BombHouse({0,200},0,1, BOMBHOUSE_BOTTOM);
 
+    _grabbedBomb = nullptr;
+
     _didGameOver = false;
 }
 
 void GameManager::Update(float deltaTime)
 {
-    if (_didGameOver) 
+    if (_didGameOver && IsKeyPressed(KEY_R))
     {
-        if (IsKeyPressed(KEY_R)) 
-        {
-            StartGame();
-            return;
-        }
+        StartGame();
+        return;
     }
 
     _timeToSpawnNextBomb -= deltaTime;
@@ -47,9 +46,25 @@ void GameManager::Update(float deltaTime)
 
     for (Bomb* o : _bombGameObjects) o->Update(deltaTime);
 
+    // GRAB BOMB
     unsigned int size = _bombGameObjects.size();
-    for (unsigned int i = 0; i < size; ++i) {
-        for (unsigned int j = i + 1; j < size; ++j) {
+    Vector2 mousePos = GetWorldMousePos();
+    if (!_didGameOver && _grabbedBomb == nullptr && IsMouseButtonPressed(0))
+    {
+        TryGrabBomb(mousePos);
+        if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
+    } 
+	else if (_grabbedBomb != nullptr && (IsMouseButtonReleased(0) || _didGameOver))
+    {
+        _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+        _grabbedBomb = nullptr;
+	}
+
+    // COLLISION CHECK
+    for (unsigned int i = 0; i < size; ++i) 
+    {
+        for (unsigned int j = i + 1; j < size; ++j) 
+        {
             _bombGameObjects[i]->CheckCollisionWith(*_bombGameObjects[j]);
         }
     }
@@ -152,6 +167,25 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
     }
 
     DestroyBomb(obj);
+}
+
+void GameManager::TryGrabBomb(const Vector2 mousePos)
+{
+    unsigned int size = _bombGameObjects.size();
+    // FIND CLOSEST BOMB FROM GRABBED ONES
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        if (_bombGameObjects[i]->WasClicked(mousePos))
+        {
+            if (_grabbedBomb == nullptr) _grabbedBomb = _bombGameObjects[i];
+            else
+            {
+                float distCurrent = Vector2Distance(mousePos, _bombGameObjects[i]->GetPosition());
+                float distGrabbed = Vector2Distance(mousePos, _grabbedBomb->GetPosition());
+                if (distCurrent < distGrabbed) _grabbedBomb = _bombGameObjects[i];
+            }
+        }
+    }
 }
 
 Vector2 GameManager::GetWorldMousePos() const
