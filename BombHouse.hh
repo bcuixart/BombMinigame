@@ -4,9 +4,6 @@
 #include <iostream>
 #include <random>
 
-#include <raylib.h>
-#include <raymath.h>
-
 #include "GameObject.hh"
 #include "Bomb.hh"
 

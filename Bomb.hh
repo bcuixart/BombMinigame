@@ -4,9 +4,6 @@
 #include <iostream>
 #include <random>
 
-#include <raylib.h>
-#include <raymath.h>
-
 #include "GameObject.hh"
 
 #define BOMB_POSITION_PLACED_LEFT_LIMIT_MIN { 0, 200 }

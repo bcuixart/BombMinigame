@@ -57,7 +57,12 @@ void Bomb::Update(float deltaTime)
 void Bomb::Update_RandomMovement(const float deltaTime) 
 {
 	_timeToExplode -= deltaTime;
-	if (_timeToExplode <= 0) GameManager::instance->GameOver();
+	if (_timeToExplode <= 0) 
+	{
+		GameManager::instance->InstantiateExplosion(_position);
+		GameManager::instance->GameOver();
+		GameManager::instance->DestroyBomb(this);
+	}
 
 	_grabbedScaleMultiplier = 1;
 
@@ -156,6 +161,8 @@ void Bomb::Render(const float deltaTime)
 
 void Bomb::GameOver() 
 {
+	_timeToExplode = min(_timeToExplode, 5.1f);
+
 	_didGameOver = true;
 }
 

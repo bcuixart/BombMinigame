@@ -11,6 +11,7 @@
 #include "GameObject.hh"
 #include "Bomb.hh"
 #include "BombHouse.hh"
+#include "Explosion.hh"
 #include "Constants.hh"
 
 using namespace std;
@@ -27,6 +28,9 @@ public:
 	void InstantiateBomb(Bomb* obj);
 	void DestroyBomb(Bomb* obj);
 
+	void InstantiateExplosion(const Vector2 position);
+	void DestroyExplosion(Explosion* expl);
+
 	void BombEntered(Bomb* obj, int _placedDirection);
 
 	Vector2 GetWorldMousePos() const;
@@ -35,6 +39,7 @@ public:
 
 	Texture2D sprBombBody = LoadTexture("Assets/Sprites/Spr_Bomb_Body.png");
 	Texture2D sprBombDeco = LoadTexture("Assets/Sprites/Spr_Bomb_Deco.png");
+	Texture2D sprExplosion = LoadTexture("Assets/Sprites/Spr_Explosion.png");
 
 protected:
 
@@ -45,6 +50,7 @@ private:
 	int GetBombReleasedState(Bomb* obj);
 
 	vector<Bomb*> _bombGameObjects;
+	vector<Explosion*> _explosionGameObjects;
 
 	Camera2D _cam = { 0 };
 

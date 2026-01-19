@@ -12,6 +12,7 @@ GameManager::GameManager()
 void GameManager::StartGame()
 {
     _bombGameObjects = vector<Bomb*>();
+    _explosionGameObjects = vector<Explosion*>();
 
     _timeToSpawnNextBomb = BOMB_SPAWN_TIME_START;
 
@@ -45,6 +46,7 @@ void GameManager::Update(float deltaTime)
     }
 
     for (Bomb* o : _bombGameObjects) o->Update(deltaTime);
+    for (Explosion* o : _explosionGameObjects) o->Update(deltaTime);
 
     // GRAB BOMB
     unsigned int size = _bombGameObjects.size();
@@ -98,7 +100,8 @@ void GameManager::Render(const float deltaTime)
 
     sort(_bombGameObjects.begin(), _bombGameObjects.end(), Bomb::BombLayerSort);
 
-    for (GameObject* o : _bombGameObjects) o->Render(deltaTime);
+    for (Bomb* o : _bombGameObjects) o->Render(deltaTime);
+    for (Explosion* o : _explosionGameObjects) o->Render(deltaTime);
 
     _bombHouseTop->Render(deltaTime);
     _bombHouseBottom->Render(deltaTime);
@@ -121,7 +124,7 @@ void GameManager::GameOver()
     if (_didGameOver) return;
     _didGameOver = true;
 
-    for (GameObject* o : _bombGameObjects) o->GameOver();
+    for (Bomb* o : _bombGameObjects) o->GameOver();
 
     _bombHouseTop->GameOver();
     _bombHouseBottom->GameOver();
@@ -143,6 +146,21 @@ void GameManager::DestroyBomb(Bomb* obj)
     }
 }
 
+void GameManager::InstantiateExplosion(const Vector2 position)
+{
+    _explosionGameObjects.push_back(new Explosion(position, 0, EXPLOSION_SIZE));
+}
+
+void GameManager::DestroyExplosion(Explosion* expl)
+{
+    auto it = std::find(_explosionGameObjects.begin(), _explosionGameObjects.end(), expl);
+
+    if (it != _explosionGameObjects.end())
+    {
+        delete* it;
+        _explosionGameObjects.erase(it);
+    }
+}
 
 int GameManager::GetBombReleasedState(Bomb* obj)
 {
@@ -157,13 +175,22 @@ int GameManager::GetBombReleasedState(Bomb* obj)
 void GameManager::BombEntered(Bomb* obj, int _placedDirection)
 {
     BombType type = obj->GetType();
+
     if (_placedDirection == BOMB_PLACED_TOP)
     {
-        if (_bombHouseTop->GetType() != type) GameOver();
+        if (_bombHouseTop->GetType() != type)
+        {
+            InstantiateExplosion(obj->GetPosition());
+            GameOver();
+        }
     }
     else if (_placedDirection == BOMB_PLACED_BOT)
     {
-        if (_bombHouseBottom->GetType() != type) GameOver();
+        if (_bombHouseBottom->GetType() != type)
+        {
+            InstantiateExplosion(obj->GetPosition());
+            GameOver();
+        }
     }
 
     DestroyBomb(obj);
