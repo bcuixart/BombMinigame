@@ -176,21 +176,15 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
 {
     BombType type = obj->GetType();
 
-    if (_placedDirection == BOMB_PLACED_TOP)
+    if (_placedDirection == BOMB_PLACED_TOP && _bombHouseTop->GetType() != type)
     {
-        if (_bombHouseTop->GetType() != type)
-        {
-            InstantiateExplosion(obj->GetPosition());
-            GameOver();
-        }
+        InstantiateExplosion(obj->GetPosition());
+        GameOver();
     }
-    else if (_placedDirection == BOMB_PLACED_BOT)
+    else if (_placedDirection == BOMB_PLACED_BOT && _bombHouseBottom->GetType() != type)
     {
-        if (_bombHouseBottom->GetType() != type)
-        {
-            InstantiateExplosion(obj->GetPosition());
-            GameOver();
-        }
+        InstantiateExplosion(obj->GetPosition());
+        GameOver();
     }
 
     DestroyBomb(obj);
