@@ -38,8 +38,9 @@ void GameManager::Update(float deltaTime)
         _bombSpawnTime = max(_bombSpawnTime - 0.25f, 1.f);
         _timeToSpawnNextBomb = _bombSpawnTime;
 
-        int spawnPos = GetRandomValue(0, 1);
         float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
+        int spawnPos = GetRandomValue(0, 1);
+
         if (spawnPos == 1) InstantiateBomb(new Bomb({ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150));
         else InstantiateBomb(new Bomb({ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150));
     }
@@ -94,6 +95,9 @@ void GameManager::Render(const float deltaTime)
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_BOT_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_TOP_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
 
+    DrawFPS(-500, -500);
+
+    EndMode2D();
     EndDrawing();
 }
 

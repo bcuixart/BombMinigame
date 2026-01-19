@@ -77,7 +77,7 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 
 	if (!_didGameOver && IsMouseButtonPressed(0))
 	{
-		if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual)) _state = GRABBED;
+		if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX)) _state = GRABBED;
 	}
 }
 
@@ -123,11 +123,9 @@ void Bomb::Update_Placed(const float deltaTime)
 	{
 		if (!_didGameOver && IsMouseButtonPressed(0))
 		{
-			if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual)) _state = GRABBED;
+			if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX)) _state = GRABBED;
 		}
 	}
-
-	// TODO: DESTROY
 }
 
 void Bomb::Render(const float deltaTime) 
