@@ -24,13 +24,17 @@ public:
 	float GetRotation() const;
 	float GetScale() const;
 
+	void MarkForDestroy();
+	bool isMarkedForDestroy() const;
+
 protected:
 	Vector2 _position;
 	float _rotation;
 	float _scale;
 
-private:
+	bool _markedForDestroy;
 
+private:
 };
 
 #endif

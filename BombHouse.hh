@@ -22,8 +22,6 @@ public:
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
 
-	bool GetIsMouseInside(Bomb* obj);
-
 	BombType GetType() const;
 
 protected:

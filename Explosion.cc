@@ -18,10 +18,12 @@ void Explosion::Render(const float deltaTime)
 {
 	Rectangle dest = { _position.x, _position.y, _scale, _scale };
 	Vector2 origin = { _scale / 2, _scale / 2 };
-	// Body
+	
+	float animProgress = (_elapsedLifetime / EXPLOSION_DURATION);
+	animProgress = fminf(animProgress, 1.0f);
 	DrawTexturePro
 	(GameManager::instance->sprExplosion,
-		{ float(int((_elapsedLifetime / EXPLOSION_DURATION) *EXPLOSION_ANIMATION_SPRITES) * EXPLOSION_SPRITE_SIZE), 0, EXPLOSION_SPRITE_SIZE, EXPLOSION_SPRITE_SIZE }, // SOURCE
+		{ float(int(animProgress * EXPLOSION_ANIMATION_SPRITES) * EXPLOSION_SPRITE_SIZE), 0, EXPLOSION_SPRITE_SIZE, EXPLOSION_SPRITE_SIZE }, // SOURCE
 		dest, origin, 0, WHITE
 	);
 }

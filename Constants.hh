@@ -1,6 +1,13 @@
 #ifndef CONSTANTS_HH
 #define CONSTANTS_HH
 
+#define ASSETS_PATH "Assets/"
+#define ASSET_SPRITES_PATH "Sprites/"
+#define ASSET_SPRITE_MAP_BG "Spr_Map_BG.png"
+#define ASSET_SPRITE_BOMB_BODY "Spr_Bomb_Body.png"
+#define ASSET_SPRITE_BOMB_DECO "Spr_Bomb_Deco.png"
+#define ASSET_SPRITE_EXPLOSION "Spr_Explosion.png"
+
 #define MAP_SPRTE_SIZE 1920
 #define MAP_COORD_SIZE 1000
 #define MAP_COORD_RADIUS MAP_COORD_SIZE / 2

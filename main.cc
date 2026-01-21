@@ -30,8 +30,6 @@ int main(int argc, char* argv[])
 
         gameManager->Update(deltaTime);
         gameManager->Render(deltaTime);
-
-		std::cout << 1 / deltaTime << std::endl;
     }
 
     delete gameManager;

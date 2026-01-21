@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector> 
 #include <algorithm> 
+#include <memory> 
 
 #include <raylib.h>
 #include <raymath.h>
@@ -19,13 +20,14 @@ using namespace std;
 class GameManager {
 public:
 	GameManager();
+	~GameManager();
 
 	void Update(const float deltaTime);
 	void Render(const float deltaTime);
 
 	void GameOver();
 
-	void InstantiateBomb(Bomb* obj);
+	void InstantiateBomb(std::unique_ptr<Bomb> obj);
 	void DestroyBomb(Bomb* obj);
 
 	void InstantiateExplosion(const Vector2 position);
@@ -37,9 +39,9 @@ public:
 
 	static GameManager* instance;
 
-	Texture2D sprBombBody = LoadTexture("Assets/Sprites/Spr_Bomb_Body.png");
-	Texture2D sprBombDeco = LoadTexture("Assets/Sprites/Spr_Bomb_Deco.png");
-	Texture2D sprExplosion = LoadTexture("Assets/Sprites/Spr_Explosion.png");
+	Texture2D sprBombBody;
+	Texture2D sprBombDeco;
+	Texture2D sprExplosion;
 
 protected:
 
@@ -49,8 +51,8 @@ private:
 	void TryGrabBomb(const Vector2 mousePos);
 	int GetBombReleasedState(Bomb* obj);
 
-	vector<Bomb*> _bombGameObjects;
-	vector<Explosion*> _explosionGameObjects;
+	vector<std::unique_ptr<Bomb>> _bombGameObjects;
+	vector<std::unique_ptr<Explosion>> _explosionGameObjects;
 
 	Camera2D _cam = { 0 };
 
@@ -59,14 +61,14 @@ private:
 
 	float _timeToSpawnNextBomb = 0;
 
-	BombHouse* _bombHouseTop;
-	BombHouse* _bombHouseBottom;
+	std::unique_ptr<BombHouse> _bombHouseTop;
+	std::unique_ptr<BombHouse> _bombHouseBottom;
 
 	Bomb* _grabbedBomb;
 
 	bool _didGameOver;
 
-	Texture2D _sprMapBG = LoadTexture("Assets/Sprites/Spr_Map_BG.png");
+	Texture2D _sprMapBG;
 };
 
 #endif

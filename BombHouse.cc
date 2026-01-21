@@ -21,9 +21,3 @@ void BombHouse::Render(const float deltaTime)
 {
 	//DrawRectangleV(_position, {100, 100}, ORANGE);
 }
-
-bool BombHouse::GetIsMouseInside(Bomb* obj) 
-{
-	Rectangle rec = {_position.x, _position.y, _position.x+100, _position.y+100};
-	return CheckCollisionCircleRec(obj->GetPosition(), obj->GetScale(), rec);
-}
