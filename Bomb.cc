@@ -98,10 +98,18 @@ void Bomb::Update_Placed(const float deltaTime)
 	if (_position.x < BOMBHOUSE_COORD_HOR_MIN) _position.x = BOMBHOUSE_COORD_HOR_MIN;
 	else if (_position.x > BOMBHOUSE_COORD_HOR_MAX) _position.x = BOMBHOUSE_COORD_HOR_MAX;
 
-	int _movement = BOMB_MOVEMENT_SPEED * deltaTime;
-	_position.y -= (_placedDirection == BOMB_PLACED_TOP) ? _movement : -_movement;
+	if (_placedDirection == BOMB_PLACED_TOP)
+	{
+		_position.y -= BOMB_MOVEMENT_SPEED * deltaTime;
+		_position.y = max(_position.y, (float) -MAP_COORD_RADIUS);
+	}
+	else
+	{
+		_position.y += BOMB_MOVEMENT_SPEED * deltaTime;
+		_position.y = min(_position.y, (float) MAP_COORD_RADIUS); // BOTTOM
+	}
 
-	if (_position.y < -MAP_COORD_RADIUS || _position.y > MAP_COORD_RADIUS) 
+	if (_position.y <= -MAP_COORD_RADIUS || _position.y >= MAP_COORD_RADIUS) 
 	{
 		GameManager::instance->BombEntered(this, this->_placedDirection);
 	}
