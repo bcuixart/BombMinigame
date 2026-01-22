@@ -138,7 +138,8 @@ void Bomb::Render(const float deltaTime)
 		dest, origin, 0, WHITE
 	);
 
-	if (DEBUG_BOMB_HITBOX_DRAW) {
+	if (DEBUG_BOMB_HITBOX_DRAW) 
+	{
 		DrawCircleLinesV(_position, _radiusVisual, _color);
 
 		DrawRectangleLines(
@@ -167,7 +168,6 @@ bool Bomb::WasClicked(const Vector2 mousePos) const
 		_radiusVisual * 2 * BOMB_GRAB_MOUSE_SCALE_INDEX,
 		_radiusVisual * 2 * BOMB_GRAB_MOUSE_SCALE_INDEX + BOMB_GRAB_MOUSE_HITBOX_OFFSET_Y 
 	});
-	//return CheckCollisionPointCircle(mousePos, _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX);
 }
 
 void Bomb::Grab() 

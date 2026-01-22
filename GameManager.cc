@@ -71,21 +71,19 @@ void GameManager::UpdateMainMenu(const float deltaTime)
 void GameManager::UpdateRound(const float deltaTime)
 {
     _roundValues.roundTimeElapsed += deltaTime;
-    if (!_roundValues.addedBlue && _roundValues.roundTimeElapsed >= ROUND_BLUE_BOMB_SPAWN_TIME_START)
+    if (!_roundValues.addedBlue && _roundValues.roundTimeElapsed >= ROUND_BLUE_BOMB_SPAWN_TIME_START) // SPAWN BLUE BOMBS
     {
-        std::cout << "Blue bombs can now spawn!" << std::endl;
         _roundValues.spawnableBombTypes.push_back(BOMB_BLUE);
         _roundValues.addedBlue = true;
     }
-    if (!_roundValues.addedGreen && _roundValues.roundTimeElapsed >= ROUND_GREEN_BOMB_SPAWN_TIME_START)
+    if (!_roundValues.addedGreen && _roundValues.roundTimeElapsed >= ROUND_GREEN_BOMB_SPAWN_TIME_START) // SPAWN GREEN BOMBS
     {
-        std::cout << "Green bombs can now spawn!" << std::endl;
         _roundValues.spawnableBombTypes.push_back(BOMB_GREEN);
         _roundValues.addedGreen = true;
     }
 
     _roundValues.timeToChangeBombHouse -= deltaTime;
-    if (_roundValues.timeToChangeBombHouse <= 0)
+    if (_roundValues.timeToChangeBombHouse <= 0) // CHANGE HOUSE TYPES
     {
         _roundValues.nextBombHouseChangeTime = max(_roundValues.nextBombHouseChangeTime - ROUND_BOMB_HOUSE_CHANGE_TIME_INCREMENT, ROUND_BOMB_HOUSE_CHANGE_TIME_MIN);
         _roundValues.timeToChangeBombHouse = _roundValues.nextBombHouseChangeTime;
@@ -93,7 +91,7 @@ void GameManager::UpdateRound(const float deltaTime)
     }
 
     _roundValues.timeToSpawnNextBomb -= deltaTime;
-    if (_roundValues.timeToSpawnNextBomb <= 0) 
+    if (_roundValues.timeToSpawnNextBomb <= 0) // SPAWN BOMB
     {
         _roundValues.nextBombSpawnTime = max(_roundValues.nextBombSpawnTime - ROUND_BOMB_SPAWN_TIME_INCREMENT, ROUND_BOMB_SPAWN_TIME_MIN);
         _roundValues.timeToSpawnNextBomb = _roundValues.nextBombSpawnTime;
@@ -105,8 +103,7 @@ void GameManager::UpdateRound(const float deltaTime)
         else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150, GetNewBombType()));
     }
 
-    // GRAB BOMB
-    if (_grabbedBomb == nullptr && IsMouseButtonPressed(0))
+    if (_grabbedBomb == nullptr && IsMouseButtonPressed(0)) // GRAB BOMB
     {
         TryGrabBomb(GetWorldMousePos());
         if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
@@ -168,7 +165,7 @@ void GameManager::Update(float deltaTime)
         case GAME_OVER_CUTSCENE:
         {
             UpdateGameOverCutscene(deltaTime);
-            return; // Do not update objects during the cutscene, time effectively stops
+            return; // Objects don't update during the cutscene, time effectively stops
             break;
         }
         case GAME_OVER:
