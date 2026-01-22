@@ -103,19 +103,19 @@ void GameManager::UpdateRound(const float deltaTime)
         else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150, GetNewBombType()));
     }
 
-    if (_grabbedBomb == nullptr && IsMouseButtonPressed(0)) // GRAB BOMB
+    _currentPressed = IsMouseButtonDown(0);
+    if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed) // GRAB BOMB
     {
         TryGrabBomb(GetWorldMousePos());
         if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
     } 
 	else if (_grabbedBomb != nullptr && IsMouseButtonReleased(0))
     {
-        if (!_grabbedBomb->isMarkedForDestroy()) 
-        {
-            _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
-        }
+        if (!_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
         _grabbedBomb = nullptr;
 	}
+
+    _prevPressed = _currentPressed;
 }
 
 void GameManager::UpdateGameOver(const float deltaTime)

@@ -107,6 +107,9 @@ private:
 
 	std::unique_ptr<GameOverOverlay> _gameOverOverlay;
 
+	bool _currentPressed;
+	bool _prevPressed;
+
 	Bomb* _grabbedBomb;
 	Bomb* _gameOverBomb;
 
