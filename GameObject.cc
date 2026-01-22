@@ -39,6 +39,21 @@ float GameObject::GetScale() const
 	return _scale;
 }
 
+void GameObject::SetPosition(const Vector2 p)
+{
+	_position = p;
+}
+
+void GameObject::SetRotation(const float r)
+{
+	_rotation = r;
+}
+
+void GameObject::SetScale(const float s)
+{
+	_scale = s;
+}
+
 void GameObject::MarkForDestroy()
 {
 	_markedForDestroy = true;

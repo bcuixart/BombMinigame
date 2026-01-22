@@ -9,9 +9,13 @@ GameManager::GameManager()
     sprBombBody = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_BODY).c_str());
     sprBombDeco = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_DECO).c_str());
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
+    sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
 
     _state = ROUND;
+
+    _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
 
     StartGame();
 }
@@ -23,6 +27,7 @@ GameManager::~GameManager()
     UnloadTexture(sprBombBody);
 	UnloadTexture(sprBombDeco);
 	UnloadTexture(sprExplosion);
+	UnloadTexture(sprGameOverOverlay);
 	UnloadTexture(_sprMapBG);
 }
 
@@ -35,10 +40,14 @@ void GameManager::StartGame()
     _bombHouseTop = std::make_unique<BombHouse>(Vector2{100,-500},0,1, BOMBHOUSE_TOP);
     _bombHouseBottom = std::make_unique<BombHouse>(Vector2{100,400},0,1, BOMBHOUSE_BOTTOM);
 
+    _gameOverOverlay = std::make_unique<GameOverOverlay>(Vector2{0,0},0,1000);
+
     _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
 
     _roundValues.score = 0;
     _roundValues.spawnableBombTypes = { BOMB_BLACK, BOMB_RED };
+    for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
     _roundValues.currentBombHouseTopType = (GetRandomValue(0, 1) == 0) ? BOMB_BLACK : BOMB_RED;
     _roundValues.currentBombHouseBottomType = (_roundValues.currentBombHouseTopType == BOMB_BLACK) ? BOMB_RED : BOMB_BLACK;
     _roundValues.roundTimeElapsed = 0;
@@ -114,10 +123,31 @@ void GameManager::UpdateRound(const float deltaTime)
 
 void GameManager::UpdateGameOver(const float deltaTime)
 {
+    _gameOverOverlay->Update(deltaTime);
+
     if (IsKeyPressed(KEY_R))
     {
         StartGame();
         return;
+    }
+}
+
+void GameManager::UpdateGameOverCutscene(const float deltaTime)
+{
+    _gameOverOverlay->Update(deltaTime);
+
+    _gameOverCutsceneTimer -= deltaTime;
+
+    if (_gameOverCutsceneTimer <= 0) 
+    {
+        if (_gameOverBomb != nullptr && !_gameOverBomb->isMarkedForDestroy())
+        {
+            InstantiateExplosion(_gameOverBomb->GetPosition());
+            DestroyBomb(_gameOverBomb);
+            _gameOverBomb = nullptr;
+        }
+
+        _state = GAME_OVER;
     }
 }
 
@@ -133,6 +163,12 @@ void GameManager::Update(float deltaTime)
         case ROUND:
         {
             UpdateRound(deltaTime);
+            break;
+        }
+        case GAME_OVER_CUTSCENE:
+        {
+            UpdateGameOverCutscene(deltaTime);
+            return; // Do not update objects during the cutscene, time effectively stops
             break;
         }
         case GAME_OVER:
@@ -203,16 +239,21 @@ void GameManager::Render(const float deltaTime)
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_BOT_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_TOP_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
 
+    _gameOverOverlay->Render(deltaTime);
+
     DrawFPS(-500, -500);
 
     EndMode2D();
     EndDrawing();
 }
 
-void GameManager::GameOver()
+void GameManager::GameOver(Bomb* obj)
 {
-    if (_state == GAME_OVER) return;
-    _state = GAME_OVER;
+    if (_state == GAME_OVER || _state == GAME_OVER_CUTSCENE) return;
+    _state = GAME_OVER_CUTSCENE;
+    _gameOverCutsceneTimer = GAMEOVER_CUTSCENE_TIME;
+
+    _gameOverBomb = obj;
 
     if (_grabbedBomb != nullptr)
     {
@@ -227,10 +268,14 @@ void GameManager::GameOver()
 
     _bombHouseTop->GameOver();
     _bombHouseBottom->GameOver();
+
+    _gameOverOverlay->SetPosition(obj->GetPosition());
+    _gameOverOverlay->GameOver();
 }
 
 void GameManager::InstantiateBomb(std::unique_ptr<Bomb> obj)
 {
+    _roundValues.spawnedBombTypes[obj.get()->GetType()]++;
     _bombGameObjects.push_back(std::move(obj));
 }
 
@@ -241,6 +286,7 @@ void GameManager::DestroyBomb(Bomb* obj)
 
     if (it != _bombGameObjects.end())
     {
+        _roundValues.spawnedBombTypes[(*it)->GetType()]--;
         (*it)->MarkForDestroy();
     }
 }
@@ -277,20 +323,30 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
 
     if (_placedDirection == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(type))
     {
-        InstantiateExplosion(obj->GetPosition());
-        GameOver();
+        ExplodeBomb(obj);
     }
     else if (_placedDirection == BOMB_PLACED_BOT && !_bombHouseBottom->GetIsBombEnteredTypeValid(type))
     {
-        InstantiateExplosion(obj->GetPosition());
-        GameOver();
+        ExplodeBomb(obj);
     }
     else 
     {
         if (_state == ROUND) _roundValues.score++;
+        DestroyBomb(obj);
     }
+}
 
-    DestroyBomb(obj);
+void GameManager::ExplodeBomb(Bomb* obj)
+{
+    if (_state == ROUND)
+    {
+        GameOver(obj);
+    }
+    else
+    {
+        InstantiateExplosion(obj->GetPosition());
+    	DestroyBomb(obj);
+    }
 }
 
 void GameManager::TryGrabBomb(const Vector2 mousePos)
@@ -331,8 +387,27 @@ Vector2 GameManager::GetWorldMousePos() const
 
 BombType GameManager::GetNewBombType() const
 {
-    int index = GetRandomValue(0, _roundValues.spawnableBombTypes.size() - 1);
-    return _roundValues.spawnableBombTypes[index];
+    int chance = GetRandomValue(1, 100);
+    if (chance < BOMB_CHANCE_TO_SPAWN_RANDOM_COLOR) // Random color from spawnable types
+    {
+        int index = GetRandomValue(0, _roundValues.spawnableBombTypes.size() - 1);
+        return _roundValues.spawnableBombTypes[index];
+    }
+    else // The color with the least bombs
+    {
+        BombType leastType = BOMB_INVALID;
+        for (int i = 0; i < (int)_roundValues.spawnableBombTypes.size(); ++i)
+        {
+            BombType t = _roundValues.spawnableBombTypes[i];
+            if (leastType == BOMB_INVALID || _roundValues.spawnedBombTypes[t] < _roundValues.spawnedBombTypes[leastType])
+            {
+                leastType = t;
+            }
+        }
+
+        return leastType;
+    }
+
 }
 
 void GameManager::ChangeBombHouseTypes()

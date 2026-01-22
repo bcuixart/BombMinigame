@@ -57,12 +57,7 @@ void Bomb::Update(float deltaTime)
 void Bomb::Update_RandomMovement(const float deltaTime) 
 {
 	_timeToExplode -= deltaTime;
-	if (_timeToExplode <= 0) 
-	{
-		GameManager::instance->InstantiateExplosion(_position);
-		GameManager::instance->GameOver();
-		GameManager::instance->DestroyBomb(this);
-	}
+	if (_timeToExplode <= 0) GameManager::instance->ExplodeBomb(this);
 
 	_grabbedScaleMultiplier = 1;
 
@@ -84,7 +79,7 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 void Bomb::Update_Grabbed(const float deltaTime) 
 {
 	_timeToExplode -= deltaTime;
-	if (_timeToExplode <= 0) GameManager::instance->GameOver();
+	if (_timeToExplode <= 0) GameManager::instance->ExplodeBomb(this);
 
 	_grabbedScaleMultiplier = BOMB_GRABBED_SCALE_INDEX;
 

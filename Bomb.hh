@@ -1,9 +1,6 @@
 #ifndef BOMB_HH
 #define BOMB_HH
 
-#include <iostream>
-#include <random>
-
 #include "GameObject.hh"
 
 #define BOMB_POSITION_PLACED_LEFT_LIMIT_MIN { 0, 200 }

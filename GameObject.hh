@@ -24,6 +24,10 @@ public:
 	float GetRotation() const;
 	float GetScale() const;
 
+	void SetPosition(const Vector2 p);
+	void SetRotation(const float r);
+	void SetScale(const float s);
+
 	void MarkForDestroy();
 	bool isMarkedForDestroy() const;
 

@@ -1,9 +1,6 @@
 #ifndef EXPLOSION_HH
 #define EXPLOSION_HH
 
-#include <iostream>
-#include <random>
-
 #include "GameObject.hh"
 
 using namespace std;

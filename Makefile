@@ -4,8 +4,8 @@
 CXX      ?= g++
 CXXFLAGS = -Wall -O3 -std=c++17
 
-SRC = main.cc GameManager.cc GameObject.cc Bomb.cc BombHouse.cc Explosion.cc
-HDR = Constants.hh GameManager.hh GameObject.hh Bomb.hh BombHouse.hh Explosion.hh
+SRC = main.cc GameManager.cc GameObject.cc Bomb.cc BombHouse.cc Explosion.cc GameOverOverlay.cc
+HDR = Constants.hh GameManager.hh GameObject.hh Bomb.hh BombHouse.hh Explosion.hh GameOverOverlay.hh
 OBJ = $(SRC:.cc=.o)
 
 TARGET = game

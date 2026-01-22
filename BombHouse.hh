@@ -1,9 +1,6 @@
 #ifndef BOMBHOUSE_HH
 #define BOMBHOUSE_HH
 
-#include <iostream>
-#include <random>
-
 #include "GameObject.hh"
 #include "Bomb.hh"
 
