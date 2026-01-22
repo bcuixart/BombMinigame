@@ -16,13 +16,16 @@ enum BombHouseType {
 
 class BombHouse : public GameObject {
 public:
-	BombHouse(const Vector2 p, const float r, const float s, BombHouseType t);
+	BombHouse(const Vector2 p, const float r, const float s, BombHouseType h);
 	virtual ~BombHouse() {};
 
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
 
+	void SetType(BombType t, bool isFirstTime);
 	BombType GetType() const;
+
+	bool GetIsBombEnteredTypeValid(BombType t) const;
 
 protected:
 
@@ -30,6 +33,9 @@ private:
 	
 	BombHouseType _houseType;
 	BombType _bombType;
+	BombType _bombTypeOld;
+
+	float _lenienceTime;
 
 	Color _color;
 };

@@ -27,7 +27,7 @@ enum BombState
 
 class Bomb : public GameObject {
 public:
-	Bomb(const Vector2 p, const float r, const float s);
+	Bomb(const Vector2 p, const float r, const float s, const BombType t);
 	virtual ~Bomb() {};
 
 	virtual void Update(const float deltaTime);

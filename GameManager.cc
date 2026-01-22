@@ -11,6 +11,8 @@ GameManager::GameManager()
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
 
+    _state = ROUND;
+
     StartGame();
 }
 
@@ -30,49 +32,77 @@ void GameManager::StartGame()
     _bombGameObjects.clear();
     _explosionGameObjects.clear();
 
-    _timeToSpawnNextBomb = BOMB_SPAWN_TIME_START;
-
-    _bombHouseTop = std::make_unique<BombHouse>(Vector2{0,200},0,1, BOMBHOUSE_TOP);
-    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{0,200},0,1, BOMBHOUSE_BOTTOM);
+    _bombHouseTop = std::make_unique<BombHouse>(Vector2{100,-500},0,1, BOMBHOUSE_TOP);
+    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{100,400},0,1, BOMBHOUSE_BOTTOM);
 
     _grabbedBomb = nullptr;
 
-    _didGameOver = false;
+    _roundValues.score = 0;
+    _roundValues.spawnableBombTypes = { BOMB_BLACK, BOMB_RED };
+    _roundValues.currentBombHouseTopType = (GetRandomValue(0, 1) == 0) ? BOMB_BLACK : BOMB_RED;
+    _roundValues.currentBombHouseBottomType = (_roundValues.currentBombHouseTopType == BOMB_BLACK) ? BOMB_RED : BOMB_BLACK;
+    _roundValues.roundTimeElapsed = 0;
+    _roundValues.timeToSpawnNextBomb = ROUND_BOMB_SPAWN_TIME_START;
+    _roundValues.nextBombSpawnTime = ROUND_BOMB_SPAWN_TIME_START;
+    _roundValues.timeToChangeBombHouse = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
+    _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
+    _roundValues.addedBlue = false;
+    _roundValues.addedGreen = false;
+
+    _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
+    _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
+
+    _state = ROUND;
 }
 
-void GameManager::Update(float deltaTime)
+void GameManager::UpdateMainMenu(const float deltaTime)
 {
-    if (_didGameOver && IsKeyPressed(KEY_R))
+}
+
+void GameManager::UpdateRound(const float deltaTime)
+{
+    _roundValues.roundTimeElapsed += deltaTime;
+    if (!_roundValues.addedBlue && _roundValues.roundTimeElapsed >= ROUND_BLUE_BOMB_SPAWN_TIME_START)
     {
-        StartGame();
-        return;
+        std::cout << "Blue bombs can now spawn!" << std::endl;
+        _roundValues.spawnableBombTypes.push_back(BOMB_BLUE);
+        _roundValues.addedBlue = true;
+    }
+    if (!_roundValues.addedGreen && _roundValues.roundTimeElapsed >= ROUND_GREEN_BOMB_SPAWN_TIME_START)
+    {
+        std::cout << "Green bombs can now spawn!" << std::endl;
+        _roundValues.spawnableBombTypes.push_back(BOMB_GREEN);
+        _roundValues.addedGreen = true;
     }
 
-    _timeToSpawnNextBomb -= deltaTime;
-    if (_timeToSpawnNextBomb <= 0 && !_didGameOver) 
+    _roundValues.timeToChangeBombHouse -= deltaTime;
+    if (_roundValues.timeToChangeBombHouse <= 0)
     {
-        _bombSpawnTime = max(_bombSpawnTime - 0.25f, 1.f);
-        _timeToSpawnNextBomb = _bombSpawnTime;
+        _roundValues.nextBombHouseChangeTime = max(_roundValues.nextBombHouseChangeTime - ROUND_BOMB_HOUSE_CHANGE_TIME_INCREMENT, ROUND_BOMB_HOUSE_CHANGE_TIME_MIN);
+        _roundValues.timeToChangeBombHouse = _roundValues.nextBombHouseChangeTime;
+        ChangeBombHouseTypes();
+    }
+
+    _roundValues.timeToSpawnNextBomb -= deltaTime;
+    if (_roundValues.timeToSpawnNextBomb <= 0) 
+    {
+        _roundValues.nextBombSpawnTime = max(_roundValues.nextBombSpawnTime - ROUND_BOMB_SPAWN_TIME_INCREMENT, ROUND_BOMB_SPAWN_TIME_MIN);
+        _roundValues.timeToSpawnNextBomb = _roundValues.nextBombSpawnTime;
 
         float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
         int spawnPos = GetRandomValue(0, 1);
 
-        if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150));
-        else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150));
+        if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150, GetNewBombType()));
+        else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150, GetNewBombType()));
     }
 
-    for (auto& o : _bombGameObjects) o->Update(deltaTime);
-    for (auto& o : _explosionGameObjects) o->Update(deltaTime);
-
     // GRAB BOMB
-    unsigned int size = _bombGameObjects.size();
-    Vector2 mousePos = GetWorldMousePos();
-    if (!_didGameOver && _grabbedBomb == nullptr && IsMouseButtonPressed(0))
+    if (_grabbedBomb == nullptr && IsMouseButtonPressed(0))
     {
-        TryGrabBomb(mousePos);
+        TryGrabBomb(GetWorldMousePos());
         if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
     } 
-	else if (_grabbedBomb != nullptr && (IsMouseButtonReleased(0) || _didGameOver))
+	else if (_grabbedBomb != nullptr && IsMouseButtonReleased(0))
     {
         if (!_grabbedBomb->isMarkedForDestroy()) 
         {
@@ -80,15 +110,42 @@ void GameManager::Update(float deltaTime)
         }
         _grabbedBomb = nullptr;
 	}
+}
 
-    // COLLISION CHECK
-    for (unsigned int i = 0; i < size; ++i) 
+void GameManager::UpdateGameOver(const float deltaTime)
+{
+    if (IsKeyPressed(KEY_R))
     {
-        for (unsigned int j = i + 1; j < size; ++j) 
+        StartGame();
+        return;
+    }
+}
+
+void GameManager::Update(float deltaTime)
+{
+    switch (_state)
+    {
+        case MAIN_MENU: 
         {
-            _bombGameObjects[i]->CheckCollisionWith(*_bombGameObjects[j]);
+            UpdateMainMenu(deltaTime);
+            break;
+        }
+        case ROUND:
+        {
+            UpdateRound(deltaTime);
+            break;
+        }
+        case GAME_OVER:
+        {
+            UpdateGameOver(deltaTime);
+            break;
         }
     }
+
+    for (auto& o : _bombGameObjects) o->Update(deltaTime);
+    for (auto& o : _explosionGameObjects) o->Update(deltaTime);
+
+    CheckBombCollisions();
 
     _bombHouseTop->Update(deltaTime);
     _bombHouseBottom->Update(deltaTime);
@@ -138,7 +195,8 @@ void GameManager::Render(const float deltaTime)
     _bombHouseTop->Render(deltaTime);
     _bombHouseBottom->Render(deltaTime);
 
-    if (_didGameOver) DrawText("Has mort :)", 190, 100, 20, RED);
+    DrawText(TextFormat("%d", _roundValues.score), -240, -490, 40, BLACK);
+    if (_state == GAME_OVER) DrawText("Has mort :)", 0, 0, 40, RED);
 
     DrawRectangleLines(-250, -500, 500, 1000, GREEN);
     DrawRectangleLines(MAP_COORD_HOR_MIN, MAP_COORD_VER_MIN, (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
@@ -153,8 +211,17 @@ void GameManager::Render(const float deltaTime)
 
 void GameManager::GameOver()
 {
-    if (_didGameOver) return;
-    _didGameOver = true;
+    if (_state == GAME_OVER) return;
+    _state = GAME_OVER;
+
+    if (_grabbedBomb != nullptr)
+    {
+        if (!_grabbedBomb->isMarkedForDestroy()) 
+        {
+            _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+        }
+        _grabbedBomb = nullptr;
+	}
 
     for (auto& o : _bombGameObjects) o->GameOver();
 
@@ -208,15 +275,19 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
 {
     BombType type = obj->GetType();
 
-    if (_placedDirection == BOMB_PLACED_TOP && _bombHouseTop->GetType() != type)
+    if (_placedDirection == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(type))
     {
         InstantiateExplosion(obj->GetPosition());
         GameOver();
     }
-    else if (_placedDirection == BOMB_PLACED_BOT && _bombHouseBottom->GetType() != type)
+    else if (_placedDirection == BOMB_PLACED_BOT && !_bombHouseBottom->GetIsBombEnteredTypeValid(type))
     {
         InstantiateExplosion(obj->GetPosition());
         GameOver();
+    }
+    else 
+    {
+        if (_state == ROUND) _roundValues.score++;
     }
 
     DestroyBomb(obj);
@@ -241,7 +312,74 @@ void GameManager::TryGrabBomb(const Vector2 mousePos)
     }
 }
 
+void GameManager::CheckBombCollisions()
+{
+    unsigned int size = _bombGameObjects.size();
+    for (unsigned int i = 0; i < size; ++i) 
+    {
+        for (unsigned int j = i + 1; j < size; ++j) 
+        {
+            _bombGameObjects[i]->CheckCollisionWith(*_bombGameObjects[j]);
+        }
+    }
+}
+
 Vector2 GameManager::GetWorldMousePos() const
 {
     return GetScreenToWorld2D(GetMousePosition(), _cam);
+}
+
+BombType GameManager::GetNewBombType() const
+{
+    int index = GetRandomValue(0, _roundValues.spawnableBombTypes.size() - 1);
+    return _roundValues.spawnableBombTypes[index];
+}
+
+void GameManager::ChangeBombHouseTypes()
+{
+    if (_roundValues.spawnableBombTypes.size() < 2) return; // Invalid case, do nothing
+    if (_roundValues.spawnableBombTypes.size() == 2) // 2 colors: swap them
+    {
+        BombType t = _roundValues.currentBombHouseBottomType;
+        _roundValues.currentBombHouseBottomType = _roundValues.currentBombHouseTopType;
+        _roundValues.currentBombHouseTopType = t;
+    }
+    else if (_roundValues.spawnableBombTypes.size() == 3) // 3 colors: swap colors, and one house must have the missing color
+    {
+        BombType t = _roundValues.currentBombHouseBottomType;
+        _roundValues.currentBombHouseBottomType = _roundValues.currentBombHouseTopType;
+        _roundValues.currentBombHouseTopType = t;
+
+        BombType missing = BOMB_BLACK;
+        for (auto c : _roundValues.spawnableBombTypes)
+        {
+            if (c != _roundValues.currentBombHouseTopType && c != _roundValues.currentBombHouseBottomType) { missing = c; break; }
+        }
+
+        if (GetRandomValue(0,1) == 0) _roundValues.currentBombHouseTopType = missing;
+        else _roundValues.currentBombHouseBottomType = missing;
+    } 
+    else // 4 or more: both houses must change and have a color not present before
+    {
+        BombType newTopType;
+        BombType newBottomType;
+        do 
+        {
+            int indexT = GetRandomValue(0, _roundValues.spawnableBombTypes.size() - 1);
+            int indexB = GetRandomValue(0, _roundValues.spawnableBombTypes.size() - 1);
+            newTopType = _roundValues.spawnableBombTypes[indexT];
+            newBottomType = _roundValues.spawnableBombTypes[indexB];
+        } 
+        while (newTopType == _roundValues.currentBombHouseTopType ||
+            newBottomType == _roundValues.currentBombHouseBottomType ||
+            newBottomType == _roundValues.currentBombHouseTopType ||
+            newTopType == _roundValues.currentBombHouseBottomType ||
+            newTopType == newBottomType
+        );
+        _roundValues.currentBombHouseTopType = newTopType;
+        _roundValues.currentBombHouseBottomType = newBottomType;        
+    }
+
+    _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, false);
+    _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, false);
 }

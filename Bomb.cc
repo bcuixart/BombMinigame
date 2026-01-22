@@ -1,7 +1,7 @@
 #include "Bomb.hh"
 #include "GameManager.hh"
 
-Bomb::Bomb(const Vector2 p, const float r, const float s) : 
+Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) : 
 	GameObject(p, r, s)
 {
 	_radius = s / 2;
@@ -10,11 +10,11 @@ Bomb::Bomb(const Vector2 p, const float r, const float s) :
 
 	_movementDirection = { 1, 1 };
 
-	_type = (rand() % 2 == 0) ? BOMB_BLACK : BOMB_RED;
+	_type = t;
 	_color = (_type == BOMB_BLACK) ? (Color) { 55, 55, 55, 255 } : (Color) { 200, 0, 0, 255 };
 	_state = RANDOM_MOVEMENT;
 
-	_timeToExplode = 30;
+	_timeToExplode = BOMB_EXPLODE_TIME;
 
 	_animationFrame = 0;
 

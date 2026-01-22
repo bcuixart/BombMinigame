@@ -17,6 +17,34 @@
 
 using namespace std;
 
+enum GameState 
+{
+	MAIN_MENU,
+	ROUND,
+	GAME_OVER,
+};
+
+struct RoundValues
+{
+	int score;
+
+	vector<BombType> spawnableBombTypes;
+
+	BombType currentBombHouseTopType;
+	BombType currentBombHouseBottomType;
+
+	float roundTimeElapsed;
+	
+	float timeToSpawnNextBomb;
+	float nextBombSpawnTime;
+
+	float timeToChangeBombHouse;
+	float nextBombHouseChangeTime;
+
+	bool addedBlue;
+	bool addedGreen;
+};
+
 class GameManager {
 public:
 	GameManager();
@@ -48,25 +76,30 @@ protected:
 private:
 	void StartGame();
 
+	void UpdateMainMenu(const float deltaTime);
+	void UpdateRound(const float deltaTime);
+	void UpdateGameOver(const float deltaTime);
+
 	void TryGrabBomb(const Vector2 mousePos);
 	int GetBombReleasedState(Bomb* obj);
+
+	void CheckBombCollisions();
+
+	BombType GetNewBombType() const;
+	void ChangeBombHouseTypes();
+
+	GameState _state;
+	RoundValues _roundValues;
 
 	vector<std::unique_ptr<Bomb>> _bombGameObjects;
 	vector<std::unique_ptr<Explosion>> _explosionGameObjects;
 
 	Camera2D _cam = { 0 };
 
-	const float BOMB_SPAWN_TIME_START = 3;
-	float _bombSpawnTime = 3;
-
-	float _timeToSpawnNextBomb = 0;
-
 	std::unique_ptr<BombHouse> _bombHouseTop;
 	std::unique_ptr<BombHouse> _bombHouseBottom;
 
 	Bomb* _grabbedBomb;
-
-	bool _didGameOver;
 
 	Texture2D _sprMapBG;
 };
