@@ -106,22 +106,10 @@ void Bomb::Update_Placed(const float deltaTime)
 	else
 	{
 		_position.y += BOMB_MOVEMENT_SPEED * deltaTime;
-		_position.y = min(_position.y, (float) MAP_COORD_RADIUS); // BOTTOM
+		_position.y = min(_position.y, (float) MAP_COORD_RADIUS);
 	}
 
-	if (_position.y <= -MAP_COORD_RADIUS || _position.y >= MAP_COORD_RADIUS) 
-	{
-		GameManager::instance->BombEntered(this, this->_placedDirection);
-	}
-	else 
-	{
-		/*
-		if (!_didGameOver && IsMouseButtonPressed(0))
-		{
-			if (CheckCollisionPointCircle(GameManager::instance->GetWorldMousePos(), _position, _radiusVisual * BOMB_GRAB_MOUSE_SCALE_INDEX)) _state = GRABBED;
-		}
-		*/
-	}
+	if (_position.y <= -MAP_COORD_RADIUS || _position.y >= MAP_COORD_RADIUS) GameManager::instance->BombEntered(this, this->_placedDirection);
 }
 
 void Bomb::Render(const float deltaTime) 
