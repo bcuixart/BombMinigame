@@ -8,6 +8,7 @@ GameManager::GameManager()
 
     sprBombBody = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_BODY).c_str());
     sprBombDeco = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_DECO).c_str());
+    sprBombHouse = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMBHOUSE).c_str());
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
     sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
@@ -26,6 +27,7 @@ GameManager::~GameManager()
 
     UnloadTexture(sprBombBody);
 	UnloadTexture(sprBombDeco);
+	UnloadTexture(sprBombHouse);
 	UnloadTexture(sprExplosion);
 	UnloadTexture(sprGameOverOverlay);
 	UnloadTexture(_sprMapBG);
@@ -37,8 +39,8 @@ void GameManager::StartGame()
     _bombGameObjects.clear();
     _explosionGameObjects.clear();
 
-    _bombHouseTop = std::make_unique<BombHouse>(Vector2{100,-500},0,1, BOMBHOUSE_TOP);
-    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{100,400},0,1, BOMBHOUSE_BOTTOM);
+    _bombHouseTop = std::make_unique<BombHouse>(Vector2{0,-425},0,256, BOMBHOUSE_TOP);
+    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{0,425},0,256, BOMBHOUSE_BOTTOM);
 
     _gameOverOverlay = std::make_unique<GameOverOverlay>(Vector2{0,0},0,1000);
 
@@ -222,11 +224,11 @@ void GameManager::Render(const float deltaTime)
             return Bomb::BombLayerSort(a.get(), b.get());
          });
 
-    for (auto& o : _bombGameObjects) o->Render(deltaTime);
-    for (auto& o : _explosionGameObjects) o->Render(deltaTime);
-
     _bombHouseTop->Render(deltaTime);
     _bombHouseBottom->Render(deltaTime);
+
+    for (auto& o : _bombGameObjects) o->Render(deltaTime);
+    for (auto& o : _explosionGameObjects) o->Render(deltaTime);
 
     DrawText(TextFormat("%d", _roundValues.score), -240, -490, 40, BLACK);
     if (_state == GAME_OVER) DrawText("Has mort :)", 0, 0, 40, RED);

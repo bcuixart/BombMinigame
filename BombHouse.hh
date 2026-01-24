@@ -32,6 +32,8 @@ private:
 	BombType _bombType;
 	BombType _bombTypeOld;
 
+	float _radius;
+
 	float _lenienceTime;
 
 	Color _color;

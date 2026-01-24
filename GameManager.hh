@@ -69,6 +69,7 @@ public:
 
 	Texture2D sprBombBody;
 	Texture2D sprBombDeco;
+	Texture2D sprBombHouse;
 	Texture2D sprExplosion;
 	Texture2D sprGameOverOverlay;
 

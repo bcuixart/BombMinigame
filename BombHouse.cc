@@ -1,12 +1,15 @@
 #include "BombHouse.hh"
+#include "GameManager.hh"
 
 BombHouse::BombHouse(const Vector2 p, const float r, const float s, const BombHouseType h) : 
 	GameObject(p, r, s)
 {
 	_houseType = h;
-
+	
 	_bombType = BOMB_INVALID;
 	_bombTypeOld = BOMB_INVALID;
+
+	_radius = s / 2;
 
 	_lenienceTime = -1;
 }
@@ -37,17 +40,26 @@ void BombHouse::Update(float deltaTime)
 
 void BombHouse::Render(const float deltaTime) 
 {
+	Rectangle dest = { _position.x, _position.y, _scale, _scale };
+	Vector2 origin = { _radius, _radius };
+	// Body
+	DrawTexturePro
+	(	GameManager::instance->sprBombHouse,
+		{ 0,0, BOMBHOUSE_SPRITE_SIZE, BOMBHOUSE_SPRITE_SIZE }, // SOURCE
+		dest, origin, 0, WHITE
+	);
+
 	Color c;
 	if (_bombType == BOMB_BLACK) c = BLACK;
 	else if (_bombType == BOMB_RED) c = RED;
 	else if (_bombType == BOMB_BLUE) c = BLUE;
 	else if (_bombType == BOMB_GREEN) c = GREEN;
-	DrawRectangleV(_position, {100, 100}, c);
+	DrawRectangle(_position.x + 100, _position.y, 100, 100, c);
 
 	if (_lenienceTime < 0) return;
 	if (_bombTypeOld == BOMB_BLACK) c = BLACK;
 	else if (_bombTypeOld == BOMB_RED) c = RED;
 	else if (_bombTypeOld == BOMB_BLUE) c = BLUE;
 	else if (_bombTypeOld == BOMB_GREEN) c = GREEN;
-	DrawRectangle(_position.x + 100, _position.y, 50, 50, c);
+	DrawRectangle(_position.x + 200, _position.y, 50, 50, c);
 }
