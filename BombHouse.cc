@@ -50,7 +50,7 @@ void BombHouse::Render(const float deltaTime)
 	Vector2 origin = { _radius, _radius };
 	DrawTexturePro
 	(	GameManager::instance->sprBombHouse,
-		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(0) * BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
+		{ float(int(_animationFrame) * BOMBHOUSE_SPRITE_SIZE), 0, BOMBHOUSE_SPRITE_SIZE, BOMBHOUSE_SPRITE_SIZE }, // SOURCE
 		dest, origin, 0, WHITE
 	);
 
