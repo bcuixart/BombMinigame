@@ -11,6 +11,8 @@ BombHouse::BombHouse(const Vector2 p, const float r, const float s, const BombHo
 
 	_radius = s / 2;
 
+	_animationFrame = 0;
+
 	_lenienceTime = -1;
 }
 
@@ -36,16 +38,19 @@ bool BombHouse::GetIsBombEnteredTypeValid(BombType t) const
 void BombHouse::Update(float deltaTime)
 {
 	_lenienceTime -= deltaTime;
+
+	float animProgress = BOMBHOUSE_ANIMATION_SPEED * deltaTime;
+	_animationFrame += (_houseType == BOMBHOUSE_TOP) ? animProgress : -animProgress;
+	if (int(_animationFrame) >= BOMBHOUSE_ANIMATION_FRAMES) _animationFrame = 0;
 }
 
 void BombHouse::Render(const float deltaTime) 
 {
 	Rectangle dest = { _position.x, _position.y, _scale, _scale };
 	Vector2 origin = { _radius, _radius };
-	// Body
 	DrawTexturePro
 	(	GameManager::instance->sprBombHouse,
-		{ 0,0, BOMBHOUSE_SPRITE_SIZE, BOMBHOUSE_SPRITE_SIZE }, // SOURCE
+		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(0) * BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
 		dest, origin, 0, WHITE
 	);
 

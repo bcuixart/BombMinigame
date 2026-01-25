@@ -36,6 +36,8 @@ private:
 
 	float _lenienceTime;
 
+	float _animationFrame;
+
 	Color _color;
 };
 
