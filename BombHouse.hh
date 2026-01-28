@@ -28,6 +28,8 @@ protected:
 
 private:
 	
+	void DrawScreen() const;
+
 	BombHouseType _houseType;
 	BombType _bombType;
 	BombType _bombTypeOld;
