@@ -54,6 +54,15 @@ void BombHouse::Render(const float deltaTime)
 		dest, origin, 0, WHITE
 	);
 
+	if (_houseType == BOMBHOUSE_BOTTOM) dest = { BOMBHOUSE_SCREEN_BOT_COORD_X, BOMBHOUSE_SCREEN_BOT_COORD_Y, BOMBHOUSE_SCREEN_COORD_SIZE, BOMBHOUSE_SCREEN_COORD_SIZE };
+	else dest = { BOMBHOUSE_SCREEN_TOP_COORD_X, BOMBHOUSE_SCREEN_TOP_COORD_Y, BOMBHOUSE_SCREEN_COORD_SIZE, BOMBHOUSE_SCREEN_COORD_SIZE };
+	origin = { BOMBHOUSE_SCREEN_COORD_SIZE / 2, BOMBHOUSE_SCREEN_COORD_SIZE / 2 };	
+	DrawTexturePro
+	(	GameManager::instance->sprBombHouseScreen,
+		{ float(int(_bombType) * BOMBHOUSE_SCREEN_SPRITE_SIZE), 0, BOMBHOUSE_SCREEN_SPRITE_SIZE, BOMBHOUSE_SCREEN_SPRITE_SIZE }, // SOURCE
+		dest, origin, 0, WHITE
+	);		
+
 	Color c;
 	if (_bombType == BOMB_BLACK) c = BLACK;
 	else if (_bombType == BOMB_RED) c = RED;
