@@ -57,6 +57,7 @@ void GameManager::StartGame()
     _roundValues.roundTimeElapsed = 0;
     _roundValues.timeToSpawnNextBomb = ROUND_BOMB_SPAWN_TIME_START;
     _roundValues.nextBombSpawnTime = ROUND_BOMB_SPAWN_TIME_START;
+    _roundValues.currentMaxBombs = ROUND_MAX_BOMBS_START;
     _roundValues.timeToChangeBombHouse = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
     _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
     _roundValues.addedBlue = false;
@@ -94,17 +95,21 @@ void GameManager::UpdateRound(const float deltaTime)
         ChangeBombHouseTypes();
     }
 
+    _roundValues.currentMaxBombs += ROUND_MAX_BOMBS_INCREMENT * deltaTime;
     _roundValues.timeToSpawnNextBomb -= deltaTime;
     if (_roundValues.timeToSpawnNextBomb <= 0) // SPAWN BOMB
     {
         _roundValues.nextBombSpawnTime = max(_roundValues.nextBombSpawnTime - ROUND_BOMB_SPAWN_TIME_INCREMENT, ROUND_BOMB_SPAWN_TIME_MIN);
         _roundValues.timeToSpawnNextBomb = _roundValues.nextBombSpawnTime;
 
-        float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
-        int spawnPos = GetRandomValue(0, 1);
+        if (_bombGameObjects.size() < (unsigned int)_roundValues.currentMaxBombs)
+        {
+            float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
+            int spawnPos = GetRandomValue(0, 1);
 
-        if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150, GetNewBombType()));
-        else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150, GetNewBombType()));
+            if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150, GetNewBombType()));
+            else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150, GetNewBombType()));
+        }
     }
 
     _currentPressed = IsMouseButtonDown(0);

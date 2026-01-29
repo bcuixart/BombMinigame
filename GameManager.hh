@@ -41,6 +41,8 @@ struct RoundValues
 	float timeToSpawnNextBomb;
 	float nextBombSpawnTime;
 
+	float currentMaxBombs;
+
 	float timeToChangeBombHouse;
 	float nextBombHouseChangeTime;
 
