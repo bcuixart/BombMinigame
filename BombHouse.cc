@@ -44,7 +44,7 @@ void BombHouse::Update(float deltaTime)
 	if (int(_animationFrame) >= BOMBHOUSE_ANIMATION_FRAMES) _animationFrame = 0;
 }
 
-void BombHouse::DrawScreen() const
+void BombHouse::RenderScreen() const
 {
 	Rectangle dest;
 
@@ -101,8 +101,6 @@ void BombHouse::Render(const float deltaTime)
 		{ float(int(_animationFrame) * BOMBHOUSE_SPRITE_SIZE), 0, BOMBHOUSE_SPRITE_SIZE, BOMBHOUSE_SPRITE_SIZE }, // SOURCE
 		dest, origin, 0, WHITE
 	);
-
-	DrawScreen();
 
 	if (DEBUG_BOMBHOUSE_TYPE_DRAW)
 	{

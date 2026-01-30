@@ -13,6 +13,8 @@ GameManager::GameManager()
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
     sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
+    _sprMapMG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_MG).c_str());
+    _sprMapFG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_FG).c_str());
 
     _state = ROUND;
 
@@ -33,6 +35,8 @@ GameManager::~GameManager()
 	UnloadTexture(sprExplosion);
 	UnloadTexture(sprGameOverOverlay);
 	UnloadTexture(_sprMapBG);
+	UnloadTexture(_sprMapMG);
+	UnloadTexture(_sprMapFG);
 }
 
 void GameManager::StartGame()
@@ -217,13 +221,19 @@ void GameManager::Render(const float deltaTime)
     BeginMode2D(_cam);
     ClearBackground(RAYWHITE);
 
+    // Map bg
     DrawTexturePro(
-        _sprMapBG,
-        { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE },  // SOURCE
-        { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE }, // DEST
-        { 0, 0 }, // ORIGIN
-        0.0f,
-        WHITE
+        _sprMapBG, { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE }, { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    _bombHouseTop->Render(deltaTime);
+    _bombHouseBottom->Render(deltaTime);
+
+    // Map mg
+    DrawTexturePro(
+        _sprMapMG, { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE }, { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE },
+        { 0, 0 }, 0.0f, WHITE
     );
 
     sort(_bombGameObjects.begin(), _bombGameObjects.end(),
@@ -231,8 +241,6 @@ void GameManager::Render(const float deltaTime)
             return Bomb::BombLayerSort(a.get(), b.get());
          });
 
-    _bombHouseTop->Render(deltaTime);
-    _bombHouseBottom->Render(deltaTime);
 
     for (auto& o : _bombGameObjects) o->Render(deltaTime);
     for (auto& o : _explosionGameObjects) o->Render(deltaTime);
@@ -244,6 +252,18 @@ void GameManager::Render(const float deltaTime)
     DrawRectangleLines(MAP_COORD_HOR_MIN, MAP_COORD_VER_MIN, (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_BOT_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_TOP_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
+
+    // Map fg
+    DrawTexturePro(
+        _sprMapFG, { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE }, { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    // Screens
+    _bombHouseTop->RenderScreen();
+    _bombHouseBottom->RenderScreen();
+
+    if (_grabbedBomb != nullptr && !_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->Render(deltaTime); // Render grabbed bomb on top of everything
 
     _gameOverOverlay->Render(deltaTime);
 

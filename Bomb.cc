@@ -11,7 +11,10 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	_movementDirection = { 1, 1 };
 
 	_type = t;
-	_color = (_type == BOMB_BLACK) ? (Color) { 55, 55, 55, 255 } : (Color) { 200, 0, 0, 255 };
+	if (_type == BOMB_BLACK) _color = { 55, 55, 55, 255 };
+	else if (_type == BOMB_RED) _color = { 200, 0, 0, 255 };
+	else if (_type == BOMB_BLUE) _color = { 0, 0, 200, 255 };
+	else if (_type == BOMB_GREEN) _color = { 0, 200, 0, 255 };
 	_state = RANDOM_MOVEMENT;
 
 	_timeToExplode = BOMB_EXPLODE_TIME;
@@ -153,7 +156,8 @@ void Bomb::Render(const float deltaTime)
 
 void Bomb::GameOver() 
 {
-	_timeToExplode = min(_timeToExplode, 5.1f);
+	float newTimeToExplode = GetRandomValue(10, 50) / 10.f;
+	_timeToExplode = min(_timeToExplode, newTimeToExplode);
 
 	_didGameOver = true;
 }

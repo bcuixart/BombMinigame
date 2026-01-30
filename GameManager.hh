@@ -120,6 +120,8 @@ private:
 	float _gameOverCutsceneTimer;
 
 	Texture2D _sprMapBG;
+	Texture2D _sprMapMG;
+	Texture2D _sprMapFG;
 };
 
 #endif

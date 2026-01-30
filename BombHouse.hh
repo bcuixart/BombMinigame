@@ -19,6 +19,8 @@ public:
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
 
+	void RenderScreen() const;
+
 	void SetType(BombType t, bool isFirstTime);
 	BombType GetType() const;
 
@@ -27,9 +29,6 @@ public:
 protected:
 
 private:
-	
-	void DrawScreen() const;
-
 	BombHouseType _houseType;
 	BombType _bombType;
 	BombType _bombTypeOld;
