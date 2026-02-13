@@ -81,6 +81,7 @@ private:
 	bool _didStepSound002;
 
 	Sound _windUpLoopSound;
+	Sound _fuseLoopSound;
 };
 
 #endif

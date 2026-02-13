@@ -28,6 +28,13 @@ GameManager::GameManager()
 
 GameManager::~GameManager()
 {
+    _bombGameObjects.clear();
+    _explosionGameObjects.clear();
+
+    _bombHouseTop.reset();
+    _bombHouseBottom.reset();
+    _gameOverOverlay.reset();
+
     GameManager::instance = nullptr;
 
     UnloadTexture(sprBombBody);
@@ -39,13 +46,10 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMapBG);
 	UnloadTexture(_sprMapMG);
 	UnloadTexture(_sprMapFG);
-
-    audioManager.release();
 }
 
 void GameManager::StartGame()
 {
-    // Clear vectors, unique_ptr automatically frees memory
     _bombGameObjects.clear();
     _explosionGameObjects.clear();
 

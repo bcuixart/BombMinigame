@@ -26,6 +26,10 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME);
 	PlaySound(_windUpLoopSound);
 
+	_fuseLoopSound = GameManager::instance->audioManager->GetBombFuseLoopSound();
+	SetSoundVolume(_fuseLoopSound, 0);
+	PlaySound(_fuseLoopSound);
+
 	_animationFrame = 0;
 
 	_didGameOver = false;
@@ -35,6 +39,7 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 Bomb::~Bomb()
 {
 	GameManager::instance->audioManager->UnloadBombWindUpLoopSound(&_windUpLoopSound);
+	GameManager::instance->audioManager->UnloadBombFuseLoopSound(&_fuseLoopSound);
 }
 
 BombType Bomb::GetType() const 
@@ -54,6 +59,11 @@ void Bomb::Update(float deltaTime)
 
 	SetSoundPan(_windUpLoopSound, GetPan());
 	if (!IsSoundPlaying(_windUpLoopSound)) PlaySound(_windUpLoopSound);
+
+	SetSoundPan(_fuseLoopSound, GetPan());
+	float fuseSoundMultiplier = Clamp(1 - (_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
+	SetSoundVolume(_fuseLoopSound, BOMB_FUSE_LOOP_SOUND_VOLUME * _timeToExplode * fuseSoundMultiplier);
+	if (!IsSoundPlaying(_fuseLoopSound)) PlaySound(_fuseLoopSound);
 
 	_collidedThisFrame = false;
 
@@ -210,6 +220,8 @@ bool Bomb::WasClicked(const Vector2 mousePos) const
 
 void Bomb::Grab() 
 {
+	SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME);
+
 	_state = GRABBED;
 }
 
@@ -219,7 +231,6 @@ void Bomb::LetGo(int releasedState)
 	else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; }
 	else 
 	{
-		SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME);
 		_state = RANDOM_MOVEMENT; 
 	}
 }
@@ -235,6 +246,7 @@ void Bomb::CheckCollisionWith(Bomb& b)
 
 	if (dist < minDist * minDist)
 	{
+		GameManager::instance->audioManager->PlayBombCollisionSound(GetPan());
 		ResolveCollisionWith(b, delta, sqrt(dist), minDist);
 	}
 }
