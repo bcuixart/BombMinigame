@@ -25,7 +25,7 @@ enum BombState
 class Bomb : public GameObject {
 public:
 	Bomb(const Vector2 p, const float r, const float s, const BombType t);
-	virtual ~Bomb() {};
+	virtual ~Bomb();
 
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
@@ -74,6 +74,11 @@ private:
 	bool _didGameOver;
 
 	int _placedDirection;
+
+	bool _didStepSound001;
+	bool _didStepSound002;
+
+	Sound _windUpLoopSound;
 };
 
 #endif

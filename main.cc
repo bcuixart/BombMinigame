@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
         InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BOMB GAME");
     }
 
+    InitAudioDevice();
     SetTargetFPS(30);
 
     GameManager* gameManager = new GameManager();
@@ -34,6 +35,7 @@ int main(int argc, char* argv[])
 
     delete gameManager;
 
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;

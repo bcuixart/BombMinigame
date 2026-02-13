@@ -9,6 +9,7 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include "AudioManager.hh"
 #include "GameObject.hh"
 #include "Bomb.hh"
 #include "BombHouse.hh"
@@ -68,6 +69,8 @@ public:
 	Vector2 GetWorldMousePos() const;
 
 	static GameManager* instance;
+
+	std::unique_ptr<AudioManager> audioManager;
 
 	Texture2D sprBombBody;
 	Texture2D sprBombDeco;

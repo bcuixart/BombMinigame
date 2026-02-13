@@ -1,0 +1,32 @@
+#ifndef AUDIOMANAGER_HH
+#define AUDIOMANAGER_HH
+
+#include <iostream>
+#include <string>
+#include <raylib.h>
+#include <raymath.h>
+
+#include "Constants.hh"
+
+class AudioManager {
+public:
+	AudioManager();
+	~AudioManager();
+
+	void Update(const float deltaTime);
+
+	void PlayBombStepSound();
+
+	Sound GetBombWindUpLoopSound();
+	void UnloadBombWindUpLoopSound(Sound* sound);
+
+protected:
+
+private:
+	Sound _bombStepSounds[ASSET_SOUND_BOMB_STEP_SOUNDS];
+	Sound _bombWindUpLoopSound;
+
+	int _currentBombStepSoundIndex;
+};
+
+#endif

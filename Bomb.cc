@@ -19,10 +19,22 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 
 	_timeToExplode = BOMB_EXPLODE_TIME;
 
+	_didStepSound001 = false;
+	_didStepSound002 = false;
+
+	_windUpLoopSound = GameManager::instance->audioManager->GetBombWindUpLoopSound();
+	PlaySound(_windUpLoopSound);
+
 	_animationFrame = 0;
 
 	_didGameOver = false;
 	_collidedThisFrame = false;
+}
+
+Bomb::~Bomb()
+{
+	StopSound(_windUpLoopSound);
+	GameManager::instance->audioManager->UnloadBombWindUpLoopSound(&_windUpLoopSound);
 }
 
 BombType Bomb::GetType() const 
@@ -33,7 +45,14 @@ BombType Bomb::GetType() const
 void Bomb::Update(float deltaTime)
 {
 	_animationFrame += ANIMATION_SPEED * deltaTime;
-	if (int(_animationFrame) >= ANIMATION_FRAMES) _animationFrame = 0;
+	if (int(_animationFrame) >= ANIMATION_FRAMES) 
+	{
+		_didStepSound001 = false;
+		_didStepSound002 = false;
+		_animationFrame = 0;
+	}
+
+	if (!IsSoundPlaying(_windUpLoopSound)) PlaySound(_windUpLoopSound);
 
 	_collidedThisFrame = false;
 
@@ -77,6 +96,10 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	if (_movementDirection.x == 1 && _movementDirection.y == 1) _animationIndex = BOMB_ANIM_INDEX_WALK_BOT_RIGHT;
 	else if (_movementDirection.x == 1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_RIGHT;
 	else if (_movementDirection.x == -1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_LEFT;
+
+	// Sounds
+	if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_001 && !_didStepSound001) { GameManager::instance->audioManager->PlayBombStepSound(); _didStepSound001 = true; }
+	else if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_002 && !_didStepSound002) { GameManager::instance->audioManager->PlayBombStepSound(); _didStepSound002 = true; }
 }
 
 void Bomb::Update_Grabbed(const float deltaTime) 

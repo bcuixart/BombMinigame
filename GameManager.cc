@@ -16,6 +16,8 @@ GameManager::GameManager()
     _sprMapMG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_MG).c_str());
     _sprMapFG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_FG).c_str());
 
+	audioManager = std::make_unique<AudioManager>();
+
     _state = ROUND;
 
     _grabbedBomb = nullptr;
@@ -37,6 +39,8 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMapBG);
 	UnloadTexture(_sprMapMG);
 	UnloadTexture(_sprMapFG);
+
+    audioManager.release();
 }
 
 void GameManager::StartGame()
