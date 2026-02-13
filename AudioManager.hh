@@ -15,6 +15,9 @@ public:
 
 	void Update(const float deltaTime);
 
+	void PlayMusic();
+	void StopMusic();
+
 	void PlayBombStepSound(const float pan);
 	void PlayBombCollisionSound(const float pan);
 
@@ -29,6 +32,9 @@ protected:
 private:
 	Sound _bombStepSounds[ASSET_SOUND_BOMB_STEP_SOUNDS];
 	Sound _bombCollisionSounds[ASSET_SOUND_BOMB_COLLISION_SOUNDS];
+
+	Music _gameMusic;
+	bool _playingMusic;
 
 	int _currentBombStepSoundIndex;
 	int _currentBombCollisionSoundIndex;

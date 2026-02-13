@@ -14,19 +14,47 @@ AudioManager::AudioManager()
 		((i < 10) ? "00" : "0") + std::to_string(i) + ASSET_SOUND_BOMB_COLLISION_SUFFIX).c_str());
 	}
 
+
+	_gameMusic = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_MUSIC).c_str());
+
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
+
+	_playingMusic = false;
 }
 
 AudioManager::~AudioManager()
 {
 	for (int i = 0; i < ASSET_SOUND_BOMB_STEP_SOUNDS; i++) UnloadSound(_bombStepSounds[i]);
 	for (int i = 0; i < ASSET_SOUND_BOMB_COLLISION_SOUNDS; i++) UnloadSound(_bombCollisionSounds[i]);
+
+	UnloadMusicStream(_gameMusic);
 }
 
 void AudioManager::Update(const float deltaTime)
 {
+	if (_playingMusic)
+	{
+		UpdateMusicStream(_gameMusic);
 
+		float musicTime = GetMusicTimePlayed(_gameMusic);
+		if (musicTime >= ASSET_SOUND_MUSIC_LOOP_END + 1)
+		{
+			SeekMusicStream(_gameMusic, musicTime - ASSET_SOUND_MUSIC_LOOP_LENGTH);
+		}
+	}
+}
+
+void AudioManager::PlayMusic()
+{
+	PlayMusicStream(_gameMusic);
+	_playingMusic = true;
+}
+
+void AudioManager::StopMusic()
+{
+	//StopMusicStream(_gameMusic);
+	//_playingMusic = false;
 }
 
 void AudioManager::PlayBombStepSound(const float pan)

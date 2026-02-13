@@ -78,6 +78,8 @@ void GameManager::StartGame()
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
+	audioManager->PlayMusic();
+
     _state = ROUND;
 }
 
@@ -204,6 +206,8 @@ void GameManager::Update(float deltaTime)
     _bombHouseTop->Update(deltaTime);
     _bombHouseBottom->Update(deltaTime);
 
+    audioManager->Update(deltaTime);
+
     _bombGameObjects.erase(std::remove_if(_bombGameObjects.begin(), _bombGameObjects.end(),
         [](const std::unique_ptr<Bomb>& p) { return p->isMarkedForDestroy(); }),
         _bombGameObjects.end());
@@ -286,6 +290,8 @@ void GameManager::GameOver(Bomb* obj)
     if (_state == GAME_OVER || _state == GAME_OVER_CUTSCENE) return;
     _state = GAME_OVER_CUTSCENE;
     _gameOverCutsceneTimer = GAMEOVER_CUTSCENE_TIME;
+
+    audioManager->StopMusic();
 
     _gameOverBomb = obj;
 
