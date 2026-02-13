@@ -28,9 +28,11 @@ void AudioManager::Update(const float deltaTime)
 
 }
 
-void AudioManager::PlayBombStepSound()
+void AudioManager::PlayBombStepSound(const float pan)
 {
+	SetSoundPan(_bombStepSounds[_currentBombStepSoundIndex], pan);
 	PlaySound(_bombStepSounds[_currentBombStepSoundIndex]);
+
 	_currentBombStepSoundIndex = (_currentBombStepSoundIndex + 1) % ASSET_SOUND_BOMB_STEP_SOUNDS;
 }
 

@@ -23,6 +23,7 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	_didStepSound002 = false;
 
 	_windUpLoopSound = GameManager::instance->audioManager->GetBombWindUpLoopSound();
+	SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME);
 	PlaySound(_windUpLoopSound);
 
 	_animationFrame = 0;
@@ -33,7 +34,6 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 
 Bomb::~Bomb()
 {
-	StopSound(_windUpLoopSound);
 	GameManager::instance->audioManager->UnloadBombWindUpLoopSound(&_windUpLoopSound);
 }
 
@@ -52,6 +52,7 @@ void Bomb::Update(float deltaTime)
 		_animationFrame = 0;
 	}
 
+	SetSoundPan(_windUpLoopSound, GetPan());
 	if (!IsSoundPlaying(_windUpLoopSound)) PlaySound(_windUpLoopSound);
 
 	_collidedThisFrame = false;
@@ -98,8 +99,8 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	else if (_movementDirection.x == -1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_LEFT;
 
 	// Sounds
-	if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_001 && !_didStepSound001) { GameManager::instance->audioManager->PlayBombStepSound(); _didStepSound001 = true; }
-	else if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_002 && !_didStepSound002) { GameManager::instance->audioManager->PlayBombStepSound(); _didStepSound002 = true; }
+	if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_001 && !_didStepSound001) { GameManager::instance->audioManager->PlayBombStepSound(GetPan()); _didStepSound001 = true; }
+	else if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_002 && !_didStepSound002) { GameManager::instance->audioManager->PlayBombStepSound(GetPan()); _didStepSound002 = true; }
 }
 
 void Bomb::Update_Grabbed(const float deltaTime) 
@@ -124,16 +125,26 @@ void Bomb::Update_Placed(const float deltaTime)
 	if (_position.x < BOMBHOUSE_COORD_HOR_MIN) _position.x = BOMBHOUSE_COORD_HOR_MIN;
 	else if (_position.x > BOMBHOUSE_COORD_HOR_MAX) _position.x = BOMBHOUSE_COORD_HOR_MAX;
 
+	float volumeMultiplier;
 	if (_placedDirection == BOMB_PLACED_TOP)
 	{
+		volumeMultiplier = abs((-MAP_COORD_RADIUS) - _position.y);
+		volumeMultiplier /= abs(BOMBHOUSE_COORD_TOP_VER_POS - -MAP_COORD_RADIUS);
+
 		_position.y -= BOMB_MOVEMENT_SPEED * deltaTime;
 		_position.y = max(_position.y, (float) -MAP_COORD_RADIUS);
 	}
 	else
 	{
+		volumeMultiplier = abs(_position.y - (MAP_COORD_RADIUS));
+		volumeMultiplier /= abs(BOMBHOUSE_COORD_BOT_VER_POS - (MAP_COORD_RADIUS));
+
 		_position.y += BOMB_MOVEMENT_SPEED * deltaTime;
 		_position.y = min(_position.y, (float) MAP_COORD_RADIUS);
 	}
+
+	volumeMultiplier = Clamp(volumeMultiplier, 0, 1);
+	SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME * volumeMultiplier);
 
 	if (_position.y <= -MAP_COORD_RADIUS || _position.y >= MAP_COORD_RADIUS) GameManager::instance->BombEntered(this, this->_placedDirection);
 }
@@ -206,7 +217,11 @@ void Bomb::LetGo(int releasedState)
 {
 	if (releasedState == BOMB_RELEASED_TOP) { _state = PLACED; _placedDirection = BOMB_PLACED_TOP; }
 	else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; }
-	else _state = RANDOM_MOVEMENT;
+	else 
+	{
+		SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME);
+		_state = RANDOM_MOVEMENT; 
+	}
 }
 
 void Bomb::CheckCollisionWith(Bomb& b)
@@ -254,4 +269,11 @@ bool Bomb::BombLayerSort(const Bomb* a, const Bomb* b)
 	if (b->_state == GRABBED) return true;
 
 	return a->_position.y < b->_position.y;
+}
+
+float Bomb::GetPan() const
+{
+	float pan = (_position.x - MAP_COORD_HOR_MIN) / (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN);
+	pan = 1 - pan;
+	return Clamp(pan, 0, 1);
 }

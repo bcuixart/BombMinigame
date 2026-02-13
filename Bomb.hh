@@ -52,6 +52,8 @@ private:
 	void Update_Grabbed(const float deltaTime);
 	void Update_Placed(const float deltaTime);
 
+	float GetPan() const;
+
 	BombType _type;
 	BombState _state;
 

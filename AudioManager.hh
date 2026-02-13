@@ -15,7 +15,7 @@ public:
 
 	void Update(const float deltaTime);
 
-	void PlayBombStepSound();
+	void PlayBombStepSound(const float pan);
 
 	Sound GetBombWindUpLoopSound();
 	void UnloadBombWindUpLoopSound(Sound* sound);
