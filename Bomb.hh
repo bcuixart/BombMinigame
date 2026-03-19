@@ -11,7 +11,7 @@
 #define BOMB_MOVEMENT_SPEED 100
 
 #define ANIMATION_FRAMES 30
-#define ANIMATION_SPEED 40
+#define ANIMATION_SPEED 33.75f
 
 using namespace std;
 

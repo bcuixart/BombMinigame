@@ -53,8 +53,13 @@ void AudioManager::PlayMusic()
 
 void AudioManager::StopMusic()
 {
-	//StopMusicStream(_gameMusic);
-	//_playingMusic = false;
+	StopMusicStream(_gameMusic);
+	_playingMusic = false;
+}
+
+float AudioManager::GetMusicTime() const
+{
+	return GetMusicTimePlayed(_gameMusic);
 }
 
 void AudioManager::PlayBombStepSound(const float pan)

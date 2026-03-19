@@ -30,7 +30,8 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	SetSoundVolume(_fuseLoopSound, 0);
 	PlaySound(_fuseLoopSound);
 
-	_animationFrame = 0;
+	float musicTime = GameManager::instance->audioManager->GetMusicTime();
+	_animationFrame = fmodf(musicTime * ANIMATION_SPEED, (float)ANIMATION_FRAMES);
 
 	_didGameOver = false;
 	_collidedThisFrame = false;
@@ -49,8 +50,12 @@ BombType Bomb::GetType() const
 
 void Bomb::Update(float deltaTime)
 {
-	_animationFrame += ANIMATION_SPEED * deltaTime;
-	if (int(_animationFrame) >= ANIMATION_FRAMES) 
+	float prevFrame = _animationFrame;
+
+	float musicTime = GameManager::instance->audioManager->GetMusicTime();
+	_animationFrame = fmodf(musicTime * 33.75f, (float)ANIMATION_FRAMES);
+
+	if (_animationFrame < prevFrame)
 	{
 		_didStepSound001 = false;
 		_didStepSound002 = false;

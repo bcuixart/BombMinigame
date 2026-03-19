@@ -18,6 +18,8 @@ public:
 	void PlayMusic();
 	void StopMusic();
 
+	float GetMusicTime() const;
+
 	void PlayBombStepSound(const float pan);
 	void PlayBombCollisionSound(const float pan);
 

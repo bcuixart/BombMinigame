@@ -173,6 +173,8 @@ void GameManager::UpdateGameOverCutscene(const float deltaTime)
 
 void GameManager::Update(float deltaTime)
 {
+    audioManager->Update(deltaTime);
+
     switch (_state)
     {
         case MAIN_MENU: 
@@ -205,8 +207,6 @@ void GameManager::Update(float deltaTime)
 
     _bombHouseTop->Update(deltaTime);
     _bombHouseBottom->Update(deltaTime);
-
-    audioManager->Update(deltaTime);
 
     _bombGameObjects.erase(std::remove_if(_bombGameObjects.begin(), _bombGameObjects.end(),
         [](const std::unique_ptr<Bomb>& p) { return p->isMarkedForDestroy(); }),
