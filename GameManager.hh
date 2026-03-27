@@ -106,7 +106,7 @@ private:
 	BombType GetNewBombType() const;
 	void ChangeBombHouseTypes();
 
-	void InstantiateExplosion(const Vector2 position);
+	void InstantiateExplosion(const Vector2 position, const float pan);
 
 	GameState _state;
 	RoundValues _roundValues;

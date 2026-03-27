@@ -23,7 +23,10 @@
 #define ASSET_SOUND_BOMB_COLLISION_SUFFIX ".wav"
 #define ASSET_SOUND_BOMB_WINDUP_LOOP "Bomb_WindUp_Loop.wav"
 #define ASSET_SOUND_BOMB_FUSE_LOOP "Bomb_Fuse_Loop.ogg"
+#define ASSET_SOUND_BOMB_EXPLOSION "Bomb_Explosion_000.wav"
 #define ASSET_SOUND_DRAMATIC_DRUM "DramaticDrum.wav"
+#define ASSET_SOUND_GAMEOVER_ALERT "GameOver_Alert.wav"
+#define ASSET_SOUND_GAMEOVER_JINGLE "GameOver_Jingle.wav"
 #define ASSET_SOUND_MUSIC "Music_000.mp3"
 #define ASSET_SOUND_FACTORY_AMBIENCE "Factory_Ambience.ogg"
 

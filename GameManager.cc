@@ -190,10 +190,12 @@ void GameManager::UpdateGameOverCutscene(const float deltaTime)
     {
         if (_gameOverBomb != nullptr && !_gameOverBomb->isMarkedForDestroy())
         {
-            InstantiateExplosion(_gameOverBomb->GetPosition());
+            InstantiateExplosion(_gameOverBomb->GetPosition(), _gameOverBomb->GetPan());
             DestroyBomb(_gameOverBomb);
             _gameOverBomb = nullptr;
         }
+
+        audioManager->PlayGameOverJingleSound();
 
         _state = GAME_OVER;
     }
@@ -321,6 +323,7 @@ void GameManager::GameOver(Bomb* obj)
 	_gameOverRestartTimer = GAMEOVER_RESTART_TIME;
 
     audioManager->StopMusic();
+	audioManager->PlayGameOverAlertSound();
 
     _gameOverBomb = obj;
 
@@ -360,8 +363,9 @@ void GameManager::DestroyBomb(Bomb* obj)
     }
 }
 
-void GameManager::InstantiateExplosion(const Vector2 position)
+void GameManager::InstantiateExplosion(const Vector2 position, const float pan)
 {
+    audioManager->PlayBombExplosionSound(pan);
     _explosionGameObjects.push_back(std::make_unique<Explosion>(position, 0, EXPLOSION_SIZE));
 }
 
@@ -420,7 +424,7 @@ void GameManager::ExplodeBomb(Bomb* obj)
     }
     else
     {
-        InstantiateExplosion(obj->GetPosition());
+        InstantiateExplosion(obj->GetPosition(), obj->GetPan());
     	DestroyBomb(obj);
     }
 }

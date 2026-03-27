@@ -23,6 +23,11 @@ public:
 	void PlayBombStepSound(const float pan);
 	void PlayBombCollisionSound(const float pan);
 
+	void PlayBombExplosionSound(const float pan);
+
+	void PlayGameOverAlertSound();
+	void PlayGameOverJingleSound();
+
 	void PlayDramaticDrum();
 
 	Sound GetBombWindUpLoopSound();
@@ -37,7 +42,10 @@ private:
 	Sound _bombStepSounds[ASSET_SOUND_BOMB_STEP_SOUNDS];
 	Sound _bombCollisionSounds[ASSET_SOUND_BOMB_COLLISION_SOUNDS];
 
+	Sound _bombExplosionSound;
 	Sound _dramaticDrumSound;
+	Sound _gameOverAlertSound;
+	Sound _gameOverJingleSound;
 
 	Music _gameMusic;
 	bool _playingMusic;

@@ -15,6 +15,9 @@ AudioManager::AudioManager()
 	}
 
 	_dramaticDrumSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_DRAMATIC_DRUM).c_str());
+	_bombExplosionSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_EXPLOSION).c_str());
+	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
+	_gameOverJingleSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_JINGLE).c_str());
 
 	_gameMusic = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_MUSIC).c_str());
 	_factoryAmbience = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_FACTORY_AMBIENCE).c_str());
@@ -33,6 +36,9 @@ AudioManager::~AudioManager()
 	for (int i = 0; i < ASSET_SOUND_BOMB_COLLISION_SOUNDS; i++) UnloadSound(_bombCollisionSounds[i]);
 
 	UnloadSound(_dramaticDrumSound);
+	UnloadSound(_bombExplosionSound);
+	UnloadSound(_gameOverAlertSound);
+	UnloadSound(_gameOverJingleSound);
 
 	UnloadMusicStream(_gameMusic);
 	UnloadMusicStream(_factoryAmbience);
@@ -95,9 +101,25 @@ void AudioManager::PlayBombCollisionSound(const float pan)
 	_currentBombCollisionSoundIndex = (_currentBombCollisionSoundIndex + 1) % ASSET_SOUND_BOMB_COLLISION_SOUNDS;
 }
 
+void AudioManager::PlayBombExplosionSound(const float pan)
+{
+	SetSoundPan(_bombExplosionSound, pan);
+	PlaySound(_bombExplosionSound);
+}
+
 void AudioManager::PlayDramaticDrum()
 {
 	PlaySound(_dramaticDrumSound);
+}
+
+void AudioManager::PlayGameOverAlertSound()
+{
+	PlaySound(_gameOverAlertSound);
+}
+
+void AudioManager::PlayGameOverJingleSound()
+{
+	PlaySound(_gameOverJingleSound);
 }
 
 Sound AudioManager::GetBombWindUpLoopSound()

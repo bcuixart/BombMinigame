@@ -44,6 +44,8 @@ public:
 
 	BombType GetType() const;
 
+	float GetPan() const;
+
 protected:
 
 private:
@@ -51,8 +53,6 @@ private:
 	void Update_RandomMovement(const float deltaTime);
 	void Update_Grabbed(const float deltaTime);
 	void Update_Placed(const float deltaTime);
-
-	float GetPan() const;
 
 	BombType _type;
 	BombState _state;
