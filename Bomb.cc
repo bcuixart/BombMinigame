@@ -253,13 +253,14 @@ void Bomb::Grab()
 	_state = GRABBED;
 }
 
-void Bomb::LetGo(int releasedState)
+int Bomb::LetGo(int releasedState)
 {
-	if (releasedState == BOMB_RELEASED_TOP) { _state = PLACED; _placedDirection = BOMB_PLACED_TOP; }
-	else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; }
+	if (releasedState == BOMB_RELEASED_TOP) { _state = PLACED; _placedDirection = BOMB_PLACED_TOP; return BOMB_PLACED_TOP; }
+	else if (releasedState == BOMB_RELEASED_BOT) { _state = PLACED; _placedDirection = BOMB_PLACED_BOT; return BOMB_PLACED_BOT;  }
 	else 
 	{
 		_state = RANDOM_MOVEMENT; 
+		return -1;
 	}
 }
 

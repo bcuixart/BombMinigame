@@ -35,7 +35,7 @@ public:
 	bool WasClicked(const Vector2 mousePos) const;
 
 	void Grab();
-	void LetGo(int releasedState);
+	int LetGo(int releasedState);
 
 	void CheckCollisionWith(Bomb& b);
 	void ResolveCollisionWith(Bomb& b, Vector2 delta, float dist, float minDist);

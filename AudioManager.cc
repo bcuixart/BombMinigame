@@ -14,6 +14,8 @@ AudioManager::AudioManager()
 		((i < 10) ? "00" : "0") + std::to_string(i) + ASSET_SOUND_BOMB_COLLISION_SUFFIX).c_str());
 	}
 
+	_dramaticDrumSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_DRAMATIC_DRUM).c_str());
+
 	_gameMusic = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_MUSIC).c_str());
 	_factoryAmbience = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_FACTORY_AMBIENCE).c_str());
 
@@ -29,6 +31,8 @@ AudioManager::~AudioManager()
 {
 	for (int i = 0; i < ASSET_SOUND_BOMB_STEP_SOUNDS; i++) UnloadSound(_bombStepSounds[i]);
 	for (int i = 0; i < ASSET_SOUND_BOMB_COLLISION_SOUNDS; i++) UnloadSound(_bombCollisionSounds[i]);
+
+	UnloadSound(_dramaticDrumSound);
 
 	UnloadMusicStream(_gameMusic);
 	UnloadMusicStream(_factoryAmbience);
@@ -89,6 +93,11 @@ void AudioManager::PlayBombCollisionSound(const float pan)
 	PlaySound(_bombCollisionSounds[_currentBombCollisionSoundIndex]);
 
 	_currentBombCollisionSoundIndex = (_currentBombCollisionSoundIndex + 1) % ASSET_SOUND_BOMB_COLLISION_SOUNDS;
+}
+
+void AudioManager::PlayDramaticDrum()
+{
+	PlaySound(_dramaticDrumSound);
 }
 
 Sound AudioManager::GetBombWindUpLoopSound()

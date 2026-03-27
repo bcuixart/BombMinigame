@@ -74,6 +74,7 @@ void GameManager::StartMainMenu()
     _roundValues.currentMaxBombs = 1;
     _roundValues.timeToChangeBombHouse = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
     _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
+    _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
     _roundValues.addedBlue = false;
     _roundValues.addedGreen = false;
 
@@ -104,6 +105,7 @@ void GameManager::StartGame()
     _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
     _roundValues.addedBlue = false;
     _roundValues.addedGreen = false;
+    _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
 
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
@@ -141,6 +143,8 @@ void GameManager::UpdateRound(const float deltaTime)
         _roundValues.timeToChangeBombHouse = _roundValues.nextBombHouseChangeTime;
         ChangeBombHouseTypes();
     }
+
+	if (_roundValues.timeForNextDramaticDrum > 0) _roundValues.timeForNextDramaticDrum -= deltaTime;
 
     _roundValues.currentMaxBombs += ROUND_MAX_BOMBS_INCREMENT * deltaTime;
     _roundValues.timeToSpawnNextBomb -= deltaTime;
@@ -424,14 +428,27 @@ void GameManager::ExplodeBomb(Bomb* obj)
 void GameManager::HandleBombGrab()
 {
     _currentPressed = IsMouseButtonDown(0);
-    if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed) // GRAB BOMB
+    if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed)
     {
         TryGrabBomb(GetWorldMousePos());
         if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
     }
     else if (_grabbedBomb != nullptr && IsMouseButtonReleased(0))
     {
-        if (!_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+        if (!_grabbedBomb->isMarkedForDestroy()) 
+        {
+            int letGoState = _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+
+            if ( (letGoState == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())) ||
+                (letGoState == BOMB_PLACED_BOT && !_bombHouseBottom->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())))
+            {
+                if (_roundValues.timeForNextDramaticDrum <= 0)
+                {
+                    audioManager->PlayDramaticDrum();
+                    _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
+                }
+            }
+        }
         _grabbedBomb = nullptr;
     }
 

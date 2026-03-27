@@ -47,6 +47,8 @@ struct RoundValues
 	float timeToChangeBombHouse;
 	float nextBombHouseChangeTime;
 
+	float timeForNextDramaticDrum;
+
 	bool addedBlue;
 	bool addedGreen;
 };
