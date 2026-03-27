@@ -67,7 +67,7 @@ void Bomb::Update(float deltaTime)
 
 	SetSoundPan(_fuseLoopSound, GetPan());
 	float fuseSoundMultiplier = Clamp(1 - (_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
-	SetSoundVolume(_fuseLoopSound, BOMB_FUSE_LOOP_SOUND_VOLUME * _timeToExplode * fuseSoundMultiplier);
+	SetSoundVolume(_fuseLoopSound, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier);
 	if (!IsSoundPlaying(_fuseLoopSound)) PlaySound(_fuseLoopSound);
 
 	_collidedThisFrame = false;
@@ -176,10 +176,16 @@ void Bomb::Render(const float deltaTime)
 	
 	Rectangle dest = { _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier };
 	Vector2 origin = { _radius * _grabbedScaleMultiplier, _radius * _grabbedScaleMultiplier };
+
 	// Body
 	DrawTexturePro
 	(	GameManager::instance->sprBombBody,
-		{ float(int((_state == RANDOM_MOVEMENT) ? _animationFrame : 0) * BOMB_SPRITE_SIZE), float(int((aboutToExplode) ? BOMB_ABOUT_TO_EXPLODE : _type) * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
+		{   
+			float(int((_state == RANDOM_MOVEMENT) ? _animationFrame : 0) * BOMB_SPRITE_SIZE), 
+			float(int((aboutToExplode) ? BOMB_ABOUT_TO_EXPLODE : (_type == BOMB_MENU) ? 0 : _type) * BOMB_SPRITE_SIZE),
+			BOMB_SPRITE_SIZE, 
+			BOMB_SPRITE_SIZE 
+		}, // SOURCE
 		dest, origin, 0, WHITE
 	);
 
@@ -189,6 +195,23 @@ void Bomb::Render(const float deltaTime)
 		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(_animationIndex * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
 		dest, origin, 0, WHITE
 	);
+
+	// Fuse
+	float fuseMultiplier = Clamp((_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
+
+	if (fuseMultiplier < 1)
+	{
+		float fuseOffsetY = BOMB_FUSE_SPRITE_OFFSET_Y_MIN + (BOMB_FUSE_SPRITE_OFFSET_Y_MAX - BOMB_FUSE_SPRITE_OFFSET_Y_MIN) * fuseMultiplier;
+
+		Rectangle destFuse = { _position.x, _position.y + fuseOffsetY, _scale * _grabbedScaleMultiplier / 4.f, _scale * _grabbedScaleMultiplier / 4.f };
+		Vector2 originFuse = { _radius * _grabbedScaleMultiplier / 4.f, _radius * _grabbedScaleMultiplier / 4.f };
+
+		DrawTexturePro
+		(GameManager::instance->sprBombFuse,
+			{ float((int(_animationFrame) % BOMB_FUSE_SPRITES) * BOMB_FUSE_SPRITE_SIZE), float(_animationIndex * BOMB_FUSE_SPRITE_SIZE), BOMB_FUSE_SPRITE_SIZE, BOMB_FUSE_SPRITE_SIZE }, // SOURCE
+			destFuse, originFuse, 0, { 255, 255, 255, (unsigned char)(255 * (1 - fuseMultiplier)) }
+		);
+	}
 
 	if (DEBUG_BOMB_HITBOX_DRAW) 
 	{

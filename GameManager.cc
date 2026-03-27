@@ -8,6 +8,7 @@ GameManager::GameManager()
 
     sprBombBody = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_BODY).c_str());
     sprBombDeco = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_DECO).c_str());
+    sprBombFuse = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMB_FUSE).c_str());
     sprBombHouse = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMBHOUSE).c_str());
     sprBombHouseScreen = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMBHOUSE_SCREEN).c_str());
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
@@ -18,12 +19,17 @@ GameManager::GameManager()
 
 	audioManager = std::make_unique<AudioManager>();
 
-    _state = ROUND;
+    _bombHouseTop = std::make_unique<BombHouse>(Vector2{ 0,-425 }, 0, 256, BOMBHOUSE_TOP);
+    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{ 0,425 }, 0, 256, BOMBHOUSE_BOTTOM);
+
+    _gameOverOverlay = std::make_unique<GameOverOverlay>(Vector2{ 0,0 }, 0, 1000);
 
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
 
-    StartGame();
+    _playerExited = false,
+
+    StartMainMenu();
 }
 
 GameManager::~GameManager()
@@ -39,6 +45,7 @@ GameManager::~GameManager()
 
     UnloadTexture(sprBombBody);
 	UnloadTexture(sprBombDeco);
+	UnloadTexture(sprBombFuse);
 	UnloadTexture(sprBombHouse);
 	UnloadTexture(sprBombHouseScreen);
 	UnloadTexture(sprExplosion);
@@ -48,15 +55,38 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMapFG);
 }
 
-void GameManager::StartGame()
+void GameManager::StartMainMenu()
 {
     _bombGameObjects.clear();
     _explosionGameObjects.clear();
 
-    _bombHouseTop = std::make_unique<BombHouse>(Vector2{0,-425},0,256, BOMBHOUSE_TOP);
-    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{0,425},0,256, BOMBHOUSE_BOTTOM);
+    _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
 
-    _gameOverOverlay = std::make_unique<GameOverOverlay>(Vector2{0,0},0,1000);
+    _roundValues.score = 0;
+    _roundValues.spawnableBombTypes = { BOMB_MENU };
+    for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
+    _roundValues.currentBombHouseTopType = BOMB_MENU;
+    _roundValues.currentBombHouseBottomType = BOMB_MENU;
+    _roundValues.roundTimeElapsed = 0;
+    _roundValues.timeToSpawnNextBomb = ROUND_BOMB_SPAWN_TIME_START;
+    _roundValues.nextBombSpawnTime = ROUND_BOMB_SPAWN_TIME_START;
+    _roundValues.currentMaxBombs = 1;
+    _roundValues.timeToChangeBombHouse = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
+    _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
+    _roundValues.addedBlue = false;
+    _roundValues.addedGreen = false;
+
+    _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
+    _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
+
+    _state = MAIN_MENU;
+}
+
+void GameManager::StartGame()
+{
+    _bombGameObjects.clear();
+    _explosionGameObjects.clear();
 
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
@@ -85,6 +115,9 @@ void GameManager::StartGame()
 
 void GameManager::UpdateMainMenu(const float deltaTime)
 {
+    if (_roundValues.spawnedBombTypes[BOMB_MENU] == 0) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, MAP_COORD_VER_MIN }, 0, 150, BOMB_MENU));
+    
+    HandleBombGrab();
 }
 
 void GameManager::UpdateRound(const float deltaTime)
@@ -126,30 +159,21 @@ void GameManager::UpdateRound(const float deltaTime)
         }
     }
 
-    _currentPressed = IsMouseButtonDown(0);
-    if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed) // GRAB BOMB
-    {
-        TryGrabBomb(GetWorldMousePos());
-        if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
-    } 
-	else if (_grabbedBomb != nullptr && IsMouseButtonReleased(0))
-    {
-        if (!_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
-        _grabbedBomb = nullptr;
-	}
-
-    _prevPressed = _currentPressed;
+    HandleBombGrab();
 }
 
 void GameManager::UpdateGameOver(const float deltaTime)
 {
     _gameOverOverlay->Update(deltaTime);
 
-    if (IsKeyPressed(KEY_R))
-    {
-        StartGame();
-        return;
-    }
+    _gameOverRestartTimer -= deltaTime;
+    if (_gameOverRestartTimer <= 0) StartMainMenu();
+
+    //if (IsKeyPressed(KEY_R))
+    //{
+        //StartMainMenu();
+        //return;
+    //}
 }
 
 void GameManager::UpdateGameOverCutscene(const float deltaTime)
@@ -290,6 +314,7 @@ void GameManager::GameOver(Bomb* obj)
     if (_state == GAME_OVER || _state == GAME_OVER_CUTSCENE) return;
     _state = GAME_OVER_CUTSCENE;
     _gameOverCutsceneTimer = GAMEOVER_CUTSCENE_TIME;
+	_gameOverRestartTimer = GAMEOVER_RESTART_TIME;
 
     audioManager->StopMusic();
 
@@ -359,6 +384,13 @@ int GameManager::GetBombReleasedState(Bomb* obj)
 
 void GameManager::BombEntered(Bomb* obj, int _placedDirection)
 {
+    if (_state == MAIN_MENU) 
+    {
+        if (_placedDirection == BOMB_PLACED_TOP) StartGame();
+        else _playerExited = true;
+        return;
+	}
+
     BombType type = obj->GetType();
 
     if (_placedDirection == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(type))
@@ -387,6 +419,23 @@ void GameManager::ExplodeBomb(Bomb* obj)
         InstantiateExplosion(obj->GetPosition());
     	DestroyBomb(obj);
     }
+}
+
+void GameManager::HandleBombGrab()
+{
+    _currentPressed = IsMouseButtonDown(0);
+    if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed) // GRAB BOMB
+    {
+        TryGrabBomb(GetWorldMousePos());
+        if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
+    }
+    else if (_grabbedBomb != nullptr && IsMouseButtonReleased(0))
+    {
+        if (!_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+        _grabbedBomb = nullptr;
+    }
+
+    _prevPressed = _currentPressed;
 }
 
 void GameManager::TryGrabBomb(const Vector2 mousePos)
@@ -428,7 +477,7 @@ Vector2 GameManager::GetWorldMousePos() const
 BombType GameManager::GetNewBombType() const
 {
     int chance = GetRandomValue(1, 100);
-    if (chance < BOMB_CHANCE_TO_SPAWN_RANDOM_COLOR) // Random color from spawnable types
+    if (chance < BOMB_CHANCE_TO_SPAWN_RANDOM_COLOR && _state == ROUND) // Random color from spawnable types
     {
         int index = GetRandomValue(0, _roundValues.spawnableBombTypes.size() - 1);
         return _roundValues.spawnableBombTypes[index];
@@ -441,13 +490,12 @@ BombType GameManager::GetNewBombType() const
             BombType t = _roundValues.spawnableBombTypes[i];
             if (leastType == BOMB_INVALID || _roundValues.spawnedBombTypes[t] < _roundValues.spawnedBombTypes[leastType])
             {
-                leastType = t;
+                if (t != BOMB_MENU) leastType = t;
             }
         }
 
         return leastType;
     }
-
 }
 
 void GameManager::ChangeBombHouseTypes()
@@ -497,4 +545,9 @@ void GameManager::ChangeBombHouseTypes()
 
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, false);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, false);
+}
+
+bool GameManager::PlayerExited() const
+{
+    return _playerExited;
 }

@@ -19,13 +19,15 @@ int main(int argc, char* argv[])
         InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BOMB GAME");
     }
 
+    SetExitKey(KEY_NULL);
+
     InitAudioDevice();
     SetTargetFPS(30);
 
     GameManager* gameManager = new GameManager();
 
     float deltaTime = 0;
-    while (!WindowShouldClose()) 
+    while (!WindowShouldClose() && !gameManager->PlayerExited())
     {
         deltaTime = GetFrameTime();
 

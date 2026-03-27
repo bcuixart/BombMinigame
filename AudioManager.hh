@@ -38,6 +38,8 @@ private:
 	Music _gameMusic;
 	bool _playingMusic;
 
+	Music _factoryAmbience;
+
 	int _currentBombStepSoundIndex;
 	int _currentBombCollisionSoundIndex;
 };

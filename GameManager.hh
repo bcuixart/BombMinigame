@@ -66,6 +66,8 @@ public:
 	void BombEntered(Bomb* obj, int _placedDirection);
 	void ExplodeBomb(Bomb* obj);
 
+	bool PlayerExited() const;
+
 	Vector2 GetWorldMousePos() const;
 
 	static GameManager* instance;
@@ -74,6 +76,7 @@ public:
 
 	Texture2D sprBombBody;
 	Texture2D sprBombDeco;
+	Texture2D sprBombFuse;
 	Texture2D sprBombHouse;
 	Texture2D sprBombHouseScreen;
 	Texture2D sprExplosion;
@@ -83,6 +86,7 @@ protected:
 
 private:
 	void StartGame();
+	void StartMainMenu();
 
 	void UpdateMainMenu(const float deltaTime);
 	void UpdateRound(const float deltaTime);
@@ -91,6 +95,7 @@ private:
 
 	void GameOver(Bomb* obj);
 
+	void HandleBombGrab();
 	void TryGrabBomb(const Vector2 mousePos);
 	int GetBombReleasedState(Bomb* obj);
 
@@ -121,10 +126,13 @@ private:
 	Bomb* _gameOverBomb;
 
 	float _gameOverCutsceneTimer;
+	float _gameOverRestartTimer;
 
 	Texture2D _sprMapBG;
 	Texture2D _sprMapMG;
 	Texture2D _sprMapFG;
+
+	bool _playerExited;
 };
 
 #endif

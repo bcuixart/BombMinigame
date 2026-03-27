@@ -14,13 +14,15 @@ AudioManager::AudioManager()
 		((i < 10) ? "00" : "0") + std::to_string(i) + ASSET_SOUND_BOMB_COLLISION_SUFFIX).c_str());
 	}
 
-
 	_gameMusic = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_MUSIC).c_str());
+	_factoryAmbience = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_FACTORY_AMBIENCE).c_str());
 
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
 
 	_playingMusic = false;
+
+	PlayMusicStream(_factoryAmbience);
 }
 
 AudioManager::~AudioManager()
@@ -29,6 +31,7 @@ AudioManager::~AudioManager()
 	for (int i = 0; i < ASSET_SOUND_BOMB_COLLISION_SOUNDS; i++) UnloadSound(_bombCollisionSounds[i]);
 
 	UnloadMusicStream(_gameMusic);
+	UnloadMusicStream(_factoryAmbience);
 }
 
 void AudioManager::Update(const float deltaTime)
@@ -42,6 +45,14 @@ void AudioManager::Update(const float deltaTime)
 		{
 			SeekMusicStream(_gameMusic, musicTime - ASSET_SOUND_MUSIC_LOOP_LENGTH);
 		}
+	}
+
+	UpdateMusicStream(_factoryAmbience);
+
+	float factoryAmbienceTime = GetMusicTimePlayed(_factoryAmbience);
+	if (factoryAmbienceTime >= ASSET_SOUND_MUSIC_LOOP_END + 1)
+	{
+		SeekMusicStream(_factoryAmbience, factoryAmbienceTime - ASSET_SOUND_MUSIC_LOOP_LENGTH);
 	}
 }
 
@@ -59,7 +70,9 @@ void AudioManager::StopMusic()
 
 float AudioManager::GetMusicTime() const
 {
-	return GetMusicTimePlayed(_gameMusic);
+	if (_playingMusic) return GetMusicTimePlayed(_gameMusic);
+
+	return GetMusicTimePlayed(_factoryAmbience);
 }
 
 void AudioManager::PlayBombStepSound(const float pan)

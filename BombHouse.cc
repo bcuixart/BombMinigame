@@ -52,7 +52,7 @@ void BombHouse::RenderScreen() const
 	else dest = { BOMBHOUSE_SCREEN_TOP_COORD_X, BOMBHOUSE_SCREEN_TOP_COORD_Y, BOMBHOUSE_SCREEN_COORD_SIZE, BOMBHOUSE_SCREEN_COORD_SIZE };
 	Vector2 origin = { BOMBHOUSE_SCREEN_COORD_SIZE / 2, BOMBHOUSE_SCREEN_COORD_SIZE / 2 };	
 
-	int screenSprite = _bombType;
+	int screenSprite = (_bombType == BOMB_MENU) ? ((_houseType == BOMBHOUSE_TOP) ? 4 : 5) : _bombType;
 	int screenSpriteOld = _bombTypeOld;
 	if (_lenienceTime < BOMBHOUSE_LENIENCE_TIME && _lenienceTime > 0) // Transition
 	{
@@ -86,7 +86,9 @@ void BombHouse::RenderScreen() const
 	{
 		DrawTexturePro
 		(	GameManager::instance->sprBombHouseScreen,
-			{ float(screenSprite * BOMBHOUSE_SCREEN_SPRITE_SIZE), 0, BOMBHOUSE_SCREEN_SPRITE_SIZE, BOMBHOUSE_SCREEN_SPRITE_SIZE }, // SOURCE
+			{ 
+				float(screenSprite * BOMBHOUSE_SCREEN_SPRITE_SIZE),
+				0, BOMBHOUSE_SCREEN_SPRITE_SIZE, BOMBHOUSE_SCREEN_SPRITE_SIZE }, // SOURCE
 			dest, origin, 0, WHITE
 		);		
 	}	
