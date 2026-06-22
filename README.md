@@ -10,10 +10,11 @@ I plan on eventually releasing this as a mobile game.
 TODO:
 -Bomb animation FPS
 -Score sound and visual
--Game over score couting
+-Game over score counting
 -Highscore
 -Grab and release sounds
 -Conveyor/screen change indicator
 -Pipe
 -Background improvement
--Better flame
+-Better flame and sound
+-About to explode sounds
