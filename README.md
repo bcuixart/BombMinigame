@@ -6,3 +6,14 @@ Taking too long or placing a bomb in the wrong slot results in a game over.
 There were plenty of great minimages in that game, but this one always stood out to me as particularly fun and addicting.
 
 I plan on eventually releasing this as a mobile game.
+
+TODO:
+-Bomb animation FPS
+-Score sound and visual
+-Game over score couting
+-Highscore
+-Grab and release sounds
+-Conveyor/screen change indicator
+-Pipe
+-Background improvement
+-Better flame
