@@ -269,7 +269,8 @@ void GameManager::Render(const float deltaTime)
 
     // Map bg
     DrawTexturePro(
-        _sprMapBG, { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE }, { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE },
+        _sprMapBG, { 0, 0, MAP_BG_SPRITE_SIZE, MAP_BG_SPRITE_SIZE },
+        { -MAP_BG_COORD_RADIUS, -MAP_BG_COORD_RADIUS, MAP_BG_COORD_SIZE, MAP_BG_COORD_SIZE },
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -278,7 +279,8 @@ void GameManager::Render(const float deltaTime)
 
     // Map mg
     DrawTexturePro(
-        _sprMapMG, { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE }, { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE },
+        _sprMapMG, { 0, 0, MAP_BG_SPRITE_SIZE, MAP_BG_SPRITE_SIZE },
+        { -MAP_BG_COORD_RADIUS, -MAP_BG_COORD_RADIUS, MAP_BG_COORD_SIZE, MAP_BG_COORD_SIZE },
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -301,7 +303,8 @@ void GameManager::Render(const float deltaTime)
 
     // Map fg
     DrawTexturePro(
-        _sprMapFG, { 0, 0, MAP_SPRTE_SIZE, MAP_SPRTE_SIZE }, { -MAP_COORD_RADIUS, -MAP_COORD_RADIUS, MAP_COORD_SIZE, MAP_COORD_SIZE },
+        _sprMapFG, { 0, 0, MAP_BG_SPRITE_SIZE, MAP_BG_SPRITE_SIZE },
+        { -MAP_BG_COORD_RADIUS, -MAP_BG_COORD_RADIUS, MAP_BG_COORD_SIZE, MAP_BG_COORD_SIZE },
         { 0, 0 }, 0.0f, WHITE
     );
 
