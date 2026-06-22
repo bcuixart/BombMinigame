@@ -70,6 +70,8 @@ public:
 
 	bool PlayerExited() const;
 
+	bool IsGameOverCutscene() const;
+
 	Vector2 GetWorldMousePos() const;
 
 	static GameManager* instance;

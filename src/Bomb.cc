@@ -170,13 +170,7 @@ void Bomb::Update_Placed(const float deltaTime)
 
 void Bomb::Render(const float deltaTime) 
 {
-	bool aboutToExplode = (_timeToExplode < 5 && _timeToExplode > 4.5f) ||
-	(_timeToExplode < 4 && _timeToExplode > 3.5f) ||
-	(_timeToExplode < 3 && _timeToExplode > 2.5f) ||
-	(_timeToExplode < 2 && _timeToExplode > 1.75f) ||
-	(_timeToExplode < 1.5f && _timeToExplode > 1.25f) ||
-	(_timeToExplode < 1.f && _timeToExplode > 0.75f) ||
-	(_timeToExplode < 0.5 && _timeToExplode > 0.25f);
+	bool aboutToExplode = GetIsAboutToExplode();
 	
 	Rectangle dest = { _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier };
 	Vector2 origin = { _radius * _grabbedScaleMultiplier, _radius * _grabbedScaleMultiplier };
@@ -327,4 +321,33 @@ float Bomb::GetPan() const
 	float pan = (_position.x - MAP_COORD_HOR_MIN) / (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN);
 	pan = 1 - pan;
 	return Clamp(pan, 0, 1);
+}
+
+bool Bomb::GetIsAboutToExplode() const
+{
+	return _state != PLACED && !GameManager::instance->IsGameOverCutscene() &&
+	(
+	(_timeToExplode < 10 && _timeToExplode > 9.5f) ||
+	(_timeToExplode < 9 && _timeToExplode > 8.5f) ||
+	(_timeToExplode < 8 && _timeToExplode > 7.5f) ||
+	(_timeToExplode < 7 && _timeToExplode > 6.5f) ||
+	(_timeToExplode < 6 && _timeToExplode > 5.5f) ||
+
+	(_timeToExplode < 5 && _timeToExplode > 4.75f) ||
+	(_timeToExplode < 4.5 && _timeToExplode > 4.25f) ||
+	(_timeToExplode < 4 && _timeToExplode > 3.75f) ||
+	(_timeToExplode < 3.5 && _timeToExplode > 3.25f) ||
+	(_timeToExplode < 3 && _timeToExplode > 2.75f) ||
+	(_timeToExplode < 2.5f && _timeToExplode > 2.25f) ||
+
+	(_timeToExplode < 2 && _timeToExplode > 1.875f) ||
+	(_timeToExplode < 1.75 && _timeToExplode > 1.625f) ||
+	(_timeToExplode < 1.5 && _timeToExplode > 1.375f) ||
+	(_timeToExplode < 1.25 && _timeToExplode > 1.125f) ||
+
+	(_timeToExplode < 1 && _timeToExplode > 0.875f) ||
+	(_timeToExplode < 0.75 && _timeToExplode > 0.625f) ||
+	(_timeToExplode < 0.5 && _timeToExplode > 0.375f) ||
+	(_timeToExplode < 0.25 && _timeToExplode > 0.125f)
+	);
 }

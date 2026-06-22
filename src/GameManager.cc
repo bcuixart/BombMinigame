@@ -345,6 +345,11 @@ void GameManager::GameOver(Bomb* obj)
     _gameOverOverlay->GameOver();
 }
 
+bool GameManager::IsGameOverCutscene() const
+{
+    return _state == GAME_OVER_CUTSCENE;
+}
+
 void GameManager::InstantiateBomb(std::unique_ptr<Bomb> obj)
 {
     _roundValues.spawnedBombTypes[obj.get()->GetType()]++;

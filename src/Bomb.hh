@@ -55,6 +55,8 @@ private:
 	void Update_Grabbed(const float deltaTime);
 	void Update_Placed(const float deltaTime);
 
+	bool GetIsAboutToExplode() const;
+
 	BombType _type;
 	BombState _state;
 
