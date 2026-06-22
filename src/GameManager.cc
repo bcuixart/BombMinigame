@@ -173,13 +173,7 @@ void GameManager::UpdateGameOver(const float deltaTime)
     _gameOverOverlay->Update(deltaTime);
 
     _gameOverRestartTimer -= deltaTime;
-    if (_gameOverRestartTimer <= 0) StartMainMenu();
-
-    //if (IsKeyPressed(KEY_R))
-    //{
-        //StartMainMenu();
-        //return;
-    //}
+    if (_gameOverRestartTimer <= 0 && _bombGameObjects.empty() && _explosionGameObjects.empty()) StartMainMenu();
 }
 
 void GameManager::UpdateGameOverCutscene(const float deltaTime)
@@ -240,6 +234,12 @@ void GameManager::Update(float deltaTime)
     _bombHouseTop->Update(deltaTime);
     _bombHouseBottom->Update(deltaTime);
 
+    _screenShakeTrauma = fmaxf(0.0f, _screenShakeTrauma - SCREEN_SHAKE_DECAY_RATE * deltaTime);
+    float shakeIntensity = _screenShakeTrauma * _screenShakeTrauma;
+
+    _screenShakePhase += SCREEN_SHAKE_MAX_FREQUENCY * shakeIntensity * deltaTime;
+    _screenShakePhase = fmodf(_screenShakePhase, 2.0f * PI);
+
     _bombGameObjects.erase(std::remove_if(_bombGameObjects.begin(), _bombGameObjects.end(),
         [](const std::unique_ptr<Bomb>& p) { return p->isMarkedForDestroy(); }),
         _bombGameObjects.end());
@@ -256,9 +256,11 @@ void GameManager::Render(const float deltaTime)
     int width = GetScreenWidth();
     int height = GetScreenHeight();
 
+    float shakeIntensity = _screenShakeTrauma * _screenShakeTrauma;
+
     _cam.target = { 0, 0 };
     _cam.offset = { width / 2.0f, height / 2.0f }; // Screen center
-    _cam.rotation = 0.0f;
+    _cam.rotation = sinf(_screenShakePhase) * SCREEN_SHAKE_MAX_ROTATION_DEGREES * shakeIntensity;
     _cam.zoom = (float)height / MAP_COORD_SIZE;
 
     BeginDrawing();
@@ -374,6 +376,8 @@ void GameManager::InstantiateExplosion(const Vector2 position, const float pan)
 {
     audioManager->PlayBombExplosionSound(pan);
     _explosionGameObjects.push_back(std::make_unique<Explosion>(position, 0, EXPLOSION_SIZE));
+
+    AddScreenShake(EXPLOSION_SCREEN_SHAKE_TIME);
 }
 
 void GameManager::DestroyExplosion(Explosion* expl)
@@ -385,6 +389,11 @@ void GameManager::DestroyExplosion(Explosion* expl)
     {
         (*it)->MarkForDestroy();
     }
+}
+
+void GameManager::AddScreenShake(float amount)
+{
+	_screenShakeTrauma = fminf(_screenShakeTrauma + amount, 1.0f);
 }
 
 int GameManager::GetBombReleasedState(Bomb* obj)
@@ -458,6 +467,7 @@ void GameManager::HandleBombGrab()
                     _grabbedBomb->MoveToBombHouseMin();
                     audioManager->PlayDramaticDrum();
                     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
+                    AddScreenShake(DRAMATIC_DRUM_SCREEN_SHAKE_TIME);
                 }
             }
         }

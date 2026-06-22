@@ -111,6 +111,8 @@ private:
 
 	void InstantiateExplosion(const Vector2 position, const float pan);
 
+	void AddScreenShake(float amount);
+
 	GameState _state;
 	RoundValues _roundValues;
 
@@ -118,6 +120,9 @@ private:
 	vector<std::unique_ptr<Explosion>> _explosionGameObjects;
 
 	Camera2D _cam = { 0 };
+
+	float _screenShakeTrauma = 0.0f;
+	float _screenShakePhase = 0.0f;
 
 	std::unique_ptr<BombHouse> _bombHouseTop;
 	std::unique_ptr<BombHouse> _bombHouseBottom;
