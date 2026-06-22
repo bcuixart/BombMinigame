@@ -84,6 +84,7 @@ public:
 	Texture2D sprBombHouse;
 	Texture2D sprBombHouseScreen;
 	Texture2D sprExplosion;
+	Texture2D sprExplosionProps;
 	Texture2D sprGameOverOverlay;
 
 protected:

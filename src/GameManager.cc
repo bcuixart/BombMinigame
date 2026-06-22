@@ -12,6 +12,7 @@ GameManager::GameManager()
     sprBombHouse = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMBHOUSE).c_str());
     sprBombHouseScreen = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_BOMBHOUSE_SCREEN).c_str());
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
+    sprExplosionProps = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION_PROPS).c_str());
     sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
     _sprMapMG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_MG).c_str());
@@ -49,6 +50,7 @@ GameManager::~GameManager()
 	UnloadTexture(sprBombHouse);
 	UnloadTexture(sprBombHouseScreen);
 	UnloadTexture(sprExplosion);
+	UnloadTexture(sprExplosionProps);
 	UnloadTexture(sprGameOverOverlay);
 	UnloadTexture(_sprMapBG);
 	UnloadTexture(_sprMapMG);
