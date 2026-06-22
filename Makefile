@@ -1,30 +1,27 @@
 # ===============================
-# Configuració comuna
+# Sort n Splode â€” build natiu Windows (MinGW-w64)
 # ===============================
-CXX      ?= g++
-CXXFLAGS = -Wall -O3 -std=c++17
+CXX      := g++
+CXXFLAGS := -Wall -O3 -std=c++17
 
-SRC = main.cc GameManager.cc GameObject.cc Bomb.cc BombHouse.cc Explosion.cc GameOverOverlay.cc AudioManager.cc
-HDR = Constants.hh GameManager.hh GameObject.hh Bomb.hh BombHouse.hh Explosion.hh GameOverOverlay.hh AudioManager.hh
-OBJ = $(SRC:.cc=.o)
+# Carpeta on tens descomprimit raylib (ha de tenir /include i /lib a dins)
+RAYLIB_PATH := raylib
 
-TARGET = game
+SRC_DIR  := src
+BUILD_DIR := build
 
-# ===============================
-# Plataforma
-# ===============================
-PLATFORM ?= linux
+SRC := $(wildcard $(SRC_DIR)/*.cc)
+HDR := $(wildcard $(SRC_DIR)/*.hh)
+OBJ := $(SRC:$(SRC_DIR)/%.cc=$(BUILD_DIR)/%.o)
 
-ifeq ($(PLATFORM),linux)
-    TARGET := game
-    LDFLAGS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-endif
+TARGET := game.exe
 
-ifeq ($(PLATFORM),windows)
-    TARGET := game.exe
-    CXX := x86_64-w64-mingw32-g++
-    LDFLAGS = -lraylib -lopengl32 -lgdi32 -lwinmm
-endif
+INCLUDES := -I$(SRC_DIR) -I$(RAYLIB_PATH)/include
+LIBPATHS := -L$(RAYLIB_PATH)/lib
+
+# -static-libgcc / -static-libstdc++ -> evita haver de distribuir les DLL del
+# runtime de MinGW juntament amb el game.exe.
+LDFLAGS := -lraylib -lopengl32 -lgdi32 -lwinmm -static-libgcc -static-libstdc++
 
 # ===============================
 # Regles
@@ -32,10 +29,15 @@ endif
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBPATHS) $(LDFLAGS)
 
-%.o: %.cc $(HDR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cc $(HDR) | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -rf $(BUILD_DIR) $(TARGET)
+
+.PHONY: all clean

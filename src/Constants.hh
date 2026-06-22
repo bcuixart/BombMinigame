@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_HH
 #define CONSTANTS_HH
 
-#define ASSETS_PATH "Assets/"
+#define ASSETS_PATH "assets/"
 #define ASSET_SPRITES_PATH "Sprites/"
 #define ASSET_SPRITE_MAP_BG "Spr_Map_BG.png"
 #define ASSET_SPRITE_MAP_MG "Spr_Map_MG.png"
