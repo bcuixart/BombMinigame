@@ -80,7 +80,7 @@ void AudioManager::StopMusic()
 
 float AudioManager::GetMusicTime() const
 {
-	if (_playingMusic) return GetMusicTimePlayed(_gameMusic);
+	if (_playingMusic) return GetMusicTimePlayed(_gameMusic) + 0.25f;
 
 	return GetMusicTimePlayed(_factoryAmbience);
 }

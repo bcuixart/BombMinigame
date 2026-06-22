@@ -448,6 +448,7 @@ void GameManager::HandleBombGrab()
             {
                 if (_roundValues.timeForNextDramaticDrum <= 0)
                 {
+                    _grabbedBomb->MoveToBombHouseMin();
                     audioManager->PlayDramaticDrum();
                     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
                 }

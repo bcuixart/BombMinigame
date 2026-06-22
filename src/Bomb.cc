@@ -268,6 +268,12 @@ int Bomb::LetGo(int releasedState)
 	}
 }
 
+void Bomb::MoveToBombHouseMin()
+{
+	if (_placedDirection == BOMB_PLACED_TOP) _position.y = BOMBHOUSE_COORD_TOP_VER_POS - 50;
+	else if (_placedDirection == BOMB_PLACED_BOT) _position.y = BOMBHOUSE_COORD_BOT_VER_POS + 50;
+}
+
 void Bomb::CheckCollisionWith(Bomb& b)
 {
 	if (b._state != RANDOM_MOVEMENT || _state != RANDOM_MOVEMENT) return;

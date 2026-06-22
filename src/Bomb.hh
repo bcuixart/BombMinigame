@@ -36,6 +36,7 @@ public:
 
 	void Grab();
 	int LetGo(int releasedState);
+	void MoveToBombHouseMin();
 
 	void CheckCollisionWith(Bomb& b);
 	void ResolveCollisionWith(Bomb& b, Vector2 delta, float dist, float minDist);
