@@ -35,6 +35,8 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 
 	_didGameOver = false;
 	_collidedThisFrame = false;
+
+	_alpha = 0;
 }
 
 Bomb::~Bomb()
@@ -54,6 +56,8 @@ void Bomb::Update(float deltaTime)
 
 	float musicTime = GameManager::instance->audioManager->GetMusicTime();
 	_animationFrame = fmodf(musicTime * 33.75f, (float)ANIMATION_FRAMES);
+
+	_alpha = Clamp(_alpha + 200.0f * deltaTime, 0.0f, 255.0f);
 
 	if (_animationFrame < prevFrame)
 	{
@@ -186,14 +190,14 @@ void Bomb::Render(const float deltaTime)
 			BOMB_SPRITE_SIZE, 
 			BOMB_SPRITE_SIZE 
 		}, // SOURCE
-		dest, origin, 0, WHITE
+		dest, origin, 0, { 255, 255, 255, (unsigned char)_alpha }
 	);
 
 	// Deco
 	DrawTexturePro
 	(	GameManager::instance->sprBombDeco,
 		{ float(int(_animationFrame) * BOMB_SPRITE_SIZE), float(_animationIndex * BOMB_SPRITE_SIZE), BOMB_SPRITE_SIZE, BOMB_SPRITE_SIZE }, // SOURCE
-		dest, origin, 0, WHITE
+		dest, origin, 0, { 255, 255, 255, (unsigned char)_alpha }
 	);
 
 	// Fuse

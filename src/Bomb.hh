@@ -63,6 +63,7 @@ private:
 
 	Color _color;
 	const Color _blowUpIndicatorColor = {200,200,200,255};
+	float _alpha;
 
 	Vector2 _movementDirection;
 
