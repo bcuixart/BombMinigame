@@ -377,7 +377,6 @@ void GameManager::DestroyBomb(Bomb* obj)
 
 void GameManager::InstantiateExplosion(const Vector2 position, const float pan)
 {
-    audioManager->PlayBombExplosionSound(pan);
     _explosionGameObjects.push_back(std::make_unique<Explosion>(position, 0, EXPLOSION_SIZE));
 
     AddScreenShake(EXPLOSION_SCREEN_SHAKE_TIME);
@@ -454,13 +453,20 @@ void GameManager::HandleBombGrab()
     if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed)
     {
         TryGrabBomb(GetWorldMousePos());
-        if (_grabbedBomb != nullptr) _grabbedBomb->Grab();
+        if (_grabbedBomb != nullptr) 
+        {
+            audioManager->PlayBombGrabbedSound(_grabbedBomb->GetPan());
+            _grabbedBomb->Grab();
+        }
     }
     else if (_grabbedBomb != nullptr && IsMouseButtonReleased(0))
     {
         if (!_grabbedBomb->isMarkedForDestroy()) 
         {
             int letGoState = _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+
+            if (letGoState == BOMB_PLACED_TOP || letGoState == BOMB_PLACED_BOT) audioManager->PlayBombReleasedBombHouseSound(_grabbedBomb->GetPan());
+            else audioManager->PlayBombReleasedMetalSound(_grabbedBomb->GetPan());
 
             if ( (letGoState == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())) ||
                 (letGoState == BOMB_PLACED_BOT && !_bombHouseBottom->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())))

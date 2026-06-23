@@ -12,7 +12,6 @@ TODO:
 -Score sound and visual
 -Game over score counting
 -Highscore
--Grab and release sounds
 -Conveyor/screen change indicator
 -Pipe
 -Background improvement
