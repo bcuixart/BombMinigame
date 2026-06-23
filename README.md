@@ -9,7 +9,7 @@ I plan on eventually releasing this as a mobile game.
 
 TODO:
 -Bomb animation FPS
--Score sound and visual
+-Score visual
 -Game over score counting
 -Highscore
 -Conveyor/screen change indicator
