@@ -27,6 +27,8 @@ public:
 	void PlayBombReleasedBombHouseSound(const float pan);
 	void PlayBombReleasedMetalSound(const float pan);
 
+	void PlayPointSound();
+
 	void PlayGameOverAlertSound();
 	void PlayGameOverJingleSound();
 
@@ -50,6 +52,8 @@ private:
 	Sound _bombGrabbedSound;
 	Sound _bombReleasedBombHouseSound;
 	Sound _bombReleasedMetalSound;
+
+	Sound _pointSound;
 
 	Sound _dramaticDrumSound;
 	Sound _gameOverAlertSound;

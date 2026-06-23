@@ -18,6 +18,7 @@ AudioManager::AudioManager()
 	_bombGrabbedSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_GRABBED).c_str());
 	_bombReleasedBombHouseSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_BOMB_HOUSE).c_str());
 	_bombReleasedMetalSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_METAL).c_str());
+	_pointSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
 	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
 	_gameOverJingleSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_JINGLE).c_str());
 
@@ -41,6 +42,7 @@ AudioManager::~AudioManager()
 	UnloadSound(_bombGrabbedSound);
 	UnloadSound(_bombReleasedBombHouseSound);
 	UnloadSound(_bombReleasedMetalSound);
+	UnloadSound(_pointSound);
 	UnloadSound(_gameOverAlertSound);
 	UnloadSound(_gameOverJingleSound);
 
@@ -103,6 +105,12 @@ void AudioManager::PlayBombCollisionSound(const float pan)
 	PlaySound(_bombCollisionSounds[_currentBombCollisionSoundIndex]);
 
 	_currentBombCollisionSoundIndex = (_currentBombCollisionSoundIndex + 1) % ASSET_SOUND_BOMB_COLLISION_SOUNDS;
+}
+
+void AudioManager::PlayPointSound()
+{
+	SetSoundPitch(_pointSound, float(GetRandomValue(90, 110)) / 100.0f);
+	PlaySound(_pointSound);
 }
 
 void AudioManager::PlayDramaticDrum()

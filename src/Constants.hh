@@ -28,6 +28,7 @@
 #define ASSET_SOUND_BOMB_GRABBED "Bomb_Grabbed.mp3"
 #define ASSET_SOUND_BOMB_RELEASED_BOMB_HOUSE "Bomb_Released_BombHouse.mp3"
 #define ASSET_SOUND_BOMB_RELEASED_METAL "Bomb_Released_Metal.mp3"
+#define ASSET_SOUND_POINT "Point.mp3"
 #define ASSET_SOUND_DRAMATIC_DRUM "DramaticDrum.wav"
 #define ASSET_SOUND_GAMEOVER_ALERT "GameOver_Alert.wav"
 #define ASSET_SOUND_GAMEOVER_JINGLE "GameOver_Jingle.wav"

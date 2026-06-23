@@ -429,7 +429,11 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
     }
     else 
     {
-        if (_state == ROUND) _roundValues.score++;
+        if (_state == ROUND) 
+        {
+            _roundValues.score++;
+            audioManager->PlayPointSound();
+        }
         DestroyBomb(obj);
     }
 }
