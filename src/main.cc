@@ -7,6 +7,8 @@
 
 int main(int argc, char* argv[])
 {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    
     if (argc == 3) 
     {
 		int wdth = atoi(argv[1]);

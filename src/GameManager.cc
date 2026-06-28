@@ -17,6 +17,7 @@ GameManager::GameManager()
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
     _sprMapMG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_MG).c_str());
     _sprMapFG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_FG).c_str());
+    _sprScreenNumbers = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_SCREEN_NUMBERS).c_str());
 
 	audioManager = std::make_unique<AudioManager>();
 
@@ -55,6 +56,7 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMapBG);
 	UnloadTexture(_sprMapMG);
 	UnloadTexture(_sprMapFG);
+	UnloadTexture(_sprScreenNumbers);
 }
 
 void GameManager::StartMainMenu()
@@ -316,6 +318,8 @@ void GameManager::Render(const float deltaTime)
 
     _gameOverOverlay->Render(deltaTime);
 
+    DrawScreenNumber(123, { 102, -443 });
+
     DrawFPS(-500, -500);
 
     EndMode2D();
@@ -396,6 +400,26 @@ void GameManager::DestroyExplosion(Explosion* expl)
 void GameManager::AddScreenShake(float amount)
 {
 	_screenShakeTrauma = fminf(_screenShakeTrauma + amount, 1.0f);
+}
+
+void GameManager::DrawScreenNumber(const int score, const Vector2 position) const
+{
+    if (score < 0 || score > 9999) return;
+
+    int digits[4] = { 0 };
+    digits[0] = score / 1000;
+    digits[1] = (score / 100) % 10;
+    digits[2] = (score / 10) % 10;
+    digits[3] = score % 10;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        DrawTexturePro(
+            _sprScreenNumbers, { (float)(digits[i] * SCREEN_NUMBER_SPRITE_WIDTH), 0, SCREEN_NUMBER_SPRITE_WIDTH, SCREEN_NUMBER_SPRITE_HEIGHT },
+            { position.x + (float)(i * (SCREEN_NUMBER_SPRITE_WIDTH + 8)), position.y, SCREEN_NUMBER_SPRITE_WIDTH, SCREEN_NUMBER_SPRITE_HEIGHT },
+            { 0, 0 }, 0.0f, WHITE
+        );
+    }   
 }
 
 int GameManager::GetBombReleasedState(Bomb* obj)

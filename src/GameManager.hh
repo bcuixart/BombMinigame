@@ -113,6 +113,8 @@ private:
 
 	void AddScreenShake(float amount);
 
+	void DrawScreenNumber(const int score, const Vector2 position) const;
+
 	GameState _state;
 	RoundValues _roundValues;
 
@@ -141,6 +143,7 @@ private:
 	Texture2D _sprMapBG;
 	Texture2D _sprMapMG;
 	Texture2D _sprMapFG;
+	Texture2D _sprScreenNumbers;
 
 	bool _playerExited;
 };
