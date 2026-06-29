@@ -8,12 +8,21 @@ There were plenty of great minimages in that game, but this one always stood out
 I plan on eventually releasing this as a mobile game.
 
 TODO:
+
 -Bomb animation FPS
+
 -Score visual
+
 -Game over score counting
+
 -Highscore
--Conveyor/screen change indicator
+
+-Conveyor/screen change sync to music
+
 -Pipe
+
 -Background improvement
+
 -Better flame and sound
--About to explode sounds
+
+-Better about to explode sounds

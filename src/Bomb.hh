@@ -77,6 +77,8 @@ private:
 
 	bool _collidedThisFrame;
 
+	bool _wasAboutToExplodeLastFrame;
+
 	bool _didGameOver;
 
 	int _placedDirection;

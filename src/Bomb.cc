@@ -30,11 +30,12 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	SetSoundVolume(_fuseLoopSound, 0);
 	PlaySound(_fuseLoopSound);
 
-	float musicTime = GameManager::instance->audioManager->GetMusicTime();
+	float musicTime = GameManager::instance->audioManager->GetMusicTime() + BOMB_MUSIC_TIME_OFFSET;
 	_animationFrame = fmodf(musicTime * ANIMATION_SPEED, (float)ANIMATION_FRAMES);
 
 	_didGameOver = false;
 	_collidedThisFrame = false;
+	_wasAboutToExplodeLastFrame = false;
 
 	_alpha = 0;
 }
@@ -54,10 +55,10 @@ void Bomb::Update(float deltaTime)
 {
 	float prevFrame = _animationFrame;
 
-	float musicTime = GameManager::instance->audioManager->GetMusicTime();
+	float musicTime = GameManager::instance->audioManager->GetMusicTime() + BOMB_MUSIC_TIME_OFFSET;
 	_animationFrame = fmodf(musicTime * 33.75f, (float)ANIMATION_FRAMES);
 
-	_alpha = Clamp(_alpha + 200.0f * deltaTime, 0.0f, 255.0f);
+	_alpha = Clamp(_alpha + 800.0f * deltaTime, 0.0f, 255.0f);
 
 	if (_animationFrame < prevFrame)
 	{
@@ -171,6 +172,8 @@ void Bomb::Update_Placed(const float deltaTime)
 void Bomb::Render(const float deltaTime) 
 {
 	bool aboutToExplode = GetIsAboutToExplode();
+	if (aboutToExplode && !_wasAboutToExplodeLastFrame) GameManager::instance->audioManager->PlayBombWarningSound(GetPan());
+	_wasAboutToExplodeLastFrame = aboutToExplode;
 	
 	Rectangle dest = { _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier };
 	Vector2 origin = { _radius * _grabbedScaleMultiplier, _radius * _grabbedScaleMultiplier };
@@ -226,7 +229,7 @@ void Bomb::Render(const float deltaTime)
 
 void Bomb::GameOver() 
 {
-	float newTimeToExplode = GetRandomValue(10, 50) / 10.f;
+	float newTimeToExplode = GetRandomValue(100, 300) / 100.f;
 	_timeToExplode = min(_timeToExplode, newTimeToExplode);
 
 	_didGameOver = true;

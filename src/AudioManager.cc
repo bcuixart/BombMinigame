@@ -18,6 +18,8 @@ AudioManager::AudioManager()
 	_bombGrabbedSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_GRABBED).c_str());
 	_bombReleasedBombHouseSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_BOMB_HOUSE).c_str());
 	_bombReleasedMetalSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_METAL).c_str());
+	_bombWarningSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_WARNING).c_str());
+	_bombHouseTransitionFlashSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMBHOUSE_TRANSITION_FLASH).c_str());
 	_pointSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
 	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
 	_gameOverJingleSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_JINGLE).c_str());
@@ -42,6 +44,8 @@ AudioManager::~AudioManager()
 	UnloadSound(_bombGrabbedSound);
 	UnloadSound(_bombReleasedBombHouseSound);
 	UnloadSound(_bombReleasedMetalSound);
+	UnloadSound(_bombWarningSound);
+	UnloadSound(_bombHouseTransitionFlashSound);
 	UnloadSound(_pointSound);
 	UnloadSound(_gameOverAlertSound);
 	UnloadSound(_gameOverJingleSound);
@@ -86,7 +90,7 @@ void AudioManager::StopMusic()
 
 float AudioManager::GetMusicTime() const
 {
-	if (_playingMusic) return GetMusicTimePlayed(_gameMusic) + 0.25f;
+	if (_playingMusic) return GetMusicTimePlayed(_gameMusic);
 
 	return GetMusicTimePlayed(_factoryAmbience);
 }
@@ -105,6 +109,11 @@ void AudioManager::PlayBombCollisionSound(const float pan)
 	PlaySound(_bombCollisionSounds[_currentBombCollisionSoundIndex]);
 
 	_currentBombCollisionSoundIndex = (_currentBombCollisionSoundIndex + 1) % ASSET_SOUND_BOMB_COLLISION_SOUNDS;
+}
+
+void AudioManager::PlayBombHouseTransitionFlashSound()
+{
+	PlaySound(_bombHouseTransitionFlashSound);
 }
 
 void AudioManager::PlayPointSound()
@@ -134,6 +143,12 @@ void AudioManager::PlayBombReleasedMetalSound(const float pan)
 {
 	SetSoundPan(_bombReleasedMetalSound, pan);
 	PlaySound(_bombReleasedMetalSound);
+}
+
+void AudioManager::PlayBombWarningSound(const float pan)
+{
+	SetSoundPan(_bombWarningSound, pan);
+	PlaySound(_bombWarningSound);
 }
 
 void AudioManager::PlayGameOverAlertSound()

@@ -19,6 +19,8 @@ public:
 	virtual void Update(const float deltaTime);
 	virtual void Render(const float deltaTime);
 
+	virtual void GameOver();
+
 	void RenderScreen() const;
 
 	void SetType(BombType t, bool isFirstTime);
@@ -36,6 +38,13 @@ private:
 	float _radius;
 
 	float _lenienceTime;
+	bool _isTransitioning;
+	bool _isScreenTransitionBright;
+	bool _wasScreenTransitionBrightLastFrame;
+	float _screenFlashStartTime;
+
+	int _screenSprite;
+	int _screenSpriteOld;
 
 	float _animationFrame;
 
