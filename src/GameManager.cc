@@ -17,6 +17,7 @@ GameManager::GameManager()
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
     _sprMapMG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_MG).c_str());
     _sprMapFG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_FG).c_str());
+    _sprSmallScreen = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_SMALL_SCREEN).c_str());
     _sprScreenNumbers = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_SCREEN_NUMBERS).c_str());
 
 	audioManager = std::make_unique<AudioManager>();
@@ -56,6 +57,7 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMapBG);
 	UnloadTexture(_sprMapMG);
 	UnloadTexture(_sprMapFG);
+    UnloadTexture(_sprSmallScreen);
 	UnloadTexture(_sprScreenNumbers);
 }
 
@@ -295,7 +297,6 @@ void GameManager::Render(const float deltaTime)
     for (auto& o : _bombGameObjects) o->Render(deltaTime);
     for (auto& o : _explosionGameObjects) o->Render(deltaTime);
 
-    DrawText(TextFormat("%d", _roundValues.score), -240, -490, 40, BLACK);
     if (_state == GAME_OVER) DrawText("Has mort :)", 0, 0, 40, RED);
 
     DrawRectangleLines(-250, -500, 500, 1000, GREEN);
@@ -316,9 +317,22 @@ void GameManager::Render(const float deltaTime)
 
     if (_grabbedBomb != nullptr && !_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->Render(deltaTime); // Render grabbed bomb on top of everything
 
+
+    DrawTexturePro(
+        _sprSmallScreen, { 0, 0, SMALL_SCREEN_SPRITE_WIDTH, SMALL_SCREEN_SPRITE_HEIGHT },
+        { SMALL_SCREEN_POSITION_X, SMALL_SCREEN_POSITION_Y, SMALL_SCREEN_SPRITE_WIDTH, SMALL_SCREEN_SPRITE_HEIGHT },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    int numberToDraw = _roundValues.score;
+    if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER) numberToDraw = -1; // -1 to show DEAD
+    DrawScreenNumber(numberToDraw, 
+        { SMALL_SCREEN_POSITION_X + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X, 
+        SMALL_SCREEN_POSITION_Y + SMALL_SCREEN_NUMBER_POSITION_OFFSET_Y });
+
     _gameOverOverlay->Render(deltaTime);
 
-    DrawScreenNumber(123, { 102, -443 });
+    //DrawScreenNumber(123, { 102, -443 });
 
     DrawFPS(-500, -500);
 
@@ -404,13 +418,21 @@ void GameManager::AddScreenShake(float amount)
 
 void GameManager::DrawScreenNumber(const int score, const Vector2 position) const
 {
-    if (score < 0 || score > 9999) return;
+    if (score > 9999) return;
 
     int digits[4] = { 0 };
     digits[0] = score / 1000;
     digits[1] = (score / 100) % 10;
     digits[2] = (score / 10) % 10;
     digits[3] = score % 10;
+
+    if (score == -1) // Show DEAD
+    {
+        digits[0] = 10;
+        digits[1] = 11;
+        digits[2] = 12;
+        digits[3] = 10;
+    }
 
     for (int i = 0; i < 4; ++i)
     {

@@ -143,6 +143,7 @@ private:
 	Texture2D _sprMapBG;
 	Texture2D _sprMapMG;
 	Texture2D _sprMapFG;
+	Texture2D _sprSmallScreen;
 	Texture2D _sprScreenNumbers;
 
 	bool _playerExited;
