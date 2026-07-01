@@ -18,6 +18,7 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	_state = RANDOM_MOVEMENT;
 
 	_timeToExplode = BOMB_EXPLODE_TIME;
+	if (_type == BOMB_REVIVE) _timeToExplode = BOMB_EXPLODE_TIME_REVIVE;
 
 	_didStepSound001 = false;
 	_didStepSound002 = false;
@@ -183,7 +184,7 @@ void Bomb::Render(const float deltaTime)
 	(	GameManager::instance->sprBombBody,
 		{   
 			float(int((_state == RANDOM_MOVEMENT) ? _animationFrame : 0) * BOMB_SPRITE_SIZE), 
-			float(int((aboutToExplode) ? BOMB_ABOUT_TO_EXPLODE : (_type == BOMB_MENU) ? 0 : _type) * BOMB_SPRITE_SIZE),
+			float(int((aboutToExplode) ? BOMB_ABOUT_TO_EXPLODE : (_type == BOMB_MENU || _type == BOMB_REVIVE || _type == BOMB_POINT_TALLY) ? 0 : _type) * BOMB_SPRITE_SIZE),
 			BOMB_SPRITE_SIZE, 
 			BOMB_SPRITE_SIZE 
 		}, // SOURCE

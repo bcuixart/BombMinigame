@@ -83,6 +83,7 @@ void GameManager::StartMainMenu()
     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
     _roundValues.addedBlue = false;
     _roundValues.addedGreen = false;
+    _roundValues.canRevive = false;
 
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
@@ -112,6 +113,7 @@ void GameManager::StartGame()
     _roundValues.addedBlue = false;
     _roundValues.addedGreen = false;
     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
+    _roundValues.canRevive = true;
 
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
@@ -119,6 +121,43 @@ void GameManager::StartGame()
 	audioManager->PlayMusic();
 
     _state = ROUND;
+}
+
+void GameManager::StartReviveDecision()
+{
+    _bombGameObjects.clear();
+
+    _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
+
+    _roundValues.spawnableBombTypes = { BOMB_REVIVE };
+    for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
+    _roundValues.currentBombHouseTopType = BOMB_REVIVE;
+    _roundValues.currentBombHouseBottomType = BOMB_REVIVE;
+    _roundValues.canRevive = false;
+
+    _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
+    _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
+
+    _state = REVIVE_DECISION;
+
+    InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, MAP_COORD_VER_MIN }, 0, 150, BOMB_REVIVE));
+}
+
+void GameManager::StartPointTally()
+{
+    _bombGameObjects.clear();
+
+    _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
+
+    _roundValues.currentBombHouseTopType = BOMB_POINT_TALLY;
+    _roundValues.currentBombHouseBottomType = BOMB_POINT_TALLY;
+    
+    _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
+    _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
+
+    _state = POINT_TALLY;
 }
 
 void GameManager::UpdateMainMenu(const float deltaTime)
@@ -177,7 +216,11 @@ void GameManager::UpdateGameOver(const float deltaTime)
     _gameOverOverlay->Update(deltaTime);
 
     _gameOverRestartTimer -= deltaTime;
-    if (_gameOverRestartTimer <= 0 && _bombGameObjects.empty() && _explosionGameObjects.empty()) StartMainMenu();
+    if (_gameOverRestartTimer <= 0 && _bombGameObjects.empty() && _explosionGameObjects.empty())
+    {
+        if (_roundValues.canRevive) StartReviveDecision();
+        else StartMainMenu();
+    }
 }
 
 void GameManager::UpdateGameOverCutscene(const float deltaTime)
@@ -199,6 +242,18 @@ void GameManager::UpdateGameOverCutscene(const float deltaTime)
 
         _state = GAME_OVER;
     }
+}
+
+void GameManager::UpdateReviveDecision(const float deltaTime)
+{
+    if (_roundValues.spawnedBombTypes[BOMB_REVIVE] == 0) StartPointTally();
+    
+    HandleBombGrab();
+}
+
+void GameManager::UpdatePointTally(const float deltaTime)
+{
+
 }
 
 void GameManager::Update(float deltaTime)
@@ -226,6 +281,16 @@ void GameManager::Update(float deltaTime)
         case GAME_OVER:
         {
             UpdateGameOver(deltaTime);
+            break;
+        }
+        case REVIVE_DECISION:
+        {
+            UpdateReviveDecision(deltaTime);
+            break;
+        }
+        case POINT_TALLY:
+        {
+            UpdatePointTally(deltaTime);
             break;
         }
     }
@@ -297,8 +362,6 @@ void GameManager::Render(const float deltaTime)
     for (auto& o : _bombGameObjects) o->Render(deltaTime);
     for (auto& o : _explosionGameObjects) o->Render(deltaTime);
 
-    if (_state == GAME_OVER) DrawText("Has mort :)", 0, 0, 40, RED);
-
     DrawRectangleLines(-250, -500, 500, 1000, GREEN);
     DrawRectangleLines(MAP_COORD_HOR_MIN, MAP_COORD_VER_MIN, (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
     DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_BOT_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
@@ -325,14 +388,12 @@ void GameManager::Render(const float deltaTime)
     );
 
     int numberToDraw = _roundValues.score;
-    if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER) numberToDraw = -1; // -1 to show DEAD
+    if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == REVIVE_DECISION || _state == POINT_TALLY) numberToDraw = -1; // -1 to show DEAD
     DrawScreenNumber(numberToDraw, 
         { SMALL_SCREEN_POSITION_X + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X, 
         SMALL_SCREEN_POSITION_Y + SMALL_SCREEN_NUMBER_POSITION_OFFSET_Y });
 
     _gameOverOverlay->Render(deltaTime);
-
-    //DrawScreenNumber(123, { 102, -443 });
 
     DrawFPS(-500, -500);
 
@@ -462,6 +523,12 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
         else _playerExited = true;
         return;
 	}
+    else if (_state == REVIVE_DECISION)
+    {
+        if (_placedDirection == BOMB_PLACED_TOP) int a = 0; // TODO
+        else StartPointTally();
+        return;
+    }
 
     BombType type = obj->GetType();
 

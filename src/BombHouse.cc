@@ -31,6 +31,8 @@ void BombHouse::SetType(BombType t, bool isFirstTime)
 	_screenSpriteOld = _bombTypeOld;
 	_screenSprite = _bombType;
 	if (_bombType == BOMB_MENU) _screenSprite = (_houseType == BOMBHOUSE_TOP) ? BOMBHOUSE_SCREEN_SPRITE_INDEX_PLAY : BOMBHOUSE_SCREEN_SPRITE_INDEX_QUIT;
+	else if (_bombType == BOMB_REVIVE) _screenSprite = (_houseType == BOMBHOUSE_TOP) ? BOMBHOUSE_SCREEN_SPRITE_INDEX_REVIVE : BOMBHOUSE_SCREEN_SPRITE_INDEX_QUIT;
+	else if (_bombType == BOMB_POINT_TALLY) _screenSprite = (_houseType == BOMBHOUSE_TOP) ? BOMBHOUSE_SCREEN_SPRITE_INDEX_SCORE : BOMBHOUSE_SCREEN_SPRITE_INDEX_HIGHSCORE;
 
 	if (!isFirstTime) 
 	{ 

@@ -25,6 +25,8 @@ enum GameState
 	ROUND,
 	GAME_OVER_CUTSCENE,
 	GAME_OVER,
+	REVIVE_DECISION,
+	POINT_TALLY
 };
 
 struct RoundValues
@@ -51,6 +53,8 @@ struct RoundValues
 
 	bool addedBlue;
 	bool addedGreen;
+
+	bool canRevive;
 };
 
 class GameManager {
@@ -92,11 +96,15 @@ protected:
 private:
 	void StartGame();
 	void StartMainMenu();
+	void StartReviveDecision();
+	void StartPointTally();
 
 	void UpdateMainMenu(const float deltaTime);
 	void UpdateRound(const float deltaTime);
 	void UpdateGameOver(const float deltaTime);
 	void UpdateGameOverCutscene(const float deltaTime);
+	void UpdateReviveDecision(const float deltaTime);
+	void UpdatePointTally(const float deltaTime);
 
 	void GameOver(Bomb* obj);
 
