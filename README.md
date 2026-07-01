@@ -24,5 +24,3 @@ TODO:
 -Background improvement
 
 -Better flame and sound
-
--Better about to explode sounds
