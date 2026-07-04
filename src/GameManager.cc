@@ -30,7 +30,11 @@ GameManager::GameManager()
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
 
-    _playerExited = false,
+    _playerExited = false;
+
+    _highScore = 100;
+    _pointTallyCounter = 0;
+    _pointTallyCounterLast = 0;
 
     StartMainMenu();
 }
@@ -157,6 +161,8 @@ void GameManager::StartPointTally()
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
+    _pointTallyCounter = 0;
+    _pointTallyCounterLast = 0;
     _state = POINT_TALLY;
 }
 
@@ -246,14 +252,44 @@ void GameManager::UpdateGameOverCutscene(const float deltaTime)
 
 void GameManager::UpdateReviveDecision(const float deltaTime)
 {
-    if (_roundValues.spawnedBombTypes[BOMB_REVIVE] == 0) StartPointTally();
+    if (_roundValues.spawnedBombTypes[BOMB_REVIVE] == 0 && _explosionGameObjects.empty()) StartPointTally();
     
     HandleBombGrab();
 }
 
 void GameManager::UpdatePointTally(const float deltaTime)
 {
+	_pointTallyCounter += POINT_TALLY_INCREMENT_SPEED * deltaTime;
 
+	if (_pointTallyCounterLast != (int)_pointTallyCounter)
+	{
+		_pointTallyCounterLast = (int)_pointTallyCounter;
+		audioManager->PlayPointSound();
+	}
+
+	if (_pointTallyCounter >= _roundValues.score)
+	{
+		if (_roundValues.score > _highScore)
+		{
+			_highScore = _roundValues.score;
+			audioManager->PlayPointTallyEndHighScoreSound();
+		}
+		else
+		{
+			audioManager->PlayPointTallyEndSound();
+		}
+
+		_pointTallyCounter = (float)_roundValues.score;
+		_pointTallyDoneTimer = 0;
+		_state = POINT_TALLY_DONE;
+	}
+}
+
+void GameManager::UpdatePointTallyDone(const float deltaTime)
+{
+	_pointTallyDoneTimer += deltaTime;
+    if (_pointTallyDoneTimer >= POINT_TALLY_DONE_TIME_MAX) StartMainMenu();
+	if (_pointTallyDoneTimer >= POINT_TALLY_DONE_TIME_MIN && IsMouseButtonPressed(0)) StartMainMenu();
 }
 
 void GameManager::Update(float deltaTime)
@@ -293,6 +329,11 @@ void GameManager::Update(float deltaTime)
             UpdatePointTally(deltaTime);
             break;
         }
+		case POINT_TALLY_DONE:
+		{
+			UpdatePointTallyDone(deltaTime);
+			break;
+		}
     }
 
     for (auto& o : _bombGameObjects) o->Update(deltaTime);
@@ -388,10 +429,19 @@ void GameManager::Render(const float deltaTime)
     );
 
     int numberToDraw = _roundValues.score;
-    if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == REVIVE_DECISION || _state == POINT_TALLY) numberToDraw = -1; // -1 to show DEAD
+	Color numberColor = WHITE;
+	if (_state == MAIN_MENU) { numberToDraw = _highScore; numberColor = YELLOW; }
+	if ((_state == ROUND || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = YELLOW;
+    if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == POINT_TALLY || _state == POINT_TALLY_DONE) numberToDraw = -1; // -1 to show DEAD
     DrawScreenNumber(numberToDraw, 
         { SMALL_SCREEN_POSITION_X + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X, 
-        SMALL_SCREEN_POSITION_Y + SMALL_SCREEN_NUMBER_POSITION_OFFSET_Y });
+        SMALL_SCREEN_POSITION_Y + SMALL_SCREEN_NUMBER_POSITION_OFFSET_Y }, numberColor);
+
+	if (_state == POINT_TALLY || _state == POINT_TALLY_DONE)
+	{
+		DrawScreenNumber((int)_pointTallyCounter, { BOMBHOUSE_SCREEN_TOP_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_TOP_COORD_Y }, WHITE);
+		DrawScreenNumber((int)_highScore, { BOMBHOUSE_SCREEN_BOT_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_BOT_COORD_Y }, YELLOW);
+	}
 
     _gameOverOverlay->Render(deltaTime);
 
@@ -477,7 +527,7 @@ void GameManager::AddScreenShake(float amount)
 	_screenShakeTrauma = fminf(_screenShakeTrauma + amount, 1.0f);
 }
 
-void GameManager::DrawScreenNumber(const int score, const Vector2 position) const
+void GameManager::DrawScreenNumber(const int score, const Vector2 position, const Color color) const
 {
     if (score > 9999) return;
 
@@ -500,7 +550,7 @@ void GameManager::DrawScreenNumber(const int score, const Vector2 position) cons
         DrawTexturePro(
             _sprScreenNumbers, { (float)(digits[i] * SCREEN_NUMBER_SPRITE_WIDTH), 0, SCREEN_NUMBER_SPRITE_WIDTH, SCREEN_NUMBER_SPRITE_HEIGHT },
             { position.x + (float)(i * (SCREEN_NUMBER_SPRITE_WIDTH + 8)), position.y, SCREEN_NUMBER_SPRITE_WIDTH, SCREEN_NUMBER_SPRITE_HEIGHT },
-            { 0, 0 }, 0.0f, WHITE
+            { 0, 0 }, 0.0f, color
         );
     }   
 }

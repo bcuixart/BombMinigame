@@ -23,6 +23,8 @@ AudioManager::AudioManager()
 	_pointSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
 	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
 	_gameOverJingleSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_JINGLE).c_str());
+	_pointTallyEndSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT_TALLY_END).c_str());
+	_pointTallyEndHighScoreSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT_TALLY_END_HIGHSCORE).c_str());
 
 	_gameMusic = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_MUSIC).c_str());
 	_factoryAmbience = LoadMusicStream((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_FACTORY_AMBIENCE).c_str());
@@ -49,7 +51,8 @@ AudioManager::~AudioManager()
 	UnloadSound(_pointSound);
 	UnloadSound(_gameOverAlertSound);
 	UnloadSound(_gameOverJingleSound);
-
+	UnloadSound(_pointTallyEndSound);
+	UnloadSound(_pointTallyEndHighScoreSound);
 	UnloadMusicStream(_gameMusic);
 	UnloadMusicStream(_factoryAmbience);
 }
@@ -159,6 +162,16 @@ void AudioManager::PlayGameOverAlertSound()
 void AudioManager::PlayGameOverJingleSound()
 {
 	PlaySound(_gameOverJingleSound);
+}
+
+void AudioManager::PlayPointTallyEndSound()
+{
+	PlaySound(_pointTallyEndSound);
+}
+
+void AudioManager::PlayPointTallyEndHighScoreSound()
+{
+	PlaySound(_pointTallyEndHighScoreSound);
 }
 
 Sound AudioManager::GetBombWindUpLoopSound()

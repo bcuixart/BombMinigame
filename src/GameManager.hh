@@ -26,7 +26,8 @@ enum GameState
 	GAME_OVER_CUTSCENE,
 	GAME_OVER,
 	REVIVE_DECISION,
-	POINT_TALLY
+	POINT_TALLY,
+	POINT_TALLY_DONE
 };
 
 struct RoundValues
@@ -105,6 +106,7 @@ private:
 	void UpdateGameOverCutscene(const float deltaTime);
 	void UpdateReviveDecision(const float deltaTime);
 	void UpdatePointTally(const float deltaTime);
+	void UpdatePointTallyDone(const float deltaTime);
 
 	void GameOver(Bomb* obj);
 
@@ -121,7 +123,7 @@ private:
 
 	void AddScreenShake(float amount);
 
-	void DrawScreenNumber(const int score, const Vector2 position) const;
+	void DrawScreenNumber(const int score, const Vector2 position, const Color color) const;
 
 	GameState _state;
 	RoundValues _roundValues;
@@ -133,6 +135,10 @@ private:
 
 	float _screenShakeTrauma = 0.0f;
 	float _screenShakePhase = 0.0f;
+
+	int _highScore;
+	float _pointTallyCounter;
+	int _pointTallyCounterLast;
 
 	std::unique_ptr<BombHouse> _bombHouseTop;
 	std::unique_ptr<BombHouse> _bombHouseBottom;
@@ -147,6 +153,7 @@ private:
 
 	float _gameOverCutsceneTimer;
 	float _gameOverRestartTimer;
+	float _pointTallyDoneTimer;
 
 	Texture2D _sprMapBG;
 	Texture2D _sprMapMG;

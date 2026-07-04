@@ -37,6 +37,9 @@ public:
 
 	void PlayDramaticDrum();
 
+	void PlayPointTallyEndSound();
+	void PlayPointTallyEndHighScoreSound();
+
 	Sound GetBombWindUpLoopSound();
 	void UnloadBombWindUpLoopSound(Sound* sound);
 
@@ -64,6 +67,9 @@ private:
 	Sound _dramaticDrumSound;
 	Sound _gameOverAlertSound;
 	Sound _gameOverJingleSound;
+
+	Sound _pointTallyEndSound;
+	Sound _pointTallyEndHighScoreSound;
 
 	Music _gameMusic;
 	bool _playingMusic;

@@ -13,9 +13,9 @@ TODO:
 
 -Score visual
 
--Game over score counting
+-Score sound multiple instances
 
--Highscore
+-Highscore saving
 
 -Conveyor/screen change sync to music
 
