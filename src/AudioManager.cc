@@ -20,7 +20,7 @@ AudioManager::AudioManager()
 	_bombReleasedMetalSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_METAL).c_str());
 	_bombWarningSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_WARNING).c_str());
 	_bombHouseTransitionFlashSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMBHOUSE_TRANSITION_FLASH).c_str());
-	_pointSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
+	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) _pointSound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
 	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
 	_gameOverJingleSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_JINGLE).c_str());
 	_pointTallyEndSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT_TALLY_END).c_str());
@@ -31,6 +31,7 @@ AudioManager::AudioManager()
 
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
+	_currentPointSoundIndex = 0;
 
 	_playingMusic = false;
 
@@ -48,7 +49,7 @@ AudioManager::~AudioManager()
 	UnloadSound(_bombReleasedMetalSound);
 	UnloadSound(_bombWarningSound);
 	UnloadSound(_bombHouseTransitionFlashSound);
-	UnloadSound(_pointSound);
+	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) UnloadSound(_pointSound[i]);
 	UnloadSound(_gameOverAlertSound);
 	UnloadSound(_gameOverJingleSound);
 	UnloadSound(_pointTallyEndSound);
@@ -121,8 +122,10 @@ void AudioManager::PlayBombHouseTransitionFlashSound()
 
 void AudioManager::PlayPointSound()
 {
-	SetSoundPitch(_pointSound, float(GetRandomValue(90, 110)) / 100.0f);
-	PlaySound(_pointSound);
+	SetSoundPitch(_pointSound[_currentPointSoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
+	PlaySound(_pointSound[_currentPointSoundIndex]);
+
+	_currentPointSoundIndex = (_currentPointSoundIndex + 1) % ASSET_SOUND_POINT_SOUNDS;
 }
 
 void AudioManager::PlayDramaticDrum()

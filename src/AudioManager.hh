@@ -62,7 +62,8 @@ private:
 
 	Sound _bombHouseTransitionFlashSound;
 
-	Sound _pointSound;
+	Sound _pointSound[ASSET_SOUND_POINT_SOUNDS];
+	int _currentPointSoundIndex;
 
 	Sound _dramaticDrumSound;
 	Sound _gameOverAlertSound;

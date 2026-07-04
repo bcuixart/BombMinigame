@@ -13,8 +13,6 @@ TODO:
 
 -Score visual
 
--Score sound multiple instances
-
 -Highscore saving
 
 -Conveyor/screen change sync to music

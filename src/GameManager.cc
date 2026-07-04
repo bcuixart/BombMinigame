@@ -32,7 +32,7 @@ GameManager::GameManager()
 
     _playerExited = false;
 
-    _highScore = 100;
+    _highScore = 10;
     _pointTallyCounter = 0;
     _pointTallyCounterLast = 0;
 
@@ -430,8 +430,8 @@ void GameManager::Render(const float deltaTime)
 
     int numberToDraw = _roundValues.score;
 	Color numberColor = WHITE;
-	if (_state == MAIN_MENU) { numberToDraw = _highScore; numberColor = YELLOW; }
-	if ((_state == ROUND || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = YELLOW;
+	if (_state == MAIN_MENU) { numberToDraw = _highScore; numberColor = SMALL_NUMBER_YELLOW_COLOR; }
+	if ((_state == ROUND || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = SMALL_NUMBER_YELLOW_COLOR;
     if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == POINT_TALLY || _state == POINT_TALLY_DONE) numberToDraw = -1; // -1 to show DEAD
     DrawScreenNumber(numberToDraw, 
         { SMALL_SCREEN_POSITION_X + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X, 
@@ -440,7 +440,7 @@ void GameManager::Render(const float deltaTime)
 	if (_state == POINT_TALLY || _state == POINT_TALLY_DONE)
 	{
 		DrawScreenNumber((int)_pointTallyCounter, { BOMBHOUSE_SCREEN_TOP_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_TOP_COORD_Y }, WHITE);
-		DrawScreenNumber((int)_highScore, { BOMBHOUSE_SCREEN_BOT_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_BOT_COORD_Y }, YELLOW);
+		DrawScreenNumber((int)_highScore, { BOMBHOUSE_SCREEN_BOT_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_BOT_COORD_Y }, SMALL_NUMBER_YELLOW_COLOR);
 	}
 
     _gameOverOverlay->Render(deltaTime);
