@@ -239,7 +239,7 @@ void GameManager::UpdateGameOverCutscene(const float deltaTime)
     {
         if (_gameOverBomb != nullptr && !_gameOverBomb->isMarkedForDestroy())
         {
-            InstantiateExplosion(_gameOverBomb->GetPosition(), _gameOverBomb->GetPan());
+            InstantiateExplosion(_gameOverBomb->GetPosition());
             DestroyBomb(_gameOverBomb);
             _gameOverBomb = nullptr;
         }
@@ -375,7 +375,7 @@ void GameManager::Render(const float deltaTime)
 
     BeginDrawing();
     BeginMode2D(_cam);
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
 
     // Map bg
     DrawTexturePro(
@@ -403,10 +403,16 @@ void GameManager::Render(const float deltaTime)
     for (auto& o : _bombGameObjects) o->Render(deltaTime);
     for (auto& o : _explosionGameObjects) o->Render(deltaTime);
 
-    DrawRectangleLines(-250, -500, 500, 1000, GREEN);
-    DrawRectangleLines(MAP_COORD_HOR_MIN, MAP_COORD_VER_MIN, (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
-    DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_BOT_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
-    DrawLine(MAP_COORD_HOR_MIN, BOMBHOUSE_COORD_TOP_VER_POS, MAP_COORD_HOR_MAX, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
+    if (DEBUG_DRAW_MAP_BOUNDS)
+    {
+		Vector2 boundsH = GetHorizontalBounds();
+
+        DrawRectangleLines(boundsH.x, -500, (boundsH.y - boundsH.x), 1000, GREEN);
+        DrawLine(boundsH.x, BOMBHOUSE_COORD_BOT_VER_POS, boundsH.y, BOMBHOUSE_COORD_BOT_VER_POS, BLUE);
+        DrawLine(boundsH.x, BOMBHOUSE_COORD_TOP_VER_POS, boundsH.y, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
+
+        DrawRectangleLines(boundsH.x, MAP_COORD_VER_MIN, (boundsH.y - boundsH.x), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
+    }
 
     // Map fg
     DrawTexturePro(
@@ -504,7 +510,7 @@ void GameManager::DestroyBomb(Bomb* obj)
     }
 }
 
-void GameManager::InstantiateExplosion(const Vector2 position, const float pan)
+void GameManager::InstantiateExplosion(const Vector2 position)
 {
     _explosionGameObjects.push_back(std::make_unique<Explosion>(position, 0, EXPLOSION_SIZE));
 
@@ -609,7 +615,7 @@ void GameManager::ExplodeBomb(Bomb* obj)
     }
     else
     {
-        InstantiateExplosion(obj->GetPosition(), obj->GetPan());
+        InstantiateExplosion(obj->GetPosition());
     	DestroyBomb(obj);
     }
 }
@@ -622,7 +628,7 @@ void GameManager::HandleBombGrab()
         TryGrabBomb(GetWorldMousePos());
         if (_grabbedBomb != nullptr) 
         {
-            audioManager->PlayBombGrabbedSound(_grabbedBomb->GetPan());
+            audioManager->PlayBombGrabbedSound(GameManager::instance->GetPan(_grabbedBomb->GetPosition()));
             _grabbedBomb->Grab();
         }
     }
@@ -632,8 +638,8 @@ void GameManager::HandleBombGrab()
         {
             int letGoState = _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
 
-            if (letGoState == BOMB_PLACED_TOP || letGoState == BOMB_PLACED_BOT) audioManager->PlayBombReleasedBombHouseSound(_grabbedBomb->GetPan());
-            else audioManager->PlayBombReleasedMetalSound(_grabbedBomb->GetPan());
+            if (letGoState == BOMB_PLACED_TOP || letGoState == BOMB_PLACED_BOT) audioManager->PlayBombReleasedBombHouseSound(GameManager::instance->GetPan(_grabbedBomb->GetPosition()));
+            else audioManager->PlayBombReleasedMetalSound(GameManager::instance->GetPan(_grabbedBomb->GetPosition()));
 
             if ( (letGoState == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())) ||
                 (letGoState == BOMB_PLACED_BOT && !_bombHouseBottom->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())))
@@ -687,6 +693,20 @@ void GameManager::CheckBombCollisions()
 Vector2 GameManager::GetWorldMousePos() const
 {
     return GetScreenToWorld2D(GetMousePosition(), _cam);
+}
+
+Vector2 GameManager::GetHorizontalBounds() const
+{
+	// Obtenir limits horitzontals del mapa segons la resolucio de pantalla
+    int width = GetScreenWidth();
+    return Vector2{ MAP_COORD_HOR_MIN, MAP_COORD_HOR_MAX };
+}
+
+float GameManager::GetPan(const Vector2& position) const
+{
+    Vector2 bounds = GetHorizontalBounds();
+    float pan = (position.x - bounds.x) / (bounds.y - bounds.x);
+    return 1.0f - pan;
 }
 
 BombType GameManager::GetNewBombType() const

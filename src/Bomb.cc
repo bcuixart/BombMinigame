@@ -68,10 +68,10 @@ void Bomb::Update(float deltaTime)
 		_animationFrame = 0;
 	}
 
-	SetSoundPan(_windUpLoopSound, GetPan());
+	SetSoundPan(_windUpLoopSound, GameManager::instance->GetPan(_position));
 	if (!IsSoundPlaying(_windUpLoopSound)) PlaySound(_windUpLoopSound);
 
-	SetSoundPan(_fuseLoopSound, GetPan());
+	SetSoundPan(_fuseLoopSound, GameManager::instance->GetPan(_position));
 	float fuseSoundMultiplier = Clamp(1 - (_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
 	SetSoundVolume(_fuseLoopSound, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier);
 	if (!IsSoundPlaying(_fuseLoopSound)) PlaySound(_fuseLoopSound);
@@ -109,8 +109,9 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	_position.y += _movementDirection.y * BOMB_MOVEMENT_SPEED * deltaTime;
 
 	// Flip at bounds
-	if (_position.x < MAP_COORD_HOR_MIN) _movementDirection.x = 1;
-	else if (_position.x > MAP_COORD_HOR_MAX) _movementDirection.x = -1;	
+	Vector2 boundsHor = GameManager::instance->GetHorizontalBounds();
+	if (_position.x < boundsHor.x) _movementDirection.x = 1;
+	else if (_position.x > boundsHor.y) _movementDirection.x = -1;	
 	if (_position.y < MAP_COORD_VER_MIN) _movementDirection.y = 1;
 	else if (_position.y > MAP_COORD_VER_MAX) _movementDirection.y = -1;
 
@@ -120,8 +121,8 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	else if (_movementDirection.x == -1 && _movementDirection.y == -1) _animationIndex = BOMB_ANIM_INDEX_WALK_TOP_LEFT;
 
 	// Sounds
-	if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_001 && !_didStepSound001) { GameManager::instance->audioManager->PlayBombStepSound(GetPan()); _didStepSound001 = true; }
-	else if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_002 && !_didStepSound002) { GameManager::instance->audioManager->PlayBombStepSound(GetPan()); _didStepSound002 = true; }
+	if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_001 && !_didStepSound001) { GameManager::instance->audioManager->PlayBombStepSound(GameManager::instance->GetPan(_position)); _didStepSound001 = true; }
+	else if (int(_animationFrame) >= BOMB_STEP_SOUND_ANIM_FRAME_002 && !_didStepSound002) { GameManager::instance->audioManager->PlayBombStepSound(GameManager::instance->GetPan(_position)); _didStepSound002 = true; }
 }
 
 void Bomb::Update_Grabbed(const float deltaTime) 
@@ -173,7 +174,7 @@ void Bomb::Update_Placed(const float deltaTime)
 void Bomb::Render(const float deltaTime) 
 {
 	bool aboutToExplode = GetIsAboutToExplode();
-	if (aboutToExplode && !_wasAboutToExplodeLastFrame) GameManager::instance->audioManager->PlayBombWarningSound(GetPan());
+	if (aboutToExplode && !_wasAboutToExplodeLastFrame) GameManager::instance->audioManager->PlayBombWarningSound(GameManager::instance->GetPan(_position));
 	_wasAboutToExplodeLastFrame = aboutToExplode;
 	
 	Rectangle dest = { _position.x, _position.y, _scale * _grabbedScaleMultiplier, _scale * _grabbedScaleMultiplier };
@@ -283,7 +284,7 @@ void Bomb::CheckCollisionWith(Bomb& b)
 
 	if (dist < minDist * minDist)
 	{
-		GameManager::instance->audioManager->PlayBombCollisionSound(GetPan());
+		GameManager::instance->audioManager->PlayBombCollisionSound(GameManager::instance->GetPan(_position));
 		ResolveCollisionWith(b, delta, sqrt(dist), minDist);
 	}
 }
@@ -318,13 +319,6 @@ bool Bomb::BombLayerSort(const Bomb* a, const Bomb* b)
 	if (b->_state == GRABBED) return true;
 
 	return a->_position.y < b->_position.y;
-}
-
-float Bomb::GetPan() const
-{
-	float pan = (_position.x - MAP_COORD_HOR_MIN) / (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN);
-	pan = 1 - pan;
-	return Clamp(pan, 0, 1);
 }
 
 bool Bomb::GetIsAboutToExplode() const

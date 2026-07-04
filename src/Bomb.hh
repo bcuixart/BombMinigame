@@ -45,8 +45,6 @@ public:
 
 	BombType GetType() const;
 
-	float GetPan() const;
-
 protected:
 
 private:

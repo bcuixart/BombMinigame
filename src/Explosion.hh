@@ -16,8 +16,6 @@ public:
 protected:
 
 private:
-	float GetPan() const;
-
 	float _elapsedLifetime;
 
 	bool _propsEnabled[EXPLOSION_PROPS_NUMBER];

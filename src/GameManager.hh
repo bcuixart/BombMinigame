@@ -79,6 +79,10 @@ public:
 
 	Vector2 GetWorldMousePos() const;
 
+	Vector2 GetHorizontalBounds() const;
+
+	float GetPan(const Vector2& position) const;
+
 	static GameManager* instance;
 
 	std::unique_ptr<AudioManager> audioManager;
@@ -119,7 +123,7 @@ private:
 	BombType GetNewBombType() const;
 	void ChangeBombHouseTypes();
 
-	void InstantiateExplosion(const Vector2 position, const float pan);
+	void InstantiateExplosion(const Vector2 position);
 
 	void AddScreenShake(float amount);
 

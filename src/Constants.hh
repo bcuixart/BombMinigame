@@ -57,6 +57,8 @@
 #define MAP_BG_COORD_SIZE (MAP_COORD_SIZE * ((float)MAP_BG_SPRITE_SIZE / (float)MAP_SPRTE_SIZE))
 #define MAP_BG_COORD_RADIUS (MAP_BG_COORD_SIZE / 2.0f)
 
+#define DEBUG_DRAW_MAP_BOUNDS true
+
 #define SPRTE_TO_COORD(a) ((float)(a) / (float)(MAP_SPRTE_SIZE) * (MAP_COORD_SIZE) - (MAP_COORD_RADIUS))
 
 #define MAP_COORD_HOR_MIN -250

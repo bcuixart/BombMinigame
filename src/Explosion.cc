@@ -16,7 +16,7 @@ Explosion::Explosion(const Vector2 p, const float r, const float s) :
 	} 
 
 	_explosionSound = GameManager::instance->audioManager->GetBombExplosionSound();
-	SetSoundPan(_explosionSound, GetPan());
+	SetSoundPan(_explosionSound, GameManager::instance->GetPan(_position));
 	SetSoundPitch(_explosionSound, float(GetRandomValue(90, 110)) / 100.0f);
 
 	PlaySound(_explosionSound);
@@ -81,11 +81,4 @@ void Explosion::Render(const float deltaTime)
 		dest, origin, 0, WHITE
 	);
 	
-}
-
-float Explosion::GetPan() const
-{
-	float pan = (_position.x - MAP_COORD_HOR_MIN) / (MAP_COORD_HOR_MAX - MAP_COORD_HOR_MIN);
-	pan = 1 - pan;
-	return Clamp(pan, 0, 1);
 }
