@@ -145,7 +145,7 @@ void GameManager::StartReviveDecision()
 
     _state = REVIVE_DECISION;
 
-    InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, MAP_COORD_VER_MIN }, 0, 150, BOMB_REVIVE));
+    InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), MAP_COORD_VER_MIN}, 0, 150, BOMB_REVIVE));
 }
 
 void GameManager::StartPointTally()
@@ -168,7 +168,7 @@ void GameManager::StartPointTally()
 
 void GameManager::UpdateMainMenu(const float deltaTime)
 {
-    if (_roundValues.spawnedBombTypes[BOMB_MENU] == 0) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, MAP_COORD_VER_MIN }, 0, 150, BOMB_MENU));
+    if (_roundValues.spawnedBombTypes[BOMB_MENU] == 0) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), MAP_COORD_VER_MIN }, 0, 150, BOMB_MENU));
     
     HandleBombGrab();
 }
@@ -209,8 +209,8 @@ void GameManager::UpdateRound(const float deltaTime)
             float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
             int spawnPos = GetRandomValue(0, 1);
 
-            if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_LEFT, verticalPos }, 0, 150, GetNewBombType()));
-            else InstantiateBomb(std::make_unique<Bomb>(Vector2{ BOMB_SPAWN_POS_X_RIGHT, verticalPos }, 0, 150, GetNewBombType()));
+            if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), verticalPos }, 0, 150, GetNewBombType()));
+            else InstantiateBomb(std::make_unique<Bomb>(Vector2{ GetBombSpawnPos(), verticalPos }, 0, 150, GetNewBombType()));
         }
     }
 
@@ -430,7 +430,7 @@ void GameManager::Render(const float deltaTime)
 
     DrawTexturePro(
         _sprSmallScreen, { 0, 0, SMALL_SCREEN_SPRITE_WIDTH, SMALL_SCREEN_SPRITE_HEIGHT },
-        { SMALL_SCREEN_POSITION_X, SMALL_SCREEN_POSITION_Y, SMALL_SCREEN_SPRITE_WIDTH, SMALL_SCREEN_SPRITE_HEIGHT },
+        { GetSmallScreenPos(), SMALL_SCREEN_POSITION_Y, SMALL_SCREEN_SPRITE_WIDTH, SMALL_SCREEN_SPRITE_HEIGHT},
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -440,7 +440,7 @@ void GameManager::Render(const float deltaTime)
 	if ((_state == ROUND || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = SMALL_NUMBER_YELLOW_COLOR;
     if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == POINT_TALLY || _state == POINT_TALLY_DONE) numberToDraw = -1; // -1 to show DEAD
     DrawScreenNumber(numberToDraw, 
-        { SMALL_SCREEN_POSITION_X + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X, 
+        { GetSmallScreenPos() + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X,
         SMALL_SCREEN_POSITION_Y + SMALL_SCREEN_NUMBER_POSITION_OFFSET_Y }, numberColor);
 
 	if (_state == POINT_TALLY || _state == POINT_TALLY_DONE)
@@ -448,6 +448,17 @@ void GameManager::Render(const float deltaTime)
 		DrawScreenNumber((int)_pointTallyCounter, { BOMBHOUSE_SCREEN_TOP_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_TOP_COORD_Y }, WHITE);
 		DrawScreenNumber((int)_highScore, { BOMBHOUSE_SCREEN_BOT_COORD_X + BOMBHOUSE_SCREEN_TEXT_OFFSET_X, BOMBHOUSE_SCREEN_BOT_COORD_Y }, SMALL_NUMBER_YELLOW_COLOR);
 	}
+
+	// Gradient and black rectangles on map limits to hide the edges of the map
+	DrawRectangleGradientH(-MAP_BG_COORD_RADIUS, -MAP_COORD_RADIUS, 60, MAP_COORD_SIZE, BLACK, { 0, 0, 0, 0 });
+	DrawRectangleGradientH(MAP_BG_COORD_RADIUS - 60, -MAP_COORD_RADIUS, 60, MAP_COORD_SIZE, { 0, 0, 0, 0 }, BLACK);
+
+    Vector2 boundsH = GetHorizontalBounds();
+    const float maskExtent = MAP_BG_COORD_SIZE;
+    const float maskY = -MAP_BG_COORD_RADIUS;
+    const float maskHeight = MAP_BG_COORD_SIZE;
+    DrawRectangleRec({ -maskExtent, maskY, maskExtent + boundsH.x, maskHeight }, BLACK);
+    DrawRectangleRec({ boundsH.y,   maskY, maskExtent - boundsH.y, maskHeight }, BLACK);
 
     _gameOverOverlay->Render(deltaTime);
 
@@ -697,9 +708,21 @@ Vector2 GameManager::GetWorldMousePos() const
 
 Vector2 GameManager::GetHorizontalBounds() const
 {
-	// Obtenir limits horitzontals del mapa segons la resolucio de pantalla
     int width = GetScreenWidth();
-    return Vector2{ MAP_COORD_HOR_MIN, MAP_COORD_HOR_MAX };
+    int height = GetScreenHeight();
+    float halfWidth = (width / 2.0f) / ((float)height / MAP_COORD_SIZE);
+    halfWidth = min(halfWidth, (float)MAP_COORD_HOR_MAX);
+    return Vector2{ -halfWidth, halfWidth };
+}
+
+float GameManager::GetBombSpawnPos() const
+{
+    return GetHorizontalBounds().y + (float)BOMB_SPAWN_POS_OFFSET;
+}
+
+float GameManager::GetSmallScreenPos() const
+{
+	return GetHorizontalBounds().y + (float)SMALL_SCREEN_POSITION_X_OFFSET;
 }
 
 float GameManager::GetPan(const Vector2& position) const

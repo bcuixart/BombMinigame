@@ -123,6 +123,9 @@ private:
 	BombType GetNewBombType() const;
 	void ChangeBombHouseTypes();
 
+	float GetBombSpawnPos() const;
+	float GetSmallScreenPos() const;
+
 	void InstantiateExplosion(const Vector2 position);
 
 	void AddScreenShake(float amount);
