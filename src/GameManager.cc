@@ -379,8 +379,8 @@ void GameManager::Render(const float deltaTime)
 
     // Map bg
     DrawTexturePro(
-        _sprMapBG, { 0, 0, MAP_BG_SPRITE_SIZE, MAP_BG_SPRITE_SIZE },
-        { -MAP_BG_COORD_RADIUS, -MAP_BG_COORD_RADIUS, MAP_BG_COORD_SIZE, MAP_BG_COORD_SIZE },
+        _sprMapBG, { 0, 0, MAP_BG_SPRITE_SIZE_X, MAP_BG_SPRITE_SIZE_Y },
+        { -MAP_BG_COORD_RADIUS_X, -MAP_BG_COORD_RADIUS_Y, MAP_BG_COORD_SIZE_X, MAP_BG_COORD_SIZE_Y },
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -389,8 +389,8 @@ void GameManager::Render(const float deltaTime)
 
     // Map mg
     DrawTexturePro(
-        _sprMapMG, { 0, 0, MAP_BG_SPRITE_SIZE, MAP_BG_SPRITE_SIZE },
-        { -MAP_BG_COORD_RADIUS, -MAP_BG_COORD_RADIUS, MAP_BG_COORD_SIZE, MAP_BG_COORD_SIZE },
+        _sprMapMG, { 0, 0, MAP_BG_SPRITE_SIZE_X, MAP_BG_SPRITE_SIZE_Y },
+        { -MAP_BG_COORD_RADIUS_X, -MAP_BG_COORD_RADIUS_Y, MAP_BG_COORD_SIZE_X, MAP_BG_COORD_SIZE_Y },
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -416,8 +416,8 @@ void GameManager::Render(const float deltaTime)
 
     // Map fg
     DrawTexturePro(
-        _sprMapFG, { 0, 0, MAP_BG_SPRITE_SIZE, MAP_BG_SPRITE_SIZE },
-        { -MAP_BG_COORD_RADIUS, -MAP_BG_COORD_RADIUS, MAP_BG_COORD_SIZE, MAP_BG_COORD_SIZE },
+        _sprMapFG, { 0, 0, MAP_BG_SPRITE_SIZE_X, MAP_BG_SPRITE_SIZE_Y },
+        { -MAP_BG_COORD_RADIUS_X, -MAP_BG_COORD_RADIUS_Y, MAP_BG_COORD_SIZE_X, MAP_BG_COORD_SIZE_Y },
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -450,13 +450,13 @@ void GameManager::Render(const float deltaTime)
 	}
 
 	// Gradient and black rectangles on map limits to hide the edges of the map
-	DrawRectangleGradientH(-MAP_BG_COORD_RADIUS, -MAP_COORD_RADIUS, 60, MAP_COORD_SIZE, BLACK, { 0, 0, 0, 0 });
-	DrawRectangleGradientH(MAP_BG_COORD_RADIUS - 60, -MAP_COORD_RADIUS, 60, MAP_COORD_SIZE, { 0, 0, 0, 0 }, BLACK);
+	DrawRectangleGradientH(-MAP_BG_COORD_RADIUS_X, -MAP_COORD_RADIUS, 60, MAP_COORD_SIZE, BLACK, { 0, 0, 0, 0 });
+	DrawRectangleGradientH(MAP_BG_COORD_RADIUS_X - 60, -MAP_COORD_RADIUS, 60, MAP_COORD_SIZE, { 0, 0, 0, 0 }, BLACK);
 
     Vector2 boundsH = GetHorizontalBounds();
-    const float maskExtent = MAP_BG_COORD_SIZE;
-    const float maskY = -MAP_BG_COORD_RADIUS;
-    const float maskHeight = MAP_BG_COORD_SIZE;
+    const float maskExtent = MAP_BG_COORD_SIZE_X;
+    const float maskY = -MAP_BG_COORD_RADIUS_Y;
+    const float maskHeight = MAP_BG_COORD_SIZE_Y;
     DrawRectangleRec({ -maskExtent, maskY, maskExtent + boundsH.x, maskHeight }, BLACK);
     DrawRectangleRec({ boundsH.y,   maskY, maskExtent - boundsH.y, maskHeight }, BLACK);
 
