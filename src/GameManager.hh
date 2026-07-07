@@ -99,6 +99,7 @@ protected:
 
 private:
 	void StartGame();
+	void StartGameRevive();
 	void StartMainMenu();
 	void StartReviveDecision();
 	void StartPointTally();
@@ -133,6 +134,9 @@ private:
 
 	GameState _state;
 	RoundValues _roundValues;
+
+	BombType _reviveHouseTopType;
+	BombType _reviveHouseBottomType;
 
 	vector<std::unique_ptr<Bomb>> _bombGameObjects;
 	vector<std::unique_ptr<Explosion>> _explosionGameObjects;

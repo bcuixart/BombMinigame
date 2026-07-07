@@ -128,6 +128,31 @@ void GameManager::StartGame()
     _state = ROUND;
 }
 
+void GameManager::StartGameRevive()
+{
+    _bombGameObjects.clear();
+    _explosionGameObjects.clear();
+
+    _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
+
+    _musicPrevTime = 0.0f;
+
+    for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
+    _roundValues.currentBombHouseTopType = _reviveHouseTopType;
+    _roundValues.currentBombHouseBottomType = _reviveHouseBottomType;
+    _roundValues.musicChangeBombHouseIndex = 0;
+    _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
+    _roundValues.canRevive = false;
+
+    _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
+    _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
+
+	audioManager->PlayMusic();
+
+    _state = ROUND;    
+}
+
 void GameManager::StartReviveDecision()
 {
     _bombGameObjects.clear();
@@ -135,7 +160,6 @@ void GameManager::StartReviveDecision()
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
 
-    _roundValues.spawnableBombTypes = { BOMB_REVIVE };
     for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
     _roundValues.currentBombHouseTopType = BOMB_REVIVE;
     _roundValues.currentBombHouseBottomType = BOMB_REVIVE;
@@ -232,7 +256,7 @@ void GameManager::UpdateGameOver(const float deltaTime)
     if (_gameOverRestartTimer <= 0 && _bombGameObjects.empty() && _explosionGameObjects.empty())
     {
         if (_roundValues.canRevive) StartReviveDecision();
-        else StartMainMenu();
+        else StartPointTally();
     }
 }
 
@@ -485,6 +509,9 @@ void GameManager::GameOver(Bomb* obj)
     audioManager->StopMusic();
 	audioManager->PlayGameOverAlertSound();
 
+    _reviveHouseTopType = _bombHouseTop->GetType();
+    _reviveHouseBottomType = _bombHouseBottom->GetType();
+
     _gameOverBomb = obj;
 
     if (_grabbedBomb != nullptr)
@@ -599,7 +626,7 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
 	}
     else if (_state == REVIVE_DECISION)
     {
-        if (_placedDirection == BOMB_PLACED_TOP) int a = 0; // TODO
+        if (_placedDirection == BOMB_PLACED_TOP) StartGameRevive();
         else StartPointTally();
         return;
     }
