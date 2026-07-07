@@ -11,14 +11,14 @@ TODO:
 
 -Bomb animation FPS
 
--Score visual
-
 -Highscore saving
-
--Conveyor/screen change sync to music
 
 -Pipe
 
 -Background improvement
 
 -Better flame and sound
+
+-Game over overlay size fix
+
+-Sound mixing

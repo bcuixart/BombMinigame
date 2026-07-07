@@ -70,6 +70,7 @@ private:
 
 	float _timeToExplode;
 
+	float _animationTime;
 	float _animationFrame;
 	int _animationIndex;
 

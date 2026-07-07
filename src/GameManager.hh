@@ -47,8 +47,7 @@ struct RoundValues
 
 	float currentMaxBombs;
 
-	float timeToChangeBombHouse;
-	float nextBombHouseChangeTime;
+	int musicChangeBombHouseIndex;
 
 	float timeForNextDramaticDrum;
 
@@ -142,6 +141,8 @@ private:
 
 	float _screenShakeTrauma = 0.0f;
 	float _screenShakePhase = 0.0f;
+
+	float _musicPrevTime = 0.0f;
 
 	int _highScore;
 	float _pointTallyCounter;

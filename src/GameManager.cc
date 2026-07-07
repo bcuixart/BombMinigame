@@ -36,6 +36,8 @@ GameManager::GameManager()
     _pointTallyCounter = 0;
     _pointTallyCounterLast = 0;
 
+    _musicPrevTime = 0.0f;
+
     StartMainMenu();
 }
 
@@ -82,8 +84,6 @@ void GameManager::StartMainMenu()
     _roundValues.timeToSpawnNextBomb = ROUND_BOMB_SPAWN_TIME_START;
     _roundValues.nextBombSpawnTime = ROUND_BOMB_SPAWN_TIME_START;
     _roundValues.currentMaxBombs = 1;
-    _roundValues.timeToChangeBombHouse = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
-    _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
     _roundValues.addedBlue = false;
     _roundValues.addedGreen = false;
@@ -103,6 +103,8 @@ void GameManager::StartGame()
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
 
+    _musicPrevTime = 0.0f;
+
     _roundValues.score = 0;
     _roundValues.spawnableBombTypes = { BOMB_BLACK, BOMB_RED };
     for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
@@ -112,8 +114,7 @@ void GameManager::StartGame()
     _roundValues.timeToSpawnNextBomb = ROUND_BOMB_SPAWN_TIME_START;
     _roundValues.nextBombSpawnTime = ROUND_BOMB_SPAWN_TIME_START;
     _roundValues.currentMaxBombs = ROUND_MAX_BOMBS_START;
-    _roundValues.timeToChangeBombHouse = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
-    _roundValues.nextBombHouseChangeTime = ROUND_BOMB_HOUSE_CHANGE_TIME_START;
+    _roundValues.musicChangeBombHouseIndex = 1; // To give more time before the first change
     _roundValues.addedBlue = false;
     _roundValues.addedGreen = false;
     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
@@ -187,13 +188,19 @@ void GameManager::UpdateRound(const float deltaTime)
         _roundValues.addedGreen = true;
     }
 
-    _roundValues.timeToChangeBombHouse -= deltaTime;
-    if (_roundValues.timeToChangeBombHouse <= 0) // CHANGE HOUSE TYPES
+    // Bomb house music change logic
+    float curTime = audioManager->GetMusicTime();
+    float target = ROUND_BOMB_HOUSE_MUSIC_CHANGE_TIMES_ARRAY[_roundValues.musicChangeBombHouseIndex];
+
+    if (curTime < _musicPrevTime - 1.0f) _roundValues.musicChangeBombHouseIndex = 1; // Loop
+    else if (_musicPrevTime < target && curTime >= target)
     {
-        _roundValues.nextBombHouseChangeTime = max(_roundValues.nextBombHouseChangeTime - ROUND_BOMB_HOUSE_CHANGE_TIME_INCREMENT, ROUND_BOMB_HOUSE_CHANGE_TIME_MIN);
-        _roundValues.timeToChangeBombHouse = _roundValues.nextBombHouseChangeTime;
+        _roundValues.musicChangeBombHouseIndex++;
+        if (_roundValues.musicChangeBombHouseIndex >= ROUND_BOMB_HOUSE_MUSIC_CHANGE_TIMES) _roundValues.musicChangeBombHouseIndex = 1;
         ChangeBombHouseTypes();
     }
+
+    _musicPrevTime = curTime;
 
 	if (_roundValues.timeForNextDramaticDrum > 0) _roundValues.timeForNextDramaticDrum -= deltaTime;
 
