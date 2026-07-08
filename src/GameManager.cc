@@ -25,10 +25,14 @@ GameManager::GameManager()
     _bombHouseTop = std::make_unique<BombHouse>(Vector2{ 0,-425 }, 0, 256, BOMBHOUSE_TOP);
     _bombHouseBottom = std::make_unique<BombHouse>(Vector2{ 0,425 }, 0, 256, BOMBHOUSE_BOTTOM);
 
+    _pipe = std::make_unique<Pipe>(Vector2 PIPE_POSITION, 0, 256);
+
     _gameOverOverlay = std::make_unique<GameOverOverlay>(Vector2{ 0,0 }, 0, 1000);
 
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
+
+    _grabbedPipe = nullptr;
 
     _playerExited = false;
 
@@ -48,6 +52,7 @@ GameManager::~GameManager()
 
     _bombHouseTop.reset();
     _bombHouseBottom.reset();
+    _pipe.reset();
     _gameOverOverlay.reset();
 
     GameManager::instance = nullptr;
@@ -74,6 +79,8 @@ void GameManager::StartMainMenu()
 
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
+
+    _grabbedPipe = nullptr;
 
     _roundValues.score = 0;
     _roundValues.spawnableBombTypes = { BOMB_MENU };
@@ -103,6 +110,8 @@ void GameManager::StartGame()
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
 
+    _grabbedPipe = nullptr;
+
     _musicPrevTime = 0.0f;
 
     _roundValues.score = 0;
@@ -123,6 +132,8 @@ void GameManager::StartGame()
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
+    _pipe->StartGame();
+
 	audioManager->PlayMusic();
 
     _state = ROUND;
@@ -136,6 +147,8 @@ void GameManager::StartGameRevive()
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
 
+    _grabbedPipe = nullptr;
+
     _musicPrevTime = 0.0f;
 
     for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
@@ -148,6 +161,8 @@ void GameManager::StartGameRevive()
     _bombHouseTop->SetType(_roundValues.currentBombHouseTopType, true);
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
+    _pipe->StartGame();
+
 	audioManager->PlayMusic();
 
     _state = ROUND;    
@@ -159,6 +174,8 @@ void GameManager::StartReviveDecision()
 
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
+
+    _grabbedPipe = nullptr;
 
     for (int i = 0; i < BOMB_TYPE_COUNT; ++i) _roundValues.spawnedBombTypes[i] = 0;
     _roundValues.currentBombHouseTopType = BOMB_REVIVE;
@@ -179,6 +196,8 @@ void GameManager::StartPointTally()
 
     _grabbedBomb = nullptr;
     _gameOverBomb = nullptr;
+
+    _grabbedPipe = nullptr;
 
     _roundValues.currentBombHouseTopType = BOMB_POINT_TALLY;
     _roundValues.currentBombHouseBottomType = BOMB_POINT_TALLY;
@@ -246,6 +265,7 @@ void GameManager::UpdateRound(const float deltaTime)
     }
 
     HandleBombGrab();
+    HandlePipeGrab();
 }
 
 void GameManager::UpdateGameOver(const float deltaTime)
@@ -325,6 +345,8 @@ void GameManager::UpdatePointTallyDone(const float deltaTime)
 
 void GameManager::Update(float deltaTime)
 {
+    _currentPressed = IsMouseButtonDown(0);
+
     audioManager->Update(deltaTime);
 
     switch (_state)
@@ -375,6 +397,8 @@ void GameManager::Update(float deltaTime)
     _bombHouseTop->Update(deltaTime);
     _bombHouseBottom->Update(deltaTime);
 
+    _pipe->Update(deltaTime);
+
     _screenShakeTrauma = fmaxf(0.0f, _screenShakeTrauma - SCREEN_SHAKE_DECAY_RATE * deltaTime);
     float shakeIntensity = _screenShakeTrauma * _screenShakeTrauma;
 
@@ -390,6 +414,8 @@ void GameManager::Update(float deltaTime)
         _explosionGameObjects.end());
 
     if (_grabbedBomb != nullptr && _grabbedBomb->isMarkedForDestroy()) _grabbedBomb = nullptr;
+
+    _prevPressed = _currentPressed;
 }
 
 void GameManager::Render(const float deltaTime) 
@@ -456,8 +482,9 @@ void GameManager::Render(const float deltaTime)
     _bombHouseTop->RenderScreen();
     _bombHouseBottom->RenderScreen();
 
-    if (_grabbedBomb != nullptr && !_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->Render(deltaTime); // Render grabbed bomb on top of everything
+    _pipe->Render(deltaTime);
 
+    if (_grabbedBomb != nullptr && !_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->Render(deltaTime); // Render grabbed bomb on top of everything
 
     DrawTexturePro(
         _sprSmallScreen, { 0, 0, SMALL_SCREEN_SPRITE_WIDTH, SMALL_SCREEN_SPRITE_HEIGHT },
@@ -523,10 +550,18 @@ void GameManager::GameOver(Bomb* obj)
         _grabbedBomb = nullptr;
 	}
 
+    if (_grabbedPipe != nullptr)
+    {
+        _grabbedPipe->LetGo();
+        _grabbedPipe = nullptr;
+    }
+
     for (auto& o : _bombGameObjects) o->GameOver();
 
     _bombHouseTop->GameOver();
     _bombHouseBottom->GameOver();
+
+    _pipe->GameOver();
 
     _gameOverOverlay->SetPosition(obj->GetPosition());
     _gameOverOverlay->GameOver();
@@ -667,7 +702,8 @@ void GameManager::ExplodeBomb(Bomb* obj)
 
 void GameManager::HandleBombGrab()
 {
-    _currentPressed = IsMouseButtonDown(0);
+    if (_grabbedPipe != nullptr) return;
+
     if (_grabbedBomb == nullptr && _currentPressed && !_prevPressed)
     {
         TryGrabBomb(GetWorldMousePos());
@@ -691,7 +727,7 @@ void GameManager::HandleBombGrab()
             {
                 if (_roundValues.timeForNextDramaticDrum <= 0)
                 {
-                    _grabbedBomb->MoveToBombHouseMin();
+                    _grabbedBomb->SnapToBombHouseMin();
                     audioManager->PlayDramaticDrum();
                     _roundValues.timeForNextDramaticDrum = ROUND_TIME_FOR_DRAMATIC_DRUM;
                     AddScreenShake(DRAMATIC_DRUM_SCREEN_SHAKE_TIME);
@@ -700,8 +736,6 @@ void GameManager::HandleBombGrab()
         }
         _grabbedBomb = nullptr;
     }
-
-    _prevPressed = _currentPressed;
 }
 
 void GameManager::TryGrabBomb(const Vector2 mousePos)
@@ -732,6 +766,32 @@ void GameManager::CheckBombCollisions()
         {
             _bombGameObjects[i]->CheckCollisionWith(*_bombGameObjects[j]);
         }
+    }
+}
+
+void GameManager::HandlePipeGrab()
+{
+    if (_grabbedBomb != nullptr) return;
+
+    if (_grabbedPipe == nullptr && _currentPressed && !_prevPressed)
+    {
+        if (_pipe->WasClicked(GetWorldMousePos())) _grabbedPipe = _pipe.get();
+
+        if (_grabbedPipe != nullptr) 
+        {
+            audioManager->PlayBombGrabbedSound(GameManager::instance->GetPan(_grabbedPipe->GetPosition()));
+            _grabbedPipe->Grab();
+        }
+    }
+    else if (_grabbedPipe != nullptr && IsMouseButtonReleased(0))
+    {
+        if (!_grabbedPipe->isMarkedForDestroy()) 
+        {
+            _grabbedPipe->LetGo();
+
+            audioManager->PlayBombReleasedMetalSound(GameManager::instance->GetPan(_grabbedPipe->GetPosition()));
+        }
+        _grabbedPipe = nullptr;
     }
 }
 

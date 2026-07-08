@@ -13,6 +13,7 @@
 #include "GameObject.hh"
 #include "Bomb.hh"
 #include "BombHouse.hh"
+#include "Pipe.hh"
 #include "Explosion.hh"
 #include "GameOverOverlay.hh"
 #include "Constants.hh"
@@ -118,6 +119,8 @@ private:
 	void TryGrabBomb(const Vector2 mousePos);
 	int GetBombReleasedState(Bomb* obj);
 
+	void HandlePipeGrab();
+
 	void CheckBombCollisions();
 
 	BombType GetNewBombType() const;
@@ -155,6 +158,8 @@ private:
 	std::unique_ptr<BombHouse> _bombHouseTop;
 	std::unique_ptr<BombHouse> _bombHouseBottom;
 
+	std::unique_ptr<Pipe> _pipe;
+
 	std::unique_ptr<GameOverOverlay> _gameOverOverlay;
 
 	bool _currentPressed;
@@ -162,6 +167,8 @@ private:
 
 	Bomb* _grabbedBomb;
 	Bomb* _gameOverBomb;
+
+	Pipe* _grabbedPipe;
 
 	float _gameOverCutsceneTimer;
 	float _gameOverRestartTimer;
