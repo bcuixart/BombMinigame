@@ -7,6 +7,10 @@ Pipe::Pipe(const Vector2 p, const float r, const float s) :
     _state = MENU;
 
     _steamValue = PIPE_STEAM_MIN_VALUE;
+
+    _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
+
+    _steamClouds = std::vector<SteamCloud>();
 }
 
 Pipe::~Pipe() 
@@ -40,6 +44,15 @@ void Pipe::Update_GameGrabbed(const float deltaTime)
     _mousePositionLastFrame = mousePos;
 }
 
+void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime) 
+{
+    cloud.lifetime -= deltaTime;
+    
+    cloud.alpha = cloud.maxAlpha; // TODO: fade in and out
+
+    if (cloud.lifetime <= 0) cloud.markedForDestroy = true;
+}
+
 void Pipe::Update(const float deltaTime) 
 {
     switch (_state)
@@ -60,6 +73,32 @@ void Pipe::Update(const float deltaTime)
             break;
         }
     }
+
+    _timeForNextSteamCloud -= deltaTime;
+    if (_timeForNextSteamCloud <= 0 && _steamValue > PIPE_STEAM_SPAWN_THRESHOLD)
+    {
+        SteamCloud cloud;
+        cloud.position = { (float)(rand() % 100 - 50), (float)(rand() % 100 - 50) };
+        cloud.lifetime = PIPE_STEAM_CLOUD_LIFETIME;
+        cloud.alpha = PIPE_STEAM_CLOUD_ALPHA_MIN;
+        cloud.maxAlpha = (_steamValue - PIPE_STEAM_SPAWN_THRESHOLD) / (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_SPAWN_THRESHOLD) 
+                 * (PIPE_STEAM_CLOUD_ALPHA_MAX - PIPE_STEAM_CLOUD_ALPHA_MIN) + PIPE_STEAM_CLOUD_ALPHA_MIN;
+        cloud.markedForDestroy = false;
+        _steamClouds.push_back(cloud);
+
+        _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
+    }
+
+    for (SteamCloud& cloud : _steamClouds) UpdateSteamCloud(cloud, deltaTime);
+
+    _steamClouds.erase(std::remove_if(_steamClouds.begin(), _steamClouds.end(),
+        [](const SteamCloud& cloud) { return cloud.markedForDestroy; }),
+        _steamClouds.end());
+}
+
+void Pipe::RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) 
+{
+    DrawCircleV(cloud.position, 20.0f, { 255, 255, 255, (unsigned char)(cloud.alpha * 255) });
 }
 
 void Pipe::Render(const float deltaTime) 
@@ -69,6 +108,8 @@ void Pipe::Render(const float deltaTime)
     char buffer[10];
     snprintf(buffer, sizeof(buffer), "%.1f", _steamValue);
     DrawText(buffer, _position.x - PIPE_VALVE_RADIUS / 2, _position.y - PIPE_VALVE_RADIUS / 2 - 20, 20, { 255, 255, 255, 255 });
+
+    for (const SteamCloud& cloud : _steamClouds) RenderSteamCloud(cloud, deltaTime);
 }
 
 void Pipe::GameOver() 

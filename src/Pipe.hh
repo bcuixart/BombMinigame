@@ -1,6 +1,8 @@
 #ifndef PIPE_HH
 #define PIPE_HH
 
+#include <vector>
+
 #include "GameObject.hh"
 
 using namespace std;
@@ -10,6 +12,15 @@ enum PipeState
 	MENU,
 	GAME,
 	GAME_GRABBED,
+};
+
+struct SteamCloud
+{
+    Vector2 position;
+    float lifetime;
+    float alpha;
+    float maxAlpha;
+    bool markedForDestroy;
 };
 
 class Pipe : public GameObject {
@@ -35,9 +46,15 @@ private:
     void Update_Game(const float deltaTime);
     void Update_GameGrabbed(const float deltaTime);
 
+    void UpdateSteamCloud(SteamCloud& cloud, const float deltaTime);
+    void RenderSteamCloud(const SteamCloud& cloud, const float deltaTime);
+
     PipeState _state;
 
     float _steamValue;
+    float _timeForNextSteamCloud;
+
+    std::vector<SteamCloud> _steamClouds;
 
     Vector2 _mousePositionLastFrame;
 };
