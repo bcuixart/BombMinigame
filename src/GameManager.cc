@@ -645,10 +645,10 @@ void GameManager::DrawScreenNumber(const int score, const Vector2 position, cons
 
 int GameManager::GetBombReleasedState(Bomb* obj)
 {
-    Vector2 mousePos = GetWorldMousePos();
+    Vector2 bombPos = obj->GetPosition();
 
-    if (mousePos.y >= BOMBHOUSE_COORD_BOT_VER_POS) return BOMB_RELEASED_BOT;
-    if (mousePos.y <= BOMBHOUSE_COORD_TOP_VER_POS) return BOMB_RELEASED_TOP;
+    if (bombPos.y >= BOMBHOUSE_COORD_BOT_VER_POS) return BOMB_RELEASED_BOT;
+    if (bombPos.y <= BOMBHOUSE_COORD_TOP_VER_POS) return BOMB_RELEASED_TOP;
 
     return BOMB_RELEASED_DEF;
 }

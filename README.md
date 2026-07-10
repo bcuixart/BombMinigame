@@ -13,7 +13,9 @@ TODO:
 
 -Highscore saving
 
--Pipe
+-Pipe sounds and valve visual
+
+-Steam and bomb max adjustement based on screen size
 
 -Background improvement
 
