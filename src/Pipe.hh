@@ -23,6 +23,7 @@ struct SteamCloud
 
     float lifetime;
     float animationFrame;
+    float animationSpeed;
     float alpha;
     float maxAlpha;
 

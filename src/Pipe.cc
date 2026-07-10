@@ -49,7 +49,7 @@ void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime)
     cloud.lifetime += deltaTime;
     float lifetimeNormalized = cloud.lifetime / PIPE_STEAM_CLOUD_LIFETIME;
 
-    cloud.animationFrame += deltaTime * PIPE_STEAM_CLOUD_ANIMATION_SPEED;
+    cloud.animationFrame += deltaTime * cloud.animationSpeed;
     if (cloud.animationFrame >= PIPE_STEAM_CLOUD_FRAMES) cloud.animationFrame = 0.0f;
 
     float alphaFunction = -4.0f * lifetimeNormalized * (lifetimeNormalized - 1.0f);
@@ -118,13 +118,17 @@ void Pipe::GameOver()
 
 void Pipe::SpawnSteamCloud()
 {
+    int boundsX = (int)GameManager::instance->GetHorizontalBounds().y;
+
     SteamCloud cloud;
-    cloud.position = { (float)(rand() % 100 - 50), (float)(rand() % 100 - 50) };
+    cloud.position = { (float)GetRandomValue(-boundsX, boundsX), (float)GetRandomValue(BOMBHOUSE_COORD_TOP_VER_POS, BOMBHOUSE_COORD_BOT_VER_POS) };
     cloud.rotation = GetRandomValue(0, 360);
     cloud.scaleX = GetRandomValue(PIPE_STEAM_CLOUD_COORD_SIZE_MIN, PIPE_STEAM_CLOUD_COORD_SIZE_MAX);
     cloud.scaleY = GetRandomValue(PIPE_STEAM_CLOUD_COORD_SIZE_MIN, PIPE_STEAM_CLOUD_COORD_SIZE_MAX);
 
     cloud.lifetime = 0.0f;
+    cloud.animationFrame = 0.0f;
+    cloud.animationSpeed = GetRandomValue(PIPE_STEAM_CLOUD_ANIMATION_SPEED_MIN, PIPE_STEAM_CLOUD_ANIMATION_SPEED_MAX);
     cloud.alpha = PIPE_STEAM_CLOUD_ALPHA_MIN;
     cloud.maxAlpha = (_steamValue - PIPE_STEAM_SPAWN_THRESHOLD) / (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_SPAWN_THRESHOLD) 
                 * (PIPE_STEAM_CLOUD_ALPHA_MAX - PIPE_STEAM_CLOUD_ALPHA_MIN) + PIPE_STEAM_CLOUD_ALPHA_MIN;
@@ -149,7 +153,9 @@ bool Pipe::WasClicked(const Vector2 mousePos) const
 void Pipe::StartGame() 
 {
     _state = GAME;
-    _steamValue = 50; // TEST VALUE, MUST BE SET TO PIPE_STEAM_MIN_VALUE
+    _steamValue = PIPE_STEAM_MIN_VALUE;
+    
+    if (DEBUG_PIPE_USE_START_VALUE) _steamValue = DEBUG_PIPE_START_VALUE;
 }
 
 void Pipe::Grab() 
