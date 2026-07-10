@@ -49,7 +49,7 @@ void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime)
     cloud.lifetime += deltaTime;
     float lifetimeNormalized = cloud.lifetime / PIPE_STEAM_CLOUD_LIFETIME;
 
-    cloud.animationFrame += deltaTime * 10.0f;
+    cloud.animationFrame += deltaTime * PIPE_STEAM_CLOUD_ANIMATION_SPEED;
     if (cloud.animationFrame >= PIPE_STEAM_CLOUD_FRAMES) cloud.animationFrame = 0.0f;
 
     float alphaFunction = -4.0f * lifetimeNormalized * (lifetimeNormalized - 1.0f);
