@@ -17,9 +17,15 @@ enum PipeState
 struct SteamCloud
 {
     Vector2 position;
+    float rotation;
+    float scaleX;
+    float scaleY;
+
     float lifetime;
+    float animationFrame;
     float alpha;
     float maxAlpha;
+
     bool markedForDestroy;
 };
 
@@ -47,7 +53,9 @@ private:
     void Update_GameGrabbed(const float deltaTime);
 
     void UpdateSteamCloud(SteamCloud& cloud, const float deltaTime);
-    void RenderSteamCloud(const SteamCloud& cloud, const float deltaTime);
+    void RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) const;
+
+    void SpawnSteamCloud();
 
     PipeState _state;
 

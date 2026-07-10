@@ -95,6 +95,7 @@ public:
 	Texture2D sprExplosion;
 	Texture2D sprExplosionProps;
 	Texture2D sprGameOverOverlay;
+	Texture2D sprSteamCloud;
 
 protected:
 

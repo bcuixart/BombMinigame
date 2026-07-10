@@ -46,11 +46,16 @@ void Pipe::Update_GameGrabbed(const float deltaTime)
 
 void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime) 
 {
-    cloud.lifetime -= deltaTime;
-    
-    cloud.alpha = cloud.maxAlpha; // TODO: fade in and out
+    cloud.lifetime += deltaTime;
+    float lifetimeNormalized = cloud.lifetime / PIPE_STEAM_CLOUD_LIFETIME;
 
-    if (cloud.lifetime <= 0) cloud.markedForDestroy = true;
+    cloud.animationFrame += deltaTime * 10.0f;
+    if (cloud.animationFrame >= PIPE_STEAM_CLOUD_FRAMES) cloud.animationFrame = 0.0f;
+
+    float alphaFunction = -4.0f * lifetimeNormalized * (lifetimeNormalized - 1.0f);
+    cloud.alpha = cloud.maxAlpha * alphaFunction;
+
+    if (cloud.lifetime >= PIPE_STEAM_CLOUD_LIFETIME) cloud.markedForDestroy = true;
 }
 
 void Pipe::Update(const float deltaTime) 
@@ -75,19 +80,7 @@ void Pipe::Update(const float deltaTime)
     }
 
     _timeForNextSteamCloud -= deltaTime;
-    if (_timeForNextSteamCloud <= 0 && _steamValue > PIPE_STEAM_SPAWN_THRESHOLD)
-    {
-        SteamCloud cloud;
-        cloud.position = { (float)(rand() % 100 - 50), (float)(rand() % 100 - 50) };
-        cloud.lifetime = PIPE_STEAM_CLOUD_LIFETIME;
-        cloud.alpha = PIPE_STEAM_CLOUD_ALPHA_MIN;
-        cloud.maxAlpha = (_steamValue - PIPE_STEAM_SPAWN_THRESHOLD) / (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_SPAWN_THRESHOLD) 
-                 * (PIPE_STEAM_CLOUD_ALPHA_MAX - PIPE_STEAM_CLOUD_ALPHA_MIN) + PIPE_STEAM_CLOUD_ALPHA_MIN;
-        cloud.markedForDestroy = false;
-        _steamClouds.push_back(cloud);
-
-        _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
-    }
+    if (_timeForNextSteamCloud <= 0 && _steamValue > PIPE_STEAM_SPAWN_THRESHOLD) SpawnSteamCloud();
 
     for (SteamCloud& cloud : _steamClouds) UpdateSteamCloud(cloud, deltaTime);
 
@@ -96,9 +89,14 @@ void Pipe::Update(const float deltaTime)
         _steamClouds.end());
 }
 
-void Pipe::RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) 
+void Pipe::RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) const
 {
-    DrawCircleV(cloud.position, 20.0f, { 255, 255, 255, (unsigned char)(cloud.alpha * 255) });
+    DrawTexturePro(
+        GameManager::instance->sprSteamCloud, 
+        { (float)(PIPE_STEAM_CLOUD_SPRITE_SIZE * (int)cloud.animationFrame), 0, PIPE_STEAM_CLOUD_SPRITE_SIZE, PIPE_STEAM_CLOUD_SPRITE_SIZE },
+        { cloud.position.x - cloud.scaleX / 2, cloud.position.y - cloud.scaleY / 2, cloud.scaleX, cloud.scaleY },
+        { cloud.scaleX / 2, cloud.scaleY / 2 }, cloud.rotation, { 255, 255, 255, (unsigned char)(cloud.alpha * 255) }
+    );
 }
 
 void Pipe::Render(const float deltaTime) 
@@ -116,6 +114,24 @@ void Pipe::GameOver()
 {
     _state = MENU;
     _steamValue = PIPE_STEAM_MIN_VALUE;
+}
+
+void Pipe::SpawnSteamCloud()
+{
+    SteamCloud cloud;
+    cloud.position = { (float)(rand() % 100 - 50), (float)(rand() % 100 - 50) };
+    cloud.rotation = GetRandomValue(0, 360);
+    cloud.scaleX = GetRandomValue(PIPE_STEAM_CLOUD_COORD_SIZE_MIN, PIPE_STEAM_CLOUD_COORD_SIZE_MAX);
+    cloud.scaleY = GetRandomValue(PIPE_STEAM_CLOUD_COORD_SIZE_MIN, PIPE_STEAM_CLOUD_COORD_SIZE_MAX);
+
+    cloud.lifetime = 0.0f;
+    cloud.alpha = PIPE_STEAM_CLOUD_ALPHA_MIN;
+    cloud.maxAlpha = (_steamValue - PIPE_STEAM_SPAWN_THRESHOLD) / (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_SPAWN_THRESHOLD) 
+                * (PIPE_STEAM_CLOUD_ALPHA_MAX - PIPE_STEAM_CLOUD_ALPHA_MIN) + PIPE_STEAM_CLOUD_ALPHA_MIN;
+    cloud.markedForDestroy = false;
+    _steamClouds.push_back(cloud);
+
+    _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
 }
 
 bool Pipe::WasClicked(const Vector2 mousePos) const 
