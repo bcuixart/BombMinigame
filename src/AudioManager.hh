@@ -16,6 +16,8 @@ public:
 	void Update(const float deltaTime);
 
 	void PlayMusic();
+	void PauseMusic();
+	void ResumeMusic();
 	void StopMusic();
 
 	float GetMusicTime() const;

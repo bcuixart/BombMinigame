@@ -86,6 +86,18 @@ void AudioManager::PlayMusic()
 	_playingMusic = true;
 }
 
+void AudioManager::PauseMusic()
+{
+	PauseMusicStream(_gameMusic);
+	_playingMusic = false;
+}
+
+void AudioManager::ResumeMusic()
+{
+	PlayMusicStream(_gameMusic);
+	_playingMusic = true;
+}
+
 void AudioManager::StopMusic()
 {
 	StopMusicStream(_gameMusic);

@@ -41,6 +41,9 @@ GameManager::GameManager()
     _pointTallyCounter = 0;
     _pointTallyCounterLast = 0;
 
+	_pauseResumeTicks = 0;
+	_pauseResumeTimer = 0.0f;
+
     _musicPrevTime = 0.0f;
 
     StartMainMenu();
@@ -268,6 +271,42 @@ void GameManager::UpdateRound(const float deltaTime)
 
     HandleBombGrab();
     HandlePipeGrab();
+
+    if (IsPauseButtonPressed()) 
+    { 
+		if (_grabbedBomb != nullptr && !_grabbedBomb->isMarkedForDestroy()) _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
+		if (_grabbedPipe != nullptr && !_grabbedPipe->isMarkedForDestroy()) _grabbedPipe->LetGo();
+
+		_grabbedBomb = nullptr;
+		_grabbedPipe = nullptr;
+
+        _state = ROUND_PAUSED; 
+        audioManager->PauseMusic(); 
+    }
+}
+
+void GameManager::UpdateRoundPaused(const float deltaTime)
+{
+	if (IsPauseButtonPressed()) 
+    { 
+		_pauseResumeTicks = PAUSE_RESUME_COUNTDOWN_TICKS + 1; // +1 because the first tick is instant
+        _pauseResumeTimer = PAUSE_RESUME_COUNTDOWN_TICK_TIME;
+        _state = ROUND_RESUMING; 
+    }
+}
+
+void GameManager::UpdateRoundResuming(const float deltaTime)
+{
+	_pauseResumeTimer += deltaTime;
+    if (_pauseResumeTimer >= PAUSE_RESUME_COUNTDOWN_TICK_TIME)
+    {
+		_pauseResumeTimer = 0.0f;
+		_pauseResumeTicks--;
+
+		audioManager->PlayBombHouseTransitionFlashSound();
+
+		if (_pauseResumeTicks <= 0) { _state = ROUND; audioManager->ResumeMusic(); }
+    }
 }
 
 void GameManager::UpdateGameOver(const float deltaTime)
@@ -363,6 +402,18 @@ void GameManager::Update(float deltaTime)
             UpdateRound(deltaTime);
             break;
         }
+		case ROUND_PAUSED:
+		{
+			UpdateRoundPaused(deltaTime);
+            return;
+			break;
+		}
+		case ROUND_RESUMING:
+		{
+			UpdateRoundResuming(deltaTime);
+            return;
+			break;
+		}
         case GAME_OVER_CUTSCENE:
         {
             UpdateGameOverCutscene(deltaTime);
@@ -497,7 +548,7 @@ void GameManager::Render(const float deltaTime)
     int numberToDraw = _roundValues.score;
 	Color numberColor = WHITE;
 	if (_state == MAIN_MENU) { numberToDraw = _highScore; numberColor = SMALL_NUMBER_YELLOW_COLOR; }
-	if ((_state == ROUND || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = SMALL_NUMBER_YELLOW_COLOR;
+	if ((_state == ROUND || _state == ROUND_PAUSED || _state == ROUND_RESUMING || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = SMALL_NUMBER_YELLOW_COLOR;
     if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == POINT_TALLY || _state == POINT_TALLY_DONE) numberToDraw = -1; // -1 to show DEAD
     DrawScreenNumber(numberToDraw, 
         { GetSmallScreenPos() + SMALL_SCREEN_NUMBER_POSITION_OFFSET_X,
@@ -572,6 +623,11 @@ void GameManager::GameOver(Bomb* obj)
 bool GameManager::IsGameOverCutscene() const
 {
     return _state == GAME_OVER_CUTSCENE;
+}
+
+bool GameManager::IsPauseButtonPressed() const
+{
+	return (_state == ROUND || _state == ROUND_PAUSED) && IsKeyPressed(KEY_ESCAPE);
 }
 
 void GameManager::InstantiateBomb(std::unique_ptr<Bomb> obj)

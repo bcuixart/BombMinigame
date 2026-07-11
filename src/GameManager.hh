@@ -24,6 +24,8 @@ enum GameState
 {
 	MAIN_MENU,
 	ROUND,
+	ROUND_PAUSED,
+	ROUND_RESUMING,
 	GAME_OVER_CUTSCENE,
 	GAME_OVER,
 	REVIVE_DECISION,
@@ -108,11 +110,15 @@ private:
 
 	void UpdateMainMenu(const float deltaTime);
 	void UpdateRound(const float deltaTime);
+	void UpdateRoundPaused(const float deltaTime);
+	void UpdateRoundResuming(const float deltaTime);
 	void UpdateGameOver(const float deltaTime);
 	void UpdateGameOverCutscene(const float deltaTime);
 	void UpdateReviveDecision(const float deltaTime);
 	void UpdatePointTally(const float deltaTime);
 	void UpdatePointTallyDone(const float deltaTime);
+
+	bool IsPauseButtonPressed() const;
 
 	void GameOver(Bomb* obj);
 
@@ -149,6 +155,9 @@ private:
 
 	float _screenShakeTrauma = 0.0f;
 	float _screenShakePhase = 0.0f;
+
+	float _pauseResumeTimer = 0.0f;
+	int _pauseResumeTicks = 0;
 
 	float _musicPrevTime = 0.0f;
 
