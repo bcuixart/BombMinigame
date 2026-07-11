@@ -15,8 +15,6 @@ TODO:
 
 -Highscore saving
 
--Big number display for score
-
 -Pipe sounds and valve visual
 
 -Steam and bomb max adjustement based on screen size
@@ -28,8 +26,6 @@ TODO:
 -Sound mixing
 
 -Pause menu
-
--Point tallying improvements
 
 -Clap every 100 points
 

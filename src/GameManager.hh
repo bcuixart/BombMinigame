@@ -164,6 +164,7 @@ private:
 	int _highScore;
 	float _pointTallyCounter;
 	int _pointTallyCounterLast;
+	int _pointTallySkipClicks;
 
 	std::unique_ptr<BombHouse> _bombHouseTop;
 	std::unique_ptr<BombHouse> _bombHouseBottom;

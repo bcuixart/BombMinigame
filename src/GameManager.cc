@@ -40,6 +40,7 @@ GameManager::GameManager()
     _highScore = 10;
     _pointTallyCounter = 0;
     _pointTallyCounterLast = 0;
+    _pointTallySkipClicks = 0;
 
 	_pauseResumeTicks = 0;
 	_pauseResumeTimer = 0.0f;
@@ -212,6 +213,7 @@ void GameManager::StartPointTally()
 
     _pointTallyCounter = 0;
     _pointTallyCounterLast = 0;
+	_pointTallySkipClicks = 0;
     _state = POINT_TALLY;
 }
 
@@ -356,8 +358,11 @@ void GameManager::UpdatePointTally(const float deltaTime)
 	if (_pointTallyCounterLast != (int)_pointTallyCounter)
 	{
 		_pointTallyCounterLast = (int)_pointTallyCounter;
-		audioManager->PlayPointSound();
+        if (_pointTallyCounterLast % POINT_TALLY_SOUND_POINT_INTERVAL == 0) audioManager->PlayPointTallySound();
 	}
+
+	if (_prevPressed && _currentPressed) _pointTallySkipClicks++;
+	if (_pointTallySkipClicks >= POINT_TALLY_SKIP_CLICKS) _pointTallyCounter = (float)_roundValues.score;
 
 	if (_pointTallyCounter >= _roundValues.score)
 	{
@@ -673,7 +678,13 @@ void GameManager::AddScreenShake(float amount)
 
 void GameManager::DrawScreenNumber(const int score, const Vector2 position, const Color color) const
 {
-    if (score > 9999) return;
+    if (score > 9999) 
+    {
+		char s[5];
+		sprintf(s, "%d", score);
+		DrawTextEx(GetFontDefault(), s, { position.x, position.y + 8 }, 32, 10, color);
+        return;
+    }
 
     int digits[4] = { 0 };
     digits[0] = score / 1000;

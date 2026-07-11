@@ -33,6 +33,7 @@ public:
 	void PlayBombHouseTransitionFlashSound();
 
 	void PlayPointSound();
+	void PlayPointTallySound();
 
 	void PlayGameOverAlertSound();
 	void PlayGameOverJingleSound();
@@ -66,6 +67,9 @@ private:
 
 	Sound _pointSound[ASSET_SOUND_POINT_SOUNDS];
 	int _currentPointSoundIndex;
+
+	Sound _pointTallySound[ASSET_SOUND_POINT_SOUNDS];
+	int _currentPointTallySoundIndex;
 
 	Sound _dramaticDrumSound;
 	Sound _gameOverAlertSound;

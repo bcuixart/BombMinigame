@@ -21,6 +21,7 @@ AudioManager::AudioManager()
 	_bombWarningSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_WARNING).c_str());
 	_bombHouseTransitionFlashSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMBHOUSE_TRANSITION_FLASH).c_str());
 	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) _pointSound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
+	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) _pointTallySound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT_TALLY).c_str());
 	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
 	_gameOverJingleSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_JINGLE).c_str());
 	_pointTallyEndSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT_TALLY_END).c_str());
@@ -32,6 +33,7 @@ AudioManager::AudioManager()
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
 	_currentPointSoundIndex = 0;
+	_currentPointTallySoundIndex = 0;
 
 	_playingMusic = false;
 
@@ -50,6 +52,7 @@ AudioManager::~AudioManager()
 	UnloadSound(_bombWarningSound);
 	UnloadSound(_bombHouseTransitionFlashSound);
 	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) UnloadSound(_pointSound[i]);
+	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) UnloadSound(_pointTallySound[i]);
 	UnloadSound(_gameOverAlertSound);
 	UnloadSound(_gameOverJingleSound);
 	UnloadSound(_pointTallyEndSound);
@@ -138,6 +141,14 @@ void AudioManager::PlayPointSound()
 	PlaySound(_pointSound[_currentPointSoundIndex]);
 
 	_currentPointSoundIndex = (_currentPointSoundIndex + 1) % ASSET_SOUND_POINT_SOUNDS;
+}
+
+void AudioManager::PlayPointTallySound()
+{
+	SetSoundPitch(_pointTallySound[_currentPointTallySoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
+	PlaySound(_pointTallySound[_currentPointTallySoundIndex]);
+
+	_currentPointTallySoundIndex = (_currentPointTallySoundIndex + 1) % ASSET_SOUND_POINT_SOUNDS;
 }
 
 void AudioManager::PlayDramaticDrum()
