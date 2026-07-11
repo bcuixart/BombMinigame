@@ -42,6 +42,18 @@ void GameOverOverlay::Render(const float deltaTime)
 {
 	if (!_didGameOver) return;
 
+	float halfScale = _scale / 2.0f;
+	float left = _position.x - halfScale;
+	float right = _position.x + halfScale;
+	float top = _position.y - halfScale;
+	float bottom = _position.y + halfScale;
+
+	const float EXTENT = 5000.0f;
+	DrawRectangleRec({ -EXTENT,  -EXTENT,  EXTENT * 2, EXTENT + top }, GAMEOVER_OVERLAY_SPRTE_COLOR);
+	DrawRectangleRec({ -EXTENT,  bottom,   EXTENT * 2, EXTENT - bottom }, GAMEOVER_OVERLAY_SPRTE_COLOR);
+	DrawRectangleRec({ -EXTENT,  top,  EXTENT + left,  _scale }, GAMEOVER_OVERLAY_SPRTE_COLOR);
+	DrawRectangleRec({ right,   top,  EXTENT - right, _scale }, GAMEOVER_OVERLAY_SPRTE_COLOR);
+
 	Rectangle dest = { _position.x, _position.y, _scale, _scale };
 	Vector2 origin = { _scale / 2, _scale / 2 };
 	

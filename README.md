@@ -11,7 +11,11 @@ TODO:
 
 -Bomb animation FPS
 
+-Loading screen
+
 -Highscore saving
+
+-Big number display for score
 
 -Pipe sounds and valve visual
 
@@ -20,8 +24,6 @@ TODO:
 -Background improvement
 
 -Better flame and sound
-
--Game over overlay size fix
 
 -Sound mixing
 
