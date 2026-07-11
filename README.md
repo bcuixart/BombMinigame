@@ -24,3 +24,11 @@ TODO:
 -Game over overlay size fix
 
 -Sound mixing
+
+-Pause menu
+
+-Point tallying improvements
+
+-Clap every 100 points
+
+-Credits and info
