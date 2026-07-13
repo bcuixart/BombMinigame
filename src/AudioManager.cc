@@ -63,10 +63,10 @@ AudioManager::~AudioManager()
 
 void AudioManager::Update(const float deltaTime)
 {
+	UpdateMusicStream(_gameMusic);
+	
 	if (_playingMusic)
 	{
-		UpdateMusicStream(_gameMusic);
-
 		float musicTime = GetMusicTimePlayed(_gameMusic);
 		if (musicTime >= ASSET_SOUND_MUSIC_LOOP_END + 1)
 		{
@@ -97,7 +97,7 @@ void AudioManager::PauseMusic()
 
 void AudioManager::ResumeMusic()
 {
-	PlayMusicStream(_gameMusic);
+	ResumeMusicStream(_gameMusic);
 	_playingMusic = true;
 }
 
