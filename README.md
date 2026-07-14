@@ -11,9 +11,8 @@ TODO:
 - Bomb animation FPS
 - Loading screen
 - Highscore saving
-- Pipe sounds and valve visual
+- Pipe sounds
 - Steam and bomb max adjustement based on screen size
-- Background improvement
 - Better flame and sound
 - Sound mixing
 - Pause menu
