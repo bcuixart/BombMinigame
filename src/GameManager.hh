@@ -84,6 +84,7 @@ public:
 	Vector2 GetHorizontalBounds() const;
 
 	float GetPan(const Vector2& position) const;
+	float GetBombExplosionSoundVolume() const;
 
 	static GameManager* instance;
 
@@ -97,7 +98,10 @@ public:
 	Texture2D sprExplosion;
 	Texture2D sprExplosionProps;
 	Texture2D sprGameOverOverlay;
+	Texture2D sprPipeValve;
 	Texture2D sprSteamCloud;
+	Texture2D sprSteamIndicatorBase;
+	Texture2D sprSteamIndicatorNeedle;
 
 protected:
 

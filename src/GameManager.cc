@@ -14,7 +14,10 @@ GameManager::GameManager()
     sprExplosion = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION).c_str());
     sprExplosionProps = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION_PROPS).c_str());
     sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
+    sprPipeValve = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_PIPE_VALVE).c_str());
     sprSteamCloud = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_CLOUD).c_str());
+    sprSteamIndicatorBase = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_INDICATOR_BASE).c_str());
+    sprSteamIndicatorNeedle = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_INDICATOR_NEEDLE).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
     _sprMapMG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_MG).c_str());
     _sprMapFG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_FG).c_str());
@@ -70,7 +73,10 @@ GameManager::~GameManager()
 	UnloadTexture(sprExplosion);
 	UnloadTexture(sprExplosionProps);
 	UnloadTexture(sprGameOverOverlay);
+    UnloadTexture(sprPipeValve);
     UnloadTexture(sprSteamCloud);
+    UnloadTexture(sprSteamIndicatorBase);
+    UnloadTexture(sprSteamIndicatorNeedle);
 	UnloadTexture(_sprMapBG);
 	UnloadTexture(_sprMapMG);
 	UnloadTexture(_sprMapFG);
@@ -307,7 +313,12 @@ void GameManager::UpdateRoundResuming(const float deltaTime)
 
 		audioManager->PlayBombHouseTransitionFlashSound();
 
-		if (_pauseResumeTicks <= 0) { _state = ROUND; audioManager->ResumeMusic(); }
+		if (_pauseResumeTicks <= 0) 
+        {
+             _state = ROUND; 
+             audioManager->ResumeMusic(); 
+             _musicPrevTime = audioManager->GetMusicTime();
+        }
     }
 }
 
@@ -778,7 +789,7 @@ void GameManager::HandleBombGrab()
         TryGrabBomb(GetWorldMousePos());
         if (_grabbedBomb != nullptr) 
         {
-            audioManager->PlayBombGrabbedSound(GameManager::instance->GetPan(_grabbedBomb->GetPosition()));
+            audioManager->PlayBombGrabbedSound(GetPan(_grabbedBomb->GetPosition()));
             _grabbedBomb->Grab();
         }
     }
@@ -788,8 +799,8 @@ void GameManager::HandleBombGrab()
         {
             int letGoState = _grabbedBomb->LetGo(GetBombReleasedState(_grabbedBomb));
 
-            if (letGoState == BOMB_PLACED_TOP || letGoState == BOMB_PLACED_BOT) audioManager->PlayBombReleasedBombHouseSound(GameManager::instance->GetPan(_grabbedBomb->GetPosition()));
-            else audioManager->PlayBombReleasedMetalSound(GameManager::instance->GetPan(_grabbedBomb->GetPosition()));
+            if (letGoState == BOMB_PLACED_TOP || letGoState == BOMB_PLACED_BOT) audioManager->PlayBombReleasedBombHouseSound(GetPan(_grabbedBomb->GetPosition()));
+            else audioManager->PlayBombReleasedMetalSound(GetPan(_grabbedBomb->GetPosition()));
 
             if ( (letGoState == BOMB_PLACED_TOP && !_bombHouseTop->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())) ||
                 (letGoState == BOMB_PLACED_BOT && !_bombHouseBottom->GetIsBombEnteredTypeValid(_grabbedBomb->GetType())))
@@ -848,7 +859,7 @@ void GameManager::HandlePipeGrab()
 
         if (_grabbedPipe != nullptr) 
         {
-            audioManager->PlayBombGrabbedSound(GameManager::instance->GetPan(_grabbedPipe->GetPosition()));
+            audioManager->PlayBombGrabbedSound(GetPan(_grabbedPipe->GetPosition()));
             _grabbedPipe->Grab();
         }
     }
@@ -858,7 +869,7 @@ void GameManager::HandlePipeGrab()
         {
             _grabbedPipe->LetGo();
 
-            audioManager->PlayBombReleasedMetalSound(GameManager::instance->GetPan(_grabbedPipe->GetPosition()));
+            audioManager->PlayBombReleasedMetalSound(GetPan(_grabbedPipe->GetPosition()));
         }
         _grabbedPipe = nullptr;
     }
@@ -893,6 +904,15 @@ float GameManager::GetPan(const Vector2& position) const
     Vector2 bounds = GetHorizontalBounds();
     float pan = (position.x - bounds.x) / (bounds.y - bounds.x);
     return 1.0f - pan;
+}
+
+float GameManager::GetBombExplosionSoundVolume() const
+{
+    int explosionCount = (int)_explosionGameObjects.size();
+
+    float volume = (explosionCount <= 0) ? 1.0f : (0.5f / (float)explosionCount) + 0.5f;
+
+    return min(volume, 1.0f);
 }
 
 BombType GameManager::GetNewBombType() const

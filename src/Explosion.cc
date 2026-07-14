@@ -16,6 +16,7 @@ Explosion::Explosion(const Vector2 p, const float r, const float s) :
 	} 
 
 	_explosionSound = GameManager::instance->audioManager->GetBombExplosionSound();
+	SetSoundVolume(_explosionSound, GameManager::instance->GetBombExplosionSoundVolume());
 	SetSoundPan(_explosionSound, GameManager::instance->GetPan(_position));
 	SetSoundPitch(_explosionSound, float(GetRandomValue(90, 110)) / 100.0f);
 
@@ -28,7 +29,7 @@ Explosion::~Explosion()
 }
 
 void Explosion::Update(float deltaTime)
-{
+{	
 	_elapsedLifetime += deltaTime;
 
 	for (int i = 0; i < EXPLOSION_PROPS_NUMBER; ++i) 

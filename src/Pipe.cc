@@ -7,6 +7,7 @@ Pipe::Pipe(const Vector2 p, const float r, const float s) :
     _state = MENU;
 
     _steamValue = PIPE_STEAM_MIN_VALUE;
+    _rotation = 0.0f;
 
     _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
 
@@ -31,12 +32,20 @@ void Pipe::Update_Game(const float deltaTime)
 
 void Pipe::Update_GameGrabbed(const float deltaTime) 
 {
+    if (_steamValue <= PIPE_STEAM_MIN_VALUE) return;
+    
     Vector2 mousePos = GameManager::instance->GetWorldMousePos();
 
     float angle = atan2f(mousePos.y - _position.y, mousePos.x - _position.x);
     float prevAngle = atan2f(_mousePositionLastFrame.y - _position.y, _mousePositionLastFrame.x - _position.x);
-    float angleDiff = fabsf(angle - prevAngle);
+    float rotationDelta = angle - prevAngle;
+    float angleDiff = fabsf(rotationDelta);
     if (angleDiff > PI) angleDiff = 2.0f * PI - angleDiff;
+
+    if (rotationDelta > PI)  rotationDelta -= 2.0f * PI;
+    if (rotationDelta < -PI) rotationDelta += 2.0f * PI;
+
+    _rotation += rotationDelta * RAD2DEG;
 
     _steamValue -= PIPE_STEAM_DECREMENT_SPEED * angleDiff * deltaTime;
     if (_steamValue > PIPE_STEAM_MAX_VALUE) _steamValue = PIPE_STEAM_MAX_VALUE;
@@ -101,11 +110,56 @@ void Pipe::RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) cons
 
 void Pipe::Render(const float deltaTime) 
 {
-    DrawRectangleLines(_position.x - PIPE_VALVE_RADIUS / 2, _position.y - PIPE_VALVE_RADIUS / 2, PIPE_VALVE_RADIUS, PIPE_VALVE_RADIUS, { 255, 255, 255, 255 });
+    if (DEBUG_PIPE_DRAW_GRAB_RADIUS)
+    {
+        DrawRectangleLines(
+            _position.x - PIPE_VALVE_GRAB_RADIUS / 2,
+            _position.y - PIPE_VALVE_GRAB_RADIUS / 2,
+            PIPE_VALVE_GRAB_RADIUS,
+            PIPE_VALVE_GRAB_RADIUS,
+            { 255, 255, 255, 255 });
+    }
 
-    char buffer[10];
-    snprintf(buffer, sizeof(buffer), "%.1f", _steamValue);
-    DrawText(buffer, _position.x - PIPE_VALVE_RADIUS / 2, _position.y - PIPE_VALVE_RADIUS / 2 - 20, 20, { 255, 255, 255, 255 });
+    if (DEBUG_PIPE_DRAW_STEAM_VALUE)
+    {
+        char buffer[10];
+        snprintf(buffer, sizeof(buffer), "%.1f", _steamValue);
+        DrawText(buffer, _position.x - PIPE_VALVE_SPRITE_SIZE / 2, _position.y - PIPE_VALVE_SPRITE_SIZE / 2 - 20, 20, { 255, 255, 255, 255 });
+    }
+
+    float baseTLx = _position.x - PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_X / 2.0f + PIPE_STEAM_INDICATOR_BASE_SPRITE_OFFSET_X;
+    float baseTLy = _position.y + PIPE_VALVE_SPRITE_SIZE / 2.0f + PIPE_STEAM_INDICATOR_BASE_SPRITE_OFFSET_Y;
+    float angle = (_steamValue - PIPE_STEAM_MIN_VALUE) / (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_MIN_VALUE)
+              * (PIPE_STEAM_INDICATOR_NEEDLE_ANGLE_MAX - PIPE_STEAM_INDICATOR_NEEDLE_ANGLE_MIN)
+              + PIPE_STEAM_INDICATOR_NEEDLE_ANGLE_MIN;
+
+    DrawTexturePro(
+        GameManager::instance->sprSteamIndicatorBase,
+        { 0, 0, PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_X, PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_Y },
+        { baseTLx, baseTLy, PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_X, PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_Y },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    DrawTexturePro(
+        GameManager::instance->sprSteamIndicatorNeedle,
+        { 0, 0, PIPE_STEAM_INDICATOR_NEEDLE_SPRITE_SIZE, PIPE_STEAM_INDICATOR_NEEDLE_SPRITE_SIZE },
+        { baseTLx + PIPE_STEAM_INDICATOR_NEEDLE_OFFSET_X,
+        baseTLy + PIPE_STEAM_INDICATOR_NEEDLE_OFFSET_Y,
+        PIPE_STEAM_INDICATOR_NEEDLE_SPRITE_SIZE,
+        PIPE_STEAM_INDICATOR_NEEDLE_SPRITE_SIZE },
+        { PIPE_STEAM_INDICATOR_NEEDLE_SPRITE_SIZE / 2.0f, PIPE_STEAM_INDICATOR_NEEDLE_SPRITE_SIZE / 2.0f },
+        angle,
+        WHITE
+    );
+
+    DrawTexturePro(
+        GameManager::instance->sprPipeValve, 
+        { 0, 0, PIPE_VALVE_SPRITE_SIZE, PIPE_VALVE_SPRITE_SIZE },
+        { _position.x, _position.y, PIPE_VALVE_SPRITE_SIZE, PIPE_VALVE_SPRITE_SIZE },
+        { PIPE_VALVE_SPRITE_SIZE / 2.0f, PIPE_VALVE_SPRITE_SIZE / 2.0f }, 
+        _rotation, 
+        WHITE
+    );
 
     for (const SteamCloud& cloud : _steamClouds) RenderSteamCloud(cloud, deltaTime);
 }
@@ -143,10 +197,10 @@ bool Pipe::WasClicked(const Vector2 mousePos) const
     if (_state == MENU || _state == GAME_GRABBED) return false;
 
     return CheckCollisionPointRec(mousePos,
-    {	_position.x - PIPE_VALVE_RADIUS / 2,
-        _position.y - PIPE_VALVE_RADIUS / 2,
-        PIPE_VALVE_RADIUS,
-        PIPE_VALVE_RADIUS
+    {	_position.x - PIPE_VALVE_GRAB_RADIUS / 2,
+        _position.y - PIPE_VALVE_GRAB_RADIUS / 2,
+        PIPE_VALVE_GRAB_RADIUS,
+        PIPE_VALVE_GRAB_RADIUS
     });
 }
 
@@ -154,6 +208,8 @@ void Pipe::StartGame()
 {
     _state = GAME;
     _steamValue = PIPE_STEAM_MIN_VALUE;
+
+    _rotation = 0.0f;
     
     if (DEBUG_PIPE_USE_START_VALUE) _steamValue = DEBUG_PIPE_START_VALUE;
 }
