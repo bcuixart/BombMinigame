@@ -87,6 +87,8 @@ private:
 
 	Sound _windUpLoopSound;
 	Sound _fuseLoopSound;
+
+	float _fuseLoopSoundTime;
 };
 
 #endif

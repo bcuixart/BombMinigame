@@ -40,6 +40,8 @@ Bomb::Bomb(const Vector2 p, const float r, const float s, const BombType t) :
 	_collidedThisFrame = false;
 	_wasAboutToExplodeLastFrame = false;
 
+	_fuseLoopSoundTime = 0;
+
 	_alpha = 0;
 }
 
@@ -75,8 +77,15 @@ void Bomb::Update(float deltaTime)
 
 	SetSoundPan(_fuseLoopSound, GameManager::instance->GetPan(_position));
 	float fuseSoundMultiplier = Clamp(1 - (_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
-	SetSoundVolume(_fuseLoopSound, min(1.0f, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier));
-	if (!IsSoundPlaying(_fuseLoopSound)) PlaySound(_fuseLoopSound);
+	if (!_didGameOver) SetSoundVolume(_fuseLoopSound, min(1.0f, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier));
+	else SetSoundVolume(_fuseLoopSound, 0);
+
+	_fuseLoopSoundTime += deltaTime;
+	if (_fuseLoopSoundTime >= BOMB_FUSE_LOOP_TIME) 
+	{
+		_fuseLoopSoundTime = 0;
+		PlaySound(_fuseLoopSound);
+	}
 
 	_collidedThisFrame = false;
 
@@ -243,6 +252,9 @@ void Bomb::GameOver()
 {
 	float newTimeToExplode = GetRandomValue(100, 300) / 100.f;
 	_timeToExplode = min(_timeToExplode, newTimeToExplode);
+
+	SetSoundVolume(_windUpLoopSound, 0);
+	SetSoundVolume(_fuseLoopSound, 0);
 
 	_didGameOver = true;
 }
