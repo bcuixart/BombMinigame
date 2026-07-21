@@ -13,7 +13,6 @@ TODO:
 - Highscore saving
 - Pipe sounds
 - Steam and bomb max adjustement based on screen size
-- Better flame and sound
 - Sound mixing
 - Pause menu
 - Clap every 100 points
@@ -31,7 +30,7 @@ Sound effects:
 - Bomb walking sounds:
 - Bomb bump sounds by bart: https://opengameart.org/content/33-metal-clang-sounds-cast-iron-pans (CC0 1.0 license)
 - Bomb grab and relase sounds by qubodup: https://opengameart.org/content/metal-interactions (CC0 1.0 license)
-- Bomb fuse sound:
+- Bomb fuse sound by Echo Cinematics: https://www.youtube.com/watch?v=WmJbhSuzRYg 
 - Bomb explosion sound:
 - Bomb beep sound: https://www.youtube.com/watch?v=G6Vxrqfytrk
 - Screen beep sound by dklon: https://opengameart.org/content/various-alerts (CC BY 3.0 license, must include link and credit, and state no changes were made)

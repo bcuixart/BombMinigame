@@ -75,7 +75,7 @@ void Bomb::Update(float deltaTime)
 
 	SetSoundPan(_fuseLoopSound, GameManager::instance->GetPan(_position));
 	float fuseSoundMultiplier = Clamp(1 - (_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
-	SetSoundVolume(_fuseLoopSound, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier);
+	SetSoundVolume(_fuseLoopSound, min(1.0f, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier));
 	if (!IsSoundPlaying(_fuseLoopSound)) PlaySound(_fuseLoopSound);
 
 	_collidedThisFrame = false;
@@ -172,7 +172,7 @@ void Bomb::Update_Placed(const float deltaTime)
 	}
 
 	volumeMultiplier = Clamp(volumeMultiplier, 0, 1);
-	SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME * volumeMultiplier);
+	SetSoundVolume(_windUpLoopSound, min(1.0f, BOMB_WINDUP_LOOP_SOUND_VOLUME * volumeMultiplier));
 
 	if (_position.y <= -MAP_COORD_RADIUS || _position.y >= MAP_COORD_RADIUS) GameManager::instance->BombEntered(this, this->_placedDirection);
 }
@@ -210,6 +210,8 @@ void Bomb::Render(const float deltaTime)
 
 	if (fuseMultiplier < 1)
 	{
+		BeginBlendMode(BLEND_ADDITIVE);
+
 		float fuseOffsetY = BOMB_FUSE_SPRITE_OFFSET_Y_MIN + (BOMB_FUSE_SPRITE_OFFSET_Y_MAX - BOMB_FUSE_SPRITE_OFFSET_Y_MIN) * fuseMultiplier;
 
 		Rectangle destFuse = { _position.x, _position.y + fuseOffsetY, _scale * _grabbedScaleMultiplier / 4.f, _scale * _grabbedScaleMultiplier / 4.f };
@@ -220,6 +222,8 @@ void Bomb::Render(const float deltaTime)
 			{ float((int(_animationFrame) % BOMB_FUSE_SPRITES) * BOMB_FUSE_SPRITE_SIZE), float(_animationIndex * BOMB_FUSE_SPRITE_SIZE), BOMB_FUSE_SPRITE_SIZE, BOMB_FUSE_SPRITE_SIZE }, // SOURCE
 			destFuse, originFuse, 0, { 255, 255, 255, (unsigned char)(255 * (1 - fuseMultiplier)) }
 		);
+
+		EndBlendMode();
 	}
 
 	if (DEBUG_BOMB_HITBOX_DRAW) 
