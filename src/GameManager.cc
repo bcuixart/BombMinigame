@@ -16,6 +16,7 @@ GameManager::GameManager()
     sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
     sprPipeValve = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_PIPE_VALVE).c_str());
     sprSteamCloud = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_CLOUD).c_str());
+    sprSteamEmitter = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_EMITTER).c_str());
     sprSteamIndicatorBase = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_INDICATOR_BASE).c_str());
     sprSteamIndicatorNeedle = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_INDICATOR_NEEDLE).c_str());
     _sprMapBG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_BG).c_str());
@@ -75,6 +76,7 @@ GameManager::~GameManager()
 	UnloadTexture(sprGameOverOverlay);
     UnloadTexture(sprPipeValve);
     UnloadTexture(sprSteamCloud);
+    UnloadTexture(sprSteamEmitter);
     UnloadTexture(sprSteamIndicatorBase);
     UnloadTexture(sprSteamIndicatorNeedle);
 	UnloadTexture(_sprMapBG);

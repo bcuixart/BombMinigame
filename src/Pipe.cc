@@ -8,6 +8,7 @@ Pipe::Pipe(const Vector2 p, const float r, const float s) :
 
     _steamValue = PIPE_STEAM_MIN_VALUE;
     _rotation = 0.0f;
+    _steamEmitterAnimationFrame = 0.0f;
 
     _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
 
@@ -91,6 +92,9 @@ void Pipe::Update(const float deltaTime)
     _timeForNextSteamCloud -= deltaTime;
     if (_timeForNextSteamCloud <= 0 && _steamValue > PIPE_STEAM_SPAWN_THRESHOLD) SpawnSteamCloud();
 
+    _steamEmitterAnimationFrame += PIPE_STEAM_EMITTER_ANIMATION_SPEED * deltaTime;
+    if (_steamEmitterAnimationFrame >= PIPE_STEAM_EMITTER_SPRITES) _steamEmitterAnimationFrame = 0.0f;
+
     for (SteamCloud& cloud : _steamClouds) UpdateSteamCloud(cloud, deltaTime);
 
     _steamClouds.erase(std::remove_if(_steamClouds.begin(), _steamClouds.end(),
@@ -126,6 +130,17 @@ void Pipe::Render(const float deltaTime)
         snprintf(buffer, sizeof(buffer), "%.1f", _steamValue);
         DrawText(buffer, _position.x - PIPE_VALVE_SPRITE_SIZE / 2, _position.y - PIPE_VALVE_SPRITE_SIZE / 2 - 20, 20, { 255, 255, 255, 255 });
     }
+
+    float emitterAlpha = (_steamValue - PIPE_STEAM_SPAWN_THRESHOLD) / (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_SPAWN_THRESHOLD) 
+                * (PIPE_STEAM_CLOUD_ALPHA_MAX - PIPE_STEAM_CLOUD_ALPHA_MIN) + PIPE_STEAM_CLOUD_ALPHA_MIN;
+
+    if (emitterAlpha < 0.0f) emitterAlpha = 0.0f;
+    DrawTexturePro(
+        GameManager::instance->sprSteamEmitter,
+        { (float)(PIPE_STEAM_EMITTER_SPRITE_SIZE_X * (int)_steamEmitterAnimationFrame), 0, PIPE_STEAM_EMITTER_SPRITE_SIZE_X, PIPE_STEAM_EMITTER_SPRITE_SIZE_Y },
+        { PIPE_STEAM_EMITTER_POSITION_X - PIPE_STEAM_EMITTER_SPRITE_SIZE_X / 2, PIPE_STEAM_EMITTER_POSITION_Y - PIPE_STEAM_EMITTER_SPRITE_SIZE_Y / 2, PIPE_STEAM_EMITTER_SPRITE_SIZE_X, PIPE_STEAM_EMITTER_SPRITE_SIZE_Y },
+        { 0, 0 }, PIPE_STEAM_EMITTER_ROTATION, { 255, 255, 255, (unsigned char)(emitterAlpha * 255) }
+    );
 
     float baseTLx = _position.x - PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_X / 2.0f + PIPE_STEAM_INDICATOR_BASE_SPRITE_OFFSET_X;
     float baseTLy = _position.y + PIPE_VALVE_SPRITE_SIZE / 2.0f + PIPE_STEAM_INDICATOR_BASE_SPRITE_OFFSET_Y;
@@ -175,7 +190,7 @@ void Pipe::SpawnSteamCloud()
     int boundsX = (int)GameManager::instance->GetHorizontalBounds().y;
 
     SteamCloud cloud;
-    cloud.position = { (float)GetRandomValue(-boundsX, boundsX), (float)GetRandomValue(BOMBHOUSE_COORD_TOP_VER_POS, BOMBHOUSE_COORD_BOT_VER_POS) };
+    cloud.position = { (float)GetRandomValue(-boundsX, boundsX), (float)GetRandomValue(PIPE_STEAM_CLOUD_POSITION_Y_MIN, PIPE_STEAM_CLOUD_POSITION_Y_MAX) };
     cloud.rotation = GetRandomValue(0, 360);
     cloud.scaleX = GetRandomValue(PIPE_STEAM_CLOUD_COORD_SIZE_MIN, PIPE_STEAM_CLOUD_COORD_SIZE_MAX);
     cloud.scaleY = GetRandomValue(PIPE_STEAM_CLOUD_COORD_SIZE_MIN, PIPE_STEAM_CLOUD_COORD_SIZE_MAX);

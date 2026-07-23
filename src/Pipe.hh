@@ -62,6 +62,7 @@ private:
 
     float _steamValue;
     float _timeForNextSteamCloud;
+    float _steamEmitterAnimationFrame;
 
     std::vector<SteamCloud> _steamClouds;
 

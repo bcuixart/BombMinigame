@@ -100,6 +100,7 @@ public:
 	Texture2D sprGameOverOverlay;
 	Texture2D sprPipeValve;
 	Texture2D sprSteamCloud;
+	Texture2D sprSteamEmitter;
 	Texture2D sprSteamIndicatorBase;
 	Texture2D sprSteamIndicatorNeedle;
 
