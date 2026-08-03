@@ -33,6 +33,8 @@ enum GameState
 	POINT_TALLY_DONE
 };
 
+enum PauseState { PAUSE_NONE = 0, PAUSE_HOLD_RESUME = 1, PAUSE_HOLD_EXIT = 2 };
+
 struct RoundValues
 {
 	int score;
@@ -123,6 +125,8 @@ private:
 	void UpdatePointTally(const float deltaTime);
 	void UpdatePointTallyDone(const float deltaTime);
 
+	void RenderRoundPaused();
+
 	bool IsPauseButtonPressed() const;
 
 	void GameOver(Bomb* obj);
@@ -148,6 +152,7 @@ private:
 	void DrawScreenNumber(const int score, const Vector2 position, const Color color) const;
 
 	GameState _state;
+	PauseState _pauseState;
 	RoundValues _roundValues;
 
 	BombType _reviveHouseTopType;
@@ -190,11 +195,15 @@ private:
 	float _gameOverRestartTimer;
 	float _pointTallyDoneTimer;
 
+	int _pauseDecoVariation;
+
 	Texture2D _sprMapBG;
 	Texture2D _sprMapMG;
 	Texture2D _sprMapFG;
 	Texture2D _sprSmallScreen;
 	Texture2D _sprScreenNumbers;
+	Texture2D _sprMenuInfo;
+	Texture2D _sprPauseMenu;
 
 	bool _playerExited;
 };

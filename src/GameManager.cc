@@ -24,6 +24,8 @@ GameManager::GameManager()
     _sprMapFG = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MAP_FG).c_str());
     _sprSmallScreen = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_SMALL_SCREEN).c_str());
     _sprScreenNumbers = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_SCREEN_NUMBERS).c_str());
+	_sprMenuInfo = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_MENU_INFO).c_str());
+    _sprPauseMenu = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_PAUSE_MENU).c_str());
 
 	audioManager = std::make_unique<AudioManager>();
 
@@ -50,6 +52,9 @@ GameManager::GameManager()
 	_pauseResumeTimer = 0.0f;
 
     _musicPrevTime = 0.0f;
+
+	_pauseState = PAUSE_NONE;
+    _pauseDecoVariation = 0;
 
     StartMainMenu();
 }
@@ -84,6 +89,8 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMapFG);
     UnloadTexture(_sprSmallScreen);
 	UnloadTexture(_sprScreenNumbers);
+	UnloadTexture(_sprMenuInfo);
+	UnloadTexture(_sprPauseMenu);
 }
 
 void GameManager::StartMainMenu()
@@ -114,6 +121,7 @@ void GameManager::StartMainMenu()
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
     _state = MAIN_MENU;
+    _pauseState = PAUSE_NONE;
 }
 
 void GameManager::StartGame()
@@ -151,6 +159,7 @@ void GameManager::StartGame()
 	audioManager->PlayMusic();
 
     _state = ROUND;
+    _pauseState = PAUSE_NONE;
 }
 
 void GameManager::StartGameRevive()
@@ -180,6 +189,7 @@ void GameManager::StartGameRevive()
 	audioManager->PlayMusic();
 
     _state = ROUND;    
+    _pauseState = PAUSE_NONE;
 }
 
 void GameManager::StartReviveDecision()
@@ -200,6 +210,7 @@ void GameManager::StartReviveDecision()
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
     _state = REVIVE_DECISION;
+    _pauseState = PAUSE_NONE;
 
     InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), MAP_COORD_VER_MIN}, 0, 150, BOMB_REVIVE));
 }
@@ -223,6 +234,7 @@ void GameManager::StartPointTally()
     _pointTallyCounterLast = 0;
 	_pointTallySkipClicks = 0;
     _state = POINT_TALLY;
+    _pauseState = PAUSE_NONE;
 }
 
 void GameManager::UpdateMainMenu(const float deltaTime)
@@ -291,18 +303,52 @@ void GameManager::UpdateRound(const float deltaTime)
 		_grabbedPipe = nullptr;
 
         _state = ROUND_PAUSED; 
+        _pauseState = PAUSE_NONE;
+
+		_pauseDecoVariation = GetRandomValue(0, PAUSE_MENU_DECO_VARIANTS - 1);
+
         audioManager->PauseMusic(); 
     }
 }
 
 void GameManager::UpdateRoundPaused(const float deltaTime)
 {
-	if (IsPauseButtonPressed()) 
+	Vector2 mousePos = GetWorldMousePos();
+
+	const Rectangle resumeButtonRect = { PAUSE_MENU_SPRITE_POSITION_X + PAUSE_MENU_RESUME_BUTTON_OFFSET_X, PAUSE_MENU_SPRITE_POSITION_Y + PAUSE_MENU_RESUME_BUTTON_OFFSET_Y, PAUSE_MENU_BUTTON_SIZE_X, PAUSE_MENU_BUTTON_SIZE_Y };
+	const Rectangle exitButtonRect = { PAUSE_MENU_SPRITE_POSITION_X + PAUSE_MENU_EXIT_BUTTON_OFFSET_X, PAUSE_MENU_SPRITE_POSITION_Y + PAUSE_MENU_EXIT_BUTTON_OFFSET_Y, PAUSE_MENU_BUTTON_SIZE_X, PAUSE_MENU_BUTTON_SIZE_Y };
+    
+    if (CheckCollisionPointRec(mousePos, resumeButtonRect))
+    {
+        if (_pauseState != PAUSE_HOLD_RESUME) { _pauseState = PAUSE_HOLD_RESUME; audioManager->PlayBombGrabbedSound(0); }
+    }
+	else if (CheckCollisionPointRec(mousePos, exitButtonRect))
+	{
+		if (_pauseState != PAUSE_HOLD_EXIT) { _pauseState = PAUSE_HOLD_EXIT; audioManager->PlayBombGrabbedSound(0); }
+	}
+    else
+    {
+		if (_pauseState != PAUSE_NONE) { _pauseState = PAUSE_NONE; audioManager->PlayBombGrabbedSound(0); }
+    }
+
+	if (IsPauseButtonPressed() || (_pauseState == PAUSE_HOLD_RESUME && !_currentPressed && _prevPressed))
     { 
 		_pauseResumeTicks = PAUSE_RESUME_COUNTDOWN_TICKS + 1; // +1 because the first tick is instant
         _pauseResumeTimer = PAUSE_RESUME_COUNTDOWN_TICK_TIME;
         _state = ROUND_RESUMING; 
     }
+
+    if (_pauseState == PAUSE_HOLD_EXIT && !_currentPressed && _prevPressed)
+    {
+        audioManager->StopMusic();
+
+        _bombHouseTop->GameOver();   // Cancels transitions
+        _bombHouseBottom->GameOver();
+
+        StartMainMenu();
+    }
+
+    _prevPressed = _currentPressed;
 }
 
 void GameManager::UpdateRoundResuming(const float deltaTime)
@@ -489,6 +535,29 @@ void GameManager::Update(float deltaTime)
     _prevPressed = _currentPressed;
 }
 
+void GameManager::RenderRoundPaused()
+{
+    // Bottom (Buttons)
+	DrawTexturePro(
+		_sprPauseMenu, { float(_pauseState * PAUSE_MENU_SPRITE_SIZE_X), PAUSE_MENU_DECO_SIZE_Y, PAUSE_MENU_SPRITE_SIZE_X, PAUSE_MENU_SPRITE_SIZE_Y - PAUSE_MENU_DECO_SIZE_Y },
+		{ PAUSE_MENU_SPRITE_POSITION_X, PAUSE_MENU_SPRITE_POSITION_Y + PAUSE_MENU_DECO_SIZE_Y, PAUSE_MENU_SPRITE_SIZE_X, PAUSE_MENU_SPRITE_SIZE_Y - PAUSE_MENU_DECO_SIZE_Y },
+		{ 0, 0 }, 0.0f, WHITE
+	);
+
+    // Top (Deco)
+    DrawTexturePro(
+        _sprPauseMenu, { float(_pauseDecoVariation * PAUSE_MENU_SPRITE_SIZE_X), 0, PAUSE_MENU_SPRITE_SIZE_X, PAUSE_MENU_DECO_SIZE_Y },
+        { PAUSE_MENU_SPRITE_POSITION_X, PAUSE_MENU_SPRITE_POSITION_Y, PAUSE_MENU_SPRITE_SIZE_X, PAUSE_MENU_DECO_SIZE_Y },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    if (DEBUG_PAUSE_MENU_DRAW_BUTTON_BOUNDS)
+    {
+		DrawRectangleLines(PAUSE_MENU_SPRITE_POSITION_X + PAUSE_MENU_RESUME_BUTTON_OFFSET_X, PAUSE_MENU_SPRITE_POSITION_Y + PAUSE_MENU_RESUME_BUTTON_OFFSET_Y, PAUSE_MENU_BUTTON_SIZE_X, PAUSE_MENU_BUTTON_SIZE_Y, GREEN);
+		DrawRectangleLines(PAUSE_MENU_SPRITE_POSITION_X + PAUSE_MENU_EXIT_BUTTON_OFFSET_X, PAUSE_MENU_SPRITE_POSITION_Y + PAUSE_MENU_EXIT_BUTTON_OFFSET_Y, PAUSE_MENU_BUTTON_SIZE_X, PAUSE_MENU_BUTTON_SIZE_Y, GREEN);
+    }
+}
+
 void GameManager::Render(const float deltaTime) 
 {
     int width = GetScreenWidth();
@@ -590,6 +659,8 @@ void GameManager::Render(const float deltaTime)
     DrawRectangleRec({ boundsH.y,   maskY, maskExtent - boundsH.y, maskHeight }, BLACK);
 
     _gameOverOverlay->Render(deltaTime);
+
+	if (_state == ROUND_PAUSED) RenderRoundPaused();
 
     DrawFPS(-500, -500);
 

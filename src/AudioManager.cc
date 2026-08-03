@@ -36,6 +36,7 @@ AudioManager::AudioManager()
 	_currentPointTallySoundIndex = 0;
 
 	_playingMusic = false;
+	_musicPaused = false;
 
 	PlayMusicStream(_factoryAmbience);
 }
@@ -62,49 +63,58 @@ AudioManager::~AudioManager()
 }
 
 void AudioManager::Update(const float deltaTime)
-{
-	UpdateMusicStream(_gameMusic);
-	
-	if (_playingMusic)
+{	
+	if (_playingMusic || _musicPaused)
 	{
-		float musicTime = GetMusicTimePlayed(_gameMusic);
-		if (musicTime >= ASSET_SOUND_MUSIC_LOOP_END + 1)
+		UpdateMusicStream(_gameMusic);
+
+		if (_playingMusic)
 		{
-			SeekMusicStream(_gameMusic, musicTime - ASSET_SOUND_MUSIC_LOOP_LENGTH);
+			float musicTime = GetMusicTimePlayed(_gameMusic);
+			if (musicTime >= ASSET_SOUND_MUSIC_LOOP_END + 1)
+			{
+				SeekMusicStream(_gameMusic, musicTime - ASSET_SOUND_MUSIC_LOOP_LENGTH);
+			}
 		}
 	}
+
 
 	UpdateMusicStream(_factoryAmbience);
 
 	float factoryAmbienceTime = GetMusicTimePlayed(_factoryAmbience);
-	if (factoryAmbienceTime >= ASSET_SOUND_MUSIC_LOOP_END + 1)
+	if (factoryAmbienceTime >= ASSET_SOUND_FACTORY_AMBIENCE_LOOP_END + 1)
 	{
-		SeekMusicStream(_factoryAmbience, factoryAmbienceTime - ASSET_SOUND_MUSIC_LOOP_LENGTH);
+		SeekMusicStream(_factoryAmbience, factoryAmbienceTime - ASSET_SOUND_FACTORY_AMBIENCE_LOOP_LENGTH);
 	}
 }
 
 void AudioManager::PlayMusic()
 {
+	SeekMusicStream(_gameMusic, 0.1f);
 	PlayMusicStream(_gameMusic);
 	_playingMusic = true;
+	_musicPaused = false;
 }
 
 void AudioManager::PauseMusic()
 {
 	PauseMusicStream(_gameMusic);
 	_playingMusic = false;
+	_musicPaused = true;
 }
 
 void AudioManager::ResumeMusic()
 {
 	ResumeMusicStream(_gameMusic);
 	_playingMusic = true;
+	_musicPaused = false;
 }
 
 void AudioManager::StopMusic()
 {
 	StopMusicStream(_gameMusic);
 	_playingMusic = false;
+	_musicPaused = false;
 }
 
 float AudioManager::GetMusicTime() const

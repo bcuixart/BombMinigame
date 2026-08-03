@@ -14,8 +14,9 @@ TODO:
 - Pipe sounds
 - Steam and bomb max adjustement based on screen size
 - Sound mixing
-- Pause menu
+- Pause button
 - Clap every 100 points
+- Pipe finger indicator
 - Credits and info
 
 # Credits

@@ -80,6 +80,7 @@ private:
 
 	Music _gameMusic;
 	bool _playingMusic;
+	bool _musicPaused;
 
 	Music _factoryAmbience;
 
