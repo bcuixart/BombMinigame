@@ -126,6 +126,7 @@ private:
 	void UpdatePointTallyDone(const float deltaTime);
 
 	void RenderRoundPaused();
+	void RenderRoundResuming();
 
 	bool IsPauseButtonPressed() const;
 
@@ -144,12 +145,14 @@ private:
 
 	float GetBombSpawnPos() const;
 	float GetSmallScreenPos() const;
+	Rectangle GetPauseButtonRect() const;
 
 	void InstantiateExplosion(const Vector2 position);
 
 	void AddScreenShake(float amount);
 
 	void DrawScreenNumber(const int score, const Vector2 position, const Color color) const;
+	void DrawResumeNumber(const int number, const Vector2 position, const Color color) const;
 
 	GameState _state;
 	PauseState _pauseState;
@@ -196,6 +199,8 @@ private:
 	float _pointTallyDoneTimer;
 
 	int _pauseDecoVariation;
+	bool _pauseButtonHovered;
+	bool _pauseButtonHoveredLastFrame;
 
 	Texture2D _sprMapBG;
 	Texture2D _sprMapMG;
@@ -204,6 +209,7 @@ private:
 	Texture2D _sprScreenNumbers;
 	Texture2D _sprMenuInfo;
 	Texture2D _sprPauseMenu;
+	Texture2D _sprPauseButton;
 
 	bool _playerExited;
 };
