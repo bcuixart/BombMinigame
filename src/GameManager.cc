@@ -57,6 +57,8 @@ GameManager::GameManager()
 
     _musicPrevTime = 0.0f;
 
+	_menuInfoState = MENU_INFO_NONE;
+    _menuInfoPage = 0;
 	_pauseState = PAUSE_NONE;
     _pauseDecoVariation = 0;
 
@@ -126,6 +128,26 @@ void GameManager::StartMainMenu()
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
     _state = MAIN_MENU;
+    _menuInfoState = MENU_INFO_NONE;
+    _pauseState = PAUSE_NONE;
+
+    _pauseButtonHovered = false;
+    _pauseButtonHoveredLastFrame = false;
+}
+
+void GameManager::StartMenuInfo()
+{
+    _bombGameObjects.clear();
+    _explosionGameObjects.clear();
+
+    _grabbedBomb = nullptr;
+    _gameOverBomb = nullptr;
+
+    _grabbedPipe = nullptr;
+
+    _state = MENU_INFO;
+    _menuInfoState = MENU_INFO_NONE;
+    _menuInfoPage = 0;
     _pauseState = PAUSE_NONE;
 
     _pauseButtonHovered = false;
@@ -167,6 +189,7 @@ void GameManager::StartGame()
 	audioManager->PlayMusic();
 
     _state = ROUND;
+    _menuInfoState = MENU_INFO_NONE;
     _pauseState = PAUSE_NONE;
 
     _pauseButtonHovered = false;
@@ -199,7 +222,8 @@ void GameManager::StartGameRevive()
 
 	audioManager->PlayMusic();
 
-    _state = ROUND;    
+    _state = ROUND; 
+    _menuInfoState = MENU_INFO_NONE;
     _pauseState = PAUSE_NONE;
 
     _pauseButtonHovered = false;
@@ -224,6 +248,7 @@ void GameManager::StartReviveDecision()
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, true);
 
     _state = REVIVE_DECISION;
+    _menuInfoState = MENU_INFO_NONE;
     _pauseState = PAUSE_NONE;
 
     _pauseButtonHovered = false;
@@ -251,6 +276,7 @@ void GameManager::StartPointTally()
     _pointTallyCounterLast = 0;
 	_pointTallySkipClicks = 0;
     _state = POINT_TALLY;
+    _menuInfoState = MENU_INFO_NONE;
     _pauseState = PAUSE_NONE;
 
     _pauseButtonHovered = false;
@@ -262,6 +288,37 @@ void GameManager::UpdateMainMenu(const float deltaTime)
     if (_roundValues.spawnedBombTypes[BOMB_MENU] == 0) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), MAP_COORD_VER_MIN }, 0, 150, BOMB_MENU));
     
     HandleBombGrab();
+}
+
+void GameManager::UpdateMenuInfo(const float deltaTime)
+{
+    Vector2 mousePos = GetWorldMousePos();
+
+    const Rectangle nextButtonRect = { MENU_INFO_SPRITE_POSITION_X + MENU_INFO_BUTTON_NEXT_OFFSET_X, MENU_INFO_SPRITE_POSITION_Y + MENU_INFO_BUTTON_NEXT_OFFSET_Y, MENU_INFO_BUTTON_SIZE_X, MENU_INFO_BUTTON_SIZE_Y };
+    const Rectangle exitButtonRect = { MENU_INFO_SPRITE_POSITION_X + MENU_INFO_BUTTON_EXIT_OFFSET_X, MENU_INFO_SPRITE_POSITION_Y + MENU_INFO_BUTTON_EXIT_OFFSET_Y, MENU_INFO_BUTTON_SIZE_X, MENU_INFO_BUTTON_SIZE_Y };
+
+    if (CheckCollisionPointRec(mousePos, nextButtonRect))
+    {
+        if (_menuInfoState != MENU_INFO_NEXT) { _menuInfoState = MENU_INFO_NEXT; audioManager->PlayBombGrabbedSound(0); }
+    }
+    else if (CheckCollisionPointRec(mousePos, exitButtonRect))
+    {
+        if (_menuInfoState != MENU_INFO_EXIT) { _menuInfoState = MENU_INFO_EXIT; audioManager->PlayBombGrabbedSound(0); }
+    }
+    else
+    {
+        if (_menuInfoState != MENU_INFO_NONE) { _menuInfoState = MENU_INFO_NONE; audioManager->PlayBombGrabbedSound(0); }
+    }
+
+    if (_menuInfoState == MENU_INFO_NEXT && !_currentPressed && _prevPressed)
+    {
+		_menuInfoPage = (_menuInfoPage + 1) % MENU_INFO_PAGES;
+    }
+
+    if (_menuInfoState == MENU_INFO_EXIT && !_currentPressed && _prevPressed)
+    {
+        StartMainMenu();
+    }
 }
 
 void GameManager::UpdateRound(const float deltaTime)
@@ -495,6 +552,11 @@ void GameManager::Update(float deltaTime)
             UpdateMainMenu(deltaTime);
             break;
         }
+        case MENU_INFO:
+        {
+            UpdateMenuInfo(deltaTime);
+            break;
+        }
         case ROUND:
         {
             UpdateRound(deltaTime);
@@ -567,6 +629,29 @@ void GameManager::Update(float deltaTime)
     if (_grabbedBomb != nullptr && _grabbedBomb->isMarkedForDestroy()) _grabbedBomb = nullptr;
 
     _prevPressed = _currentPressed;
+}
+
+void GameManager::RenderMenuInfo()
+{
+    // Bottom (Buttons)
+    DrawTexturePro(
+        _sprMenuInfo, { float((int)_menuInfoState * MENU_INFO_SPRITE_SIZE_X), MENU_INFO_INFO_SIZE_Y, MENU_INFO_SPRITE_SIZE_X, MENU_INFO_SPRITE_SIZE_Y - MENU_INFO_INFO_SIZE_Y },
+        { MENU_INFO_SPRITE_POSITION_X, MENU_INFO_SPRITE_POSITION_Y + MENU_INFO_INFO_SIZE_Y, MENU_INFO_SPRITE_SIZE_X, MENU_INFO_SPRITE_SIZE_Y - MENU_INFO_INFO_SIZE_Y },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    // Top (Info)
+    DrawTexturePro(
+        _sprMenuInfo, { float(_menuInfoPage * MENU_INFO_SPRITE_SIZE_X), 0, MENU_INFO_SPRITE_SIZE_X, MENU_INFO_INFO_SIZE_Y },
+        { MENU_INFO_SPRITE_POSITION_X, MENU_INFO_SPRITE_POSITION_Y, MENU_INFO_SPRITE_SIZE_X, MENU_INFO_INFO_SIZE_Y },
+        { 0, 0 }, 0.0f, WHITE
+    );
+
+    if (DEBUG_MENU_INFO_DRAW_BUTTON_BOUNDS)
+    {
+        DrawRectangleLines(MENU_INFO_SPRITE_POSITION_X + MENU_INFO_BUTTON_NEXT_OFFSET_X, MENU_INFO_SPRITE_POSITION_Y + MENU_INFO_BUTTON_NEXT_OFFSET_Y, MENU_INFO_BUTTON_SIZE_X, MENU_INFO_BUTTON_SIZE_Y, GREEN);
+        DrawRectangleLines(MENU_INFO_SPRITE_POSITION_X + MENU_INFO_BUTTON_EXIT_OFFSET_X, MENU_INFO_SPRITE_POSITION_Y + MENU_INFO_BUTTON_EXIT_OFFSET_Y, MENU_INFO_BUTTON_SIZE_X, MENU_INFO_BUTTON_SIZE_Y, GREEN);
+    }
 }
 
 void GameManager::RenderRoundPaused()
@@ -679,7 +764,7 @@ void GameManager::Render(const float deltaTime)
 
     int numberToDraw = _roundValues.score;
 	Color numberColor = WHITE;
-	if (_state == MAIN_MENU) { numberToDraw = _highScore; numberColor = SMALL_NUMBER_YELLOW_COLOR; }
+	if (_state == MAIN_MENU || _state == MENU_INFO) { numberToDraw = _highScore; numberColor = SMALL_NUMBER_YELLOW_COLOR; }
 	if ((_state == ROUND || _state == ROUND_PAUSED || _state == ROUND_RESUMING || _state == REVIVE_DECISION) && _roundValues.score > _highScore) numberColor = SMALL_NUMBER_YELLOW_COLOR;
     if (_state == GAME_OVER_CUTSCENE || _state == GAME_OVER || _state == POINT_TALLY || _state == POINT_TALLY_DONE) numberToDraw = -1; // -1 to show DEAD
     DrawScreenNumber(numberToDraw, 
@@ -715,7 +800,8 @@ void GameManager::Render(const float deltaTime)
 
     _gameOverOverlay->Render(deltaTime);
 
-	if (_state == ROUND_PAUSED) RenderRoundPaused();
+    if (_state == MENU_INFO) RenderMenuInfo();
+	else if (_state == ROUND_PAUSED) RenderRoundPaused();
 	else if (_state == ROUND_RESUMING) RenderRoundResuming();
 
     DrawFPS(-500, -500);
@@ -879,7 +965,7 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
     if (_state == MAIN_MENU) 
     {
         if (_placedDirection == BOMB_PLACED_TOP) StartGame();
-        else _playerExited = true;
+        else StartMenuInfo();
         return;
 	}
     else if (_state == REVIVE_DECISION)

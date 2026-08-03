@@ -23,6 +23,7 @@ using namespace std;
 enum GameState 
 {
 	MAIN_MENU,
+	MENU_INFO,
 	ROUND,
 	ROUND_PAUSED,
 	ROUND_RESUMING,
@@ -33,6 +34,7 @@ enum GameState
 	POINT_TALLY_DONE
 };
 
+enum MenuInfoState { MENU_INFO_NONE = 0, MENU_INFO_NEXT = 1, MENU_INFO_EXIT = 2 };
 enum PauseState { PAUSE_NONE = 0, PAUSE_HOLD_RESUME = 1, PAUSE_HOLD_EXIT = 2 };
 
 struct RoundValues
@@ -112,10 +114,12 @@ private:
 	void StartGame();
 	void StartGameRevive();
 	void StartMainMenu();
+	void StartMenuInfo();
 	void StartReviveDecision();
 	void StartPointTally();
 
 	void UpdateMainMenu(const float deltaTime);
+	void UpdateMenuInfo(const float deltaTime);
 	void UpdateRound(const float deltaTime);
 	void UpdateRoundPaused(const float deltaTime);
 	void UpdateRoundResuming(const float deltaTime);
@@ -125,6 +129,7 @@ private:
 	void UpdatePointTally(const float deltaTime);
 	void UpdatePointTallyDone(const float deltaTime);
 
+	void RenderMenuInfo();
 	void RenderRoundPaused();
 	void RenderRoundResuming();
 
@@ -155,6 +160,8 @@ private:
 	void DrawResumeNumber(const int number, const Vector2 position, const Color color) const;
 
 	GameState _state;
+	MenuInfoState _menuInfoState;
+	int _menuInfoPage;
 	PauseState _pauseState;
 	RoundValues _roundValues;
 
