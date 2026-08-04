@@ -14,6 +14,13 @@ AudioManager::AudioManager()
 		((i < 10) ? "00" : "0") + std::to_string(i) + ASSET_SOUND_BOMB_COLLISION_SUFFIX).c_str());
 	}
 
+	for (int i = 0; i < ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS; i++)
+	{
+		int soundFileIndex = i % ASSET_SOUND_PIPE_VALVE_ROTATE_SOUND_FILES;
+		_pipeValveRotateSound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_PIPE_VALVE_ROTATE_PREFIX +
+			((i < 10) ? "00" : "0") + std::to_string(soundFileIndex) + ASSET_SOUND_PIPE_VALVE_ROTATE_SUFFIX).c_str());
+	}
+
 	_dramaticDrumSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_DRAMATIC_DRUM).c_str());
 	_bombGrabbedSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_GRABBED).c_str());
 	_bombReleasedBombHouseSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_BOMB_HOUSE).c_str());
@@ -32,6 +39,7 @@ AudioManager::AudioManager()
 
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
+	_currentPipeValveRotatePointSoundIndex = 0;
 	_currentPointSoundIndex = 0;
 	_currentPointTallySoundIndex = 0;
 
@@ -45,6 +53,7 @@ AudioManager::~AudioManager()
 {
 	for (int i = 0; i < ASSET_SOUND_BOMB_STEP_SOUNDS; i++) UnloadSound(_bombStepSounds[i]);
 	for (int i = 0; i < ASSET_SOUND_BOMB_COLLISION_SOUNDS; i++) UnloadSound(_bombCollisionSounds[i]);
+	for (int i = 0; i < ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS; i++) UnloadSound(_pipeValveRotateSound[i]);
 
 	UnloadSound(_dramaticDrumSound);
 	UnloadSound(_bombGrabbedSound);
@@ -188,6 +197,14 @@ void AudioManager::PlayBombWarningSound(const float pan)
 {
 	SetSoundPan(_bombWarningSound, pan);
 	PlaySound(_bombWarningSound);
+}
+
+void AudioManager::PlayPipeValveRotateSound()
+{
+	SetSoundPitch(_pipeValveRotateSound[_currentPipeValveRotatePointSoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
+	PlaySound(_pipeValveRotateSound[_currentPipeValveRotatePointSoundIndex]);
+
+	_currentPipeValveRotatePointSoundIndex = (_currentPipeValveRotatePointSoundIndex + 1) % ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS;
 }
 
 void AudioManager::PlayGameOverAlertSound()

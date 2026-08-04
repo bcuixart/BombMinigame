@@ -48,10 +48,14 @@ void Pipe::Update_GameGrabbed(const float deltaTime)
 
     _rotation += rotationDelta * RAD2DEG;
 
+    int prevSteamValue = (int)_steamValue;
+
     _steamValue -= PIPE_STEAM_DECREMENT_SPEED * angleDiff * deltaTime;
     if (_steamValue > PIPE_STEAM_MAX_VALUE) _steamValue = PIPE_STEAM_MAX_VALUE;
     if (_steamValue < PIPE_STEAM_MIN_VALUE) _steamValue = PIPE_STEAM_MIN_VALUE;
     _mousePositionLastFrame = mousePos;
+
+    if (prevSteamValue != (int)_steamValue && prevSteamValue % 3 == 0) GameManager::instance->audioManager->PlayPipeValveRotateSound();
 }
 
 void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime) 

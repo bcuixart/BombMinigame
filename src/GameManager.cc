@@ -312,11 +312,13 @@ void GameManager::UpdateMenuInfo(const float deltaTime)
 
     if (_menuInfoState == MENU_INFO_NEXT && !_currentPressed && _prevPressed)
     {
+        audioManager->PlayBombReleasedBombHouseSound(0);
 		_menuInfoPage = (_menuInfoPage + 1) % MENU_INFO_PAGES;
     }
 
     if (_menuInfoState == MENU_INFO_EXIT && !_currentPressed && _prevPressed)
     {
+        audioManager->PlayBombReleasedBombHouseSound(0);
         StartMainMenu();
     }
 }
@@ -390,6 +392,7 @@ void GameManager::UpdateRound(const float deltaTime)
 
 		_pauseDecoVariation = GetRandomValue(0, PAUSE_MENU_DECO_VARIANTS - 1);
 
+        audioManager->PlayBombReleasedBombHouseSound(0);
         audioManager->PauseMusic(); 
     }
 
@@ -424,11 +427,14 @@ void GameManager::UpdateRoundPaused(const float deltaTime)
 
         _pauseButtonHovered = false;
         _pauseButtonHoveredLastFrame = false;
+
+        audioManager->PlayBombReleasedBombHouseSound(0);
     }
 
     if (_pauseState == PAUSE_HOLD_EXIT && !_currentPressed && _prevPressed)
     {
         audioManager->StopMusic();
+        audioManager->PlayBombReleasedBombHouseSound(0);
 
         _bombHouseTop->GameOver();   // Cancels transitions
         _bombHouseBottom->GameOver();

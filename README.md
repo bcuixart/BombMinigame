@@ -33,6 +33,7 @@ Sound effects:
 - Bomb fuse sound by Echo Cinematics: https://www.youtube.com/watch?v=WmJbhSuzRYg 
 - Bomb explosion sound:
 - Bomb beep sound: https://www.youtube.com/watch?v=G6Vxrqfytrk
+- Pipe valve rotate sounds by dilsun: https://freesound.org/people/dilsun/sounds/508281/ (CC0 1.0 license)
 - Screen beep sound by dklon: https://opengameart.org/content/various-alerts (CC BY 3.0 license, must include link and credit, and state no changes were made)
 - Dramatic drum sound: https://www.freesoundslibrary.com/dramatic-tension-cinematic-drums/ (CC BY 4.0 license, must include link and credit, and state no changes were made)
 - Game over alert sound by aquinn: https://opengameart.org/content/sirens-and-alarm-noise (CC0 1.0 license)

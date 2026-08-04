@@ -32,6 +32,8 @@ public:
 
 	void PlayBombHouseTransitionFlashSound();
 
+	void PlayPipeValveRotateSound();
+
 	void PlayPointSound();
 	void PlayPointTallySound();
 
@@ -64,6 +66,9 @@ private:
 	Sound _bombWarningSound;
 
 	Sound _bombHouseTransitionFlashSound;
+
+	Sound _pipeValveRotateSound[ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS];
+	int _currentPipeValveRotatePointSoundIndex;
 
 	Sound _pointSound[ASSET_SOUND_POINT_SOUNDS];
 	int _currentPointSoundIndex;
