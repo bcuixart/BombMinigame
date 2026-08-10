@@ -159,6 +159,9 @@ private:
 	void DrawScreenNumber(const int score, const Vector2 position, const Color color) const;
 	void DrawResumeNumber(const int number, const Vector2 position, const Color color) const;
 
+	void GetSaveData();
+	void SaveData();
+
 	GameState _state;
 	MenuInfoState _menuInfoState;
 	int _menuInfoPage;

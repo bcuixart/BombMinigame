@@ -47,7 +47,7 @@ GameManager::GameManager()
 
     _playerExited = false;
 
-    _highScore = 10;
+    _highScore = HIGHSCORE_DEFAULT;
     _pointTallyCounter = 0;
     _pointTallyCounterLast = 0;
     _pointTallySkipClicks = 0;
@@ -61,6 +61,8 @@ GameManager::GameManager()
     _menuInfoPage = 0;
 	_pauseState = PAUSE_NONE;
     _pauseDecoVariation = 0;
+
+    GetSaveData();
 
     StartMainMenu();
 }
@@ -98,6 +100,8 @@ GameManager::~GameManager()
 	UnloadTexture(_sprMenuInfo);
 	UnloadTexture(_sprPauseMenu);
 	UnloadTexture(_sprPauseButton);
+
+    SaveData();
 }
 
 void GameManager::StartMainMenu()
@@ -525,6 +529,7 @@ void GameManager::UpdatePointTally(const float deltaTime)
 		if (_roundValues.score > _highScore)
 		{
 			_highScore = _roundValues.score;
+			SaveData();
 			audioManager->PlayPointTallyEndHighScoreSound();
 		}
 		else
@@ -1232,4 +1237,34 @@ void GameManager::ChangeBombHouseTypes()
 bool GameManager::PlayerExited() const
 {
     return _playerExited;
+}
+
+void GameManager::GetSaveData()
+{
+    std::string path = std::string(GetApplicationDirectory()) + SAVE_FILE_PATH;
+
+    if (!FileExists(path.c_str()))
+    {
+        _highScore = HIGHSCORE_DEFAULT;
+        return;
+    }
+
+    char* data = LoadFileText(path.c_str());
+    if (data == nullptr)
+    {
+        _highScore = HIGHSCORE_DEFAULT;
+        return;
+    }
+
+    _highScore = atoi(data);
+    UnloadFileText(data);
+}
+
+void GameManager::SaveData()
+{
+    std::string path = std::string(GetApplicationDirectory()) + "save_data.bbw";
+
+    char buffer[16];
+    sprintf(buffer, "%d", _highScore);
+    SaveFileText(path.c_str(), buffer);
 }
