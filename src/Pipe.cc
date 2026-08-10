@@ -9,30 +9,44 @@ Pipe::Pipe(const Vector2 p, const float r, const float s) :
     _steamValue = PIPE_STEAM_MIN_VALUE;
     _rotation = 0.0f;
     _steamEmitterAnimationFrame = 0.0f;
+    _steamLifetimeMultiplier = 1.0f;
 
     _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
 
     _steamClouds = std::vector<SteamCloud>();
+
+	_steamLoopSound = GameManager::instance->audioManager->GetPipeSteamLoopSound();
+	_steamHissLoopSound = GameManager::instance->audioManager->GetPipeSteamHissLoopSound();
+
+	_steamLoopSoundTimer = 0.0f;
+    _steamHissLoopSoundTimer = 0.0f;
 }
 
 Pipe::~Pipe() 
 {
-
+    GameManager::instance->audioManager->UnloadPipeSteamLoopSound(&_steamLoopSound);
+    GameManager::instance->audioManager->UnloadPipeSteamHissLoopSound(&_steamHissLoopSound);
 }
 
 void Pipe::Update_Menu(const float deltaTime) 
 {
+    _steamLifetimeMultiplier = 5.0f;
+
     _steamValue = PIPE_STEAM_MIN_VALUE;
 }
 
 void Pipe::Update_Game(const float deltaTime) 
 {
+    _steamLifetimeMultiplier = 1.0f;
+
     _steamValue += PIPE_STEAM_INCREMENT_SPEED * deltaTime;
     if (_steamValue > PIPE_STEAM_MAX_VALUE) _steamValue = PIPE_STEAM_MAX_VALUE;
 }
 
 void Pipe::Update_GameGrabbed(const float deltaTime) 
 {
+    _steamLifetimeMultiplier = 5.0f;
+
     if (_steamValue <= PIPE_STEAM_MIN_VALUE) return;
     
     Vector2 mousePos = GameManager::instance->GetWorldMousePos();
@@ -60,7 +74,7 @@ void Pipe::Update_GameGrabbed(const float deltaTime)
 
 void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime) 
 {
-    cloud.lifetime += deltaTime;
+    cloud.lifetime += deltaTime * _steamLifetimeMultiplier;
     float lifetimeNormalized = cloud.lifetime / PIPE_STEAM_CLOUD_LIFETIME;
 
     cloud.animationFrame += deltaTime * cloud.animationSpeed;
@@ -92,6 +106,20 @@ void Pipe::Update(const float deltaTime)
             break;
         }
     }
+
+    float steamT = Clamp((_steamValue - PIPE_STEAM_SOUND_STEAM_VALUE_MIN) /
+        (PIPE_STEAM_SOUND_STEAM_VALUE_MAX - PIPE_STEAM_SOUND_STEAM_VALUE_MIN), 0.0f, 1.0f);
+    float steamHissT = Clamp((_steamValue - PIPE_STEAM_HISS_SOUND_STEAM_VALUE_MIN) /
+        (PIPE_STEAM_HISS_SOUND_STEAM_VALUE_MAX - PIPE_STEAM_HISS_SOUND_STEAM_VALUE_MIN), 0.0f, 1.0f);
+
+    SetSoundVolume(_steamLoopSound, steamT);
+    SetSoundVolume(_steamHissLoopSound, steamHissT);
+
+	_steamLoopSoundTimer += deltaTime;
+	_steamHissLoopSoundTimer += deltaTime;
+
+	if (_steamLoopSoundTimer >= PIPE_STEAM_SOUND_LOOP_TIME) { _steamLoopSoundTimer = 0.0f; PlaySound(_steamLoopSound); }
+	if (_steamHissLoopSoundTimer >= PIPE_STEAM_HISS_SOUND_LOOP_TIME) { _steamHissLoopSoundTimer = 0.0f; PlaySound(_steamHissLoopSound); }
 
     _timeForNextSteamCloud -= deltaTime;
     if (_timeForNextSteamCloud <= 0 && _steamValue > PIPE_STEAM_SPAWN_THRESHOLD) SpawnSteamCloud();

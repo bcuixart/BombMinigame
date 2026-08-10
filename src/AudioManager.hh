@@ -54,6 +54,11 @@ public:
 	Sound GetBombExplosionSound();
 	void UnloadBombExplosionSound(Sound* sound);
 
+	Sound GetPipeSteamLoopSound();
+	void UnloadPipeSteamLoopSound(Sound* sound);
+	Sound GetPipeSteamHissLoopSound();
+	void UnloadPipeSteamHissLoopSound(Sound* sound);
+
 protected:
 
 private:

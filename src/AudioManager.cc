@@ -256,3 +256,23 @@ void AudioManager::UnloadBombExplosionSound(Sound* sound)
 {
 	UnloadSound(*sound);
 }
+
+Sound AudioManager::GetPipeSteamLoopSound()
+{
+	return LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_PIPE_STEAM_LOOP).c_str());
+}
+
+void AudioManager::UnloadPipeSteamLoopSound(Sound* sound)
+{
+	UnloadSound(*sound);
+}
+
+Sound AudioManager::GetPipeSteamHissLoopSound()
+{
+	return LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_PIPE_STEAM_HISS_LOOP).c_str());
+}
+
+void AudioManager::UnloadPipeSteamHissLoopSound(Sound* sound)
+{
+	UnloadSound(*sound);
+}

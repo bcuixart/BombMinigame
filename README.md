@@ -9,7 +9,7 @@ I plan on eventually releasing this as a mobile game.
 
 TODO:
 - Bomb animation FPS
-- Pipe sounds
+- Pipe sound improvements
 - Steam and bomb max adjustement based on screen size
 - Sound mixing
 - Clap every 100 points
@@ -28,9 +28,11 @@ Sound effects:
 - Bomb walking sounds:
 - Bomb bump sounds by bart: https://opengameart.org/content/33-metal-clang-sounds-cast-iron-pans (CC0 1.0 license)
 - Bomb grab and relase sounds by qubodup: https://opengameart.org/content/metal-interactions (CC0 1.0 license)
-- Bomb fuse sound by Echo Cinematics: https://www.youtube.com/watch?v=WmJbhSuzRYg 
+- Bomb fuse sound by Echo Cinematics: https://www.youtube.com/watch?v=WmJbhSuzRYg (Free to use commercially)
 - Bomb explosion sound:
-- Bomb beep sound: https://www.youtube.com/watch?v=G6Vxrqfytrk
+- Bomb beep sound by SoundEffectsArchive: https://www.youtube.com/watch?v=G6Vxrqfytrk (CC0 1.0 license)
+- Pipe steam sound by duckturd: https://freesound.org/people/duckturd/sounds/437247/ (CC0 1.0 license)
+- Pipe steam hissing sound by mycompasstv: https://freesound.org/people/mycompasstv/sounds/678964/ (CC0 1.0 license)
 - Pipe valve rotate sounds by dilsun: https://freesound.org/people/dilsun/sounds/508281/ (CC0 1.0 license)
 - Screen beep sound by dklon: https://opengameart.org/content/various-alerts (CC BY 3.0 license, must include link and credit, and state no changes were made)
 - Dramatic drum sound: https://www.freesoundslibrary.com/dramatic-tension-cinematic-drums/ (CC BY 4.0 license, must include link and credit, and state no changes were made)

@@ -63,10 +63,17 @@ private:
     float _steamValue;
     float _timeForNextSteamCloud;
     float _steamEmitterAnimationFrame;
+    float _steamLifetimeMultiplier;
 
     std::vector<SteamCloud> _steamClouds;
 
     Vector2 _mousePositionLastFrame;
+
+    Sound _steamLoopSound;
+    Sound _steamHissLoopSound;
+
+    float _steamLoopSoundTimer;
+	float _steamHissLoopSoundTimer;
 };
 
 #endif
