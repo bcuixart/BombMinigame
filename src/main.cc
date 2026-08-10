@@ -1,6 +1,7 @@
 #include <raylib.h>
 
 #include "GameManager.hh"
+#include "LoadingScreen.hh"
 
 #define SCREEN_WIDTH 600
 #define SCREEN_HEIGHT 600
@@ -14,11 +15,11 @@ int main(int argc, char* argv[])
 		int wdth = atoi(argv[1]);
 		int hght = atoi(argv[2]);
 
-        InitWindow(wdth, hght, "BOMB GAME");
+        InitWindow(wdth, hght, "Boom Boom Workshop");
     }
     else 
     {
-        InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "BOMB GAME");
+        InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Boom Boom Workshop");
     }
 
     SetExitKey(KEY_NULL);
@@ -26,7 +27,12 @@ int main(int argc, char* argv[])
     InitAudioDevice();
     SetTargetFPS(30);
 
+	LoadingScreen* loadingScreen = new LoadingScreen();
+	loadingScreen->DrawLoadingScreen(GetScreenWidth(), GetScreenHeight());
+
     GameManager* gameManager = new GameManager();
+
+	delete loadingScreen;
 
     float deltaTime = 0;
     while (!WindowShouldClose() && !gameManager->PlayerExited())
