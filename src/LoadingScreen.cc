@@ -12,34 +12,35 @@ LoadingScreen::~LoadingScreen()
 
 void LoadingScreen::DrawLoadingScreen(const int width, const int height)
 {
-    int horizontalBackgroundTiles = (width / LOADING_SCREEN_SPRITE_SIZE) + 1;
-    int verticalBackgroundTiles = (height / LOADING_SCREEN_SPRITE_SIZE) + 1;
+    const int SIZE = LOADING_SCREEN_SPRITE_SIZE;
+
+    int tilesH = (width / SIZE) + 3;
+    int tilesV = (height / SIZE) + 3;
+
+    int centerTileX = tilesH / 2;
+    int centerTileY = tilesV / 2;
+
+    float offsetX = (width - SIZE) / 2.0f - centerTileX * SIZE;
+    float offsetY = (height - SIZE) / 2.0f - centerTileY * SIZE;
 
     BeginDrawing();
     ClearBackground(BLACK);
 
-    for (int i = 0; i < horizontalBackgroundTiles; ++i)
+    for (int i = 0; i < tilesH; ++i)
     {
-        for (int j = 0; j < verticalBackgroundTiles; ++j)
+        for (int j = 0; j < tilesV; ++j)
         {
+            bool isCenter = (i == centerTileX && j == centerTileY);
+            float srcX = isCenter ? 0.0f : (float)SIZE;
+
             DrawTexturePro(
                 _sprLoadingScreen,
-                { LOADING_SCREEN_SPRITE_SIZE, 0, LOADING_SCREEN_SPRITE_SIZE, LOADING_SCREEN_SPRITE_SIZE },
-                { (float)(i * LOADING_SCREEN_SPRITE_SIZE), (float)(j * LOADING_SCREEN_SPRITE_SIZE),
-                  LOADING_SCREEN_SPRITE_SIZE, LOADING_SCREEN_SPRITE_SIZE },
+                { srcX, 0, (float)SIZE, (float)SIZE },
+                { offsetX + i * SIZE, offsetY + j * SIZE, (float)SIZE, (float)SIZE },
                 { 0, 0 }, 0.0f, WHITE
             );
         }
     }
-
-    DrawTexturePro(
-        _sprLoadingScreen,
-        { 0, 0, LOADING_SCREEN_SPRITE_SIZE, LOADING_SCREEN_SPRITE_SIZE },
-        { (width - LOADING_SCREEN_SPRITE_SIZE) / 2.0f,
-          (height - LOADING_SCREEN_SPRITE_SIZE) / 2.0f,
-          LOADING_SCREEN_SPRITE_SIZE, LOADING_SCREEN_SPRITE_SIZE },
-        { 0, 0 }, 0.0f, WHITE
-    );
 
     EndDrawing();
 }
