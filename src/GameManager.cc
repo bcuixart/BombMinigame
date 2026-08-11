@@ -15,6 +15,7 @@ GameManager::GameManager()
     sprExplosionProps = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_EXPLOSION_PROPS).c_str());
     sprGameOverOverlay = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_GAMEOVER_OVERLAY).c_str());
     sprPipeValve = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_PIPE_VALVE).c_str());
+    sprPipeValveIndicator = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_PIPE_VALVE_INDICATOR).c_str());
     sprSteamCloud = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_CLOUD).c_str());
     sprSteamEmitter = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_EMITTER).c_str());
     sprSteamIndicatorBase = LoadTexture((std::string(ASSETS_PATH) + ASSET_SPRITES_PATH + ASSET_SPRITE_STEAM_INDICATOR_BASE).c_str());
@@ -88,6 +89,7 @@ GameManager::~GameManager()
 	UnloadTexture(sprExplosionProps);
 	UnloadTexture(sprGameOverOverlay);
     UnloadTexture(sprPipeValve);
+	UnloadTexture(sprPipeValveIndicator);
     UnloadTexture(sprSteamCloud);
     UnloadTexture(sprSteamEmitter);
     UnloadTexture(sprSteamIndicatorBase);
@@ -442,6 +444,8 @@ void GameManager::UpdateRoundPaused(const float deltaTime)
 
         _bombHouseTop->GameOver();   // Cancels transitions
         _bombHouseBottom->GameOver();
+
+        _pipe->GameOver();
 
         StartMainMenu();
     }

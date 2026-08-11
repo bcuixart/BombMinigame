@@ -11,12 +11,26 @@ Pipe::Pipe(const Vector2 p, const float r, const float s) :
     _steamEmitterAnimationFrame = 0.0f;
     _steamLifetimeMultiplier = 1.0f;
 
+    _steamIndicatorOffsetX = 0.0f;
+    _steamIndicatorOffsetY = 0.0f;
+
+    _steamMaxTimer = 0.0f;
+
+    _valveIndicatorRotation = 0.0f;
+    _isValveIndicatorVisible = false;
+    _valveIndicatorColorT = 0.0f;
+
     _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
 
     _steamClouds = std::vector<SteamCloud>();
 
 	_steamLoopSound = GameManager::instance->audioManager->GetPipeSteamLoopSound();
 	_steamHissLoopSound = GameManager::instance->audioManager->GetPipeSteamHissLoopSound();
+
+    SetSoundVolume(_steamLoopSound, 0.0f);
+    PlaySound(_steamLoopSound);
+    SetSoundVolume(_steamHissLoopSound, 0.0f);
+    PlaySound(_steamHissLoopSound);
 
 	_steamLoopSoundTimer = 0.0f;
     _steamHissLoopSoundTimer = 0.0f;
@@ -32,6 +46,9 @@ void Pipe::Update_Menu(const float deltaTime)
 {
     _steamLifetimeMultiplier = 5.0f;
 
+    _isValveIndicatorVisible = false;
+    _steamMaxTimer = 0.0f;
+
     _steamValue = PIPE_STEAM_MIN_VALUE;
 }
 
@@ -41,6 +58,12 @@ void Pipe::Update_Game(const float deltaTime)
 
     _steamValue += PIPE_STEAM_INCREMENT_SPEED * deltaTime;
     if (_steamValue > PIPE_STEAM_MAX_VALUE) _steamValue = PIPE_STEAM_MAX_VALUE;
+
+	if (_steamValue >= PIPE_STEAM_MAX_VALUE) _steamMaxTimer += deltaTime;
+	else _steamMaxTimer = 0.0f;
+
+	if (_steamMaxTimer >= PIPE_STEAM_MAX_TIMER_THRESHOLD) _isValveIndicatorVisible = true;
+	else _isValveIndicatorVisible = false;
 }
 
 void Pipe::Update_GameGrabbed(const float deltaTime) 
@@ -70,6 +93,11 @@ void Pipe::Update_GameGrabbed(const float deltaTime)
     _mousePositionLastFrame = mousePos;
 
     if (prevSteamValue != (int)_steamValue && prevSteamValue % 3 == 0) GameManager::instance->audioManager->PlayPipeValveRotateSound();
+
+    if (_isValveIndicatorVisible)
+    {
+        if (_steamValue < PIPE_VALVE_INDICATOR_STEAM_DISAPPEAR_THRESHOLD) _isValveIndicatorVisible = false;
+    }
 }
 
 void Pipe::UpdateSteamCloud(SteamCloud& cloud, const float deltaTime) 
@@ -115,11 +143,13 @@ void Pipe::Update(const float deltaTime)
     SetSoundVolume(_steamLoopSound, steamT);
     SetSoundVolume(_steamHissLoopSound, steamHissT);
 
-	_steamLoopSoundTimer += deltaTime;
-	_steamHissLoopSoundTimer += deltaTime;
+    if (!IsSoundPlaying(_steamLoopSound)) PlaySound(_steamLoopSound);
+    if (!IsSoundPlaying(_steamHissLoopSound)) PlaySound(_steamHissLoopSound);
 
-	if (_steamLoopSoundTimer >= PIPE_STEAM_SOUND_LOOP_TIME) { _steamLoopSoundTimer = 0.0f; PlaySound(_steamLoopSound); }
-	if (_steamHissLoopSoundTimer >= PIPE_STEAM_HISS_SOUND_LOOP_TIME) { _steamHissLoopSoundTimer = 0.0f; PlaySound(_steamHissLoopSound); }
+    float _steamIndicatorOffsetMultiplier = Clamp((_steamValue - PIPE_STEAM_SPAWN_THRESHOLD) /
+        (PIPE_STEAM_MAX_VALUE - PIPE_STEAM_SPAWN_THRESHOLD), 0.0f, 1.0f);
+	_steamIndicatorOffsetX = GetRandomValue(-1, 1) * _steamIndicatorOffsetMultiplier;
+	_steamIndicatorOffsetY = GetRandomValue(-1, 1) * _steamIndicatorOffsetMultiplier;
 
     _timeForNextSteamCloud -= deltaTime;
     if (_timeForNextSteamCloud <= 0 && _steamValue > PIPE_STEAM_SPAWN_THRESHOLD) SpawnSteamCloud();
@@ -132,6 +162,11 @@ void Pipe::Update(const float deltaTime)
     _steamClouds.erase(std::remove_if(_steamClouds.begin(), _steamClouds.end(),
         [](const SteamCloud& cloud) { return cloud.markedForDestroy; }),
         _steamClouds.end());
+
+	_valveIndicatorRotation += PIPE_VALVE_INDICATOR_ROTATION_SPEED * deltaTime;
+	if (_valveIndicatorRotation >= 360.0f) _valveIndicatorRotation -= 360.0f;
+
+    _valveIndicatorColorT += deltaTime / PIPE_VALVE_INDICATOR_COLOR_CYCLE_TIME;
 }
 
 void Pipe::RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) const
@@ -180,6 +215,9 @@ void Pipe::Render(const float deltaTime)
               * (PIPE_STEAM_INDICATOR_NEEDLE_ANGLE_MAX - PIPE_STEAM_INDICATOR_NEEDLE_ANGLE_MIN)
               + PIPE_STEAM_INDICATOR_NEEDLE_ANGLE_MIN;
 
+	baseTLx += _steamIndicatorOffsetX;
+	baseTLy += _steamIndicatorOffsetY;
+
     DrawTexturePro(
         GameManager::instance->sprSteamIndicatorBase,
         { 0, 0, PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_X, PIPE_STEAM_INDICATOR_BASE_SPRITE_SIZE_Y },
@@ -209,6 +247,29 @@ void Pipe::Render(const float deltaTime)
     );
 
     for (const SteamCloud& cloud : _steamClouds) RenderSteamCloud(cloud, deltaTime);
+
+    if (_isValveIndicatorVisible)
+    {
+        float t = (sinf(_valveIndicatorColorT * 2.0f * PI) + 1.0f) / 2.0f; // 0..1 suau
+
+        Color c1 = PIPE_VALVE_INDICATOR_COLOR_1;
+        Color c2 = PIPE_VALVE_INDICATOR_COLOR_2;
+        Color indicatorColor = {
+            (unsigned char)(c1.r + t * (c2.r - c1.r)),
+            (unsigned char)(c1.g + t * (c2.g - c1.g)),
+            (unsigned char)(c1.b + t * (c2.b - c1.b)),
+			(unsigned char)((_steamValue - PIPE_VALVE_INDICATOR_STEAM_DISAPPEAR_THRESHOLD) / (PIPE_STEAM_MAX_VALUE - PIPE_VALVE_INDICATOR_STEAM_DISAPPEAR_THRESHOLD) * 255)
+        };
+
+        DrawTexturePro(
+            GameManager::instance->sprPipeValveIndicator,
+            { 0, 0, PIPE_VALVE_INDICATOR_SPRITE_SIZE, PIPE_VALVE_INDICATOR_SPRITE_SIZE },
+            { _position.x, _position.y, PIPE_VALVE_INDICATOR_SPRITE_SIZE, PIPE_VALVE_INDICATOR_SPRITE_SIZE },
+            { PIPE_VALVE_INDICATOR_SPRITE_SIZE / 2.0f, PIPE_VALVE_INDICATOR_SPRITE_SIZE / 2.0f },
+            _valveIndicatorRotation,
+            indicatorColor
+        );
+    }
 }
 
 void Pipe::GameOver() 

@@ -65,6 +65,15 @@ private:
     float _steamEmitterAnimationFrame;
     float _steamLifetimeMultiplier;
 
+    float _steamIndicatorOffsetX;
+    float _steamIndicatorOffsetY;
+
+    float _steamMaxTimer;
+
+	float _valveIndicatorRotation;
+	bool _isValveIndicatorVisible;
+    float _valveIndicatorColorT;
+
     std::vector<SteamCloud> _steamClouds;
 
     Vector2 _mousePositionLastFrame;

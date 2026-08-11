@@ -103,6 +103,7 @@ public:
 	Texture2D sprExplosionProps;
 	Texture2D sprGameOverOverlay;
 	Texture2D sprPipeValve;
+	Texture2D sprPipeValveIndicator;
 	Texture2D sprSteamCloud;
 	Texture2D sprSteamEmitter;
 	Texture2D sprSteamIndicatorBase;

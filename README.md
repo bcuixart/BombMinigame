@@ -9,11 +9,10 @@ I plan on eventually releasing this as a mobile game.
 
 TODO:
 - Bomb animation FPS
-- Pipe sound improvements
-- Steam and bomb max adjustement based on screen size
+- Steam and bomb max adjustment based on screen size
 - Sound mixing
 - Clap every 100 points
-- Pipe finger indicator
+- Pause proper sound stopping
 - Credits and info
 
 # Credits
