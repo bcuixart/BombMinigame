@@ -20,7 +20,7 @@ All visual assets were made by me without using AI.
 The background was made from the ground up, using materials from Blenderkit.
 
 The music is "Toy Soldiers" by Zane Little Music, licensed under Creative Commons Universal (CC0 1.0) license.
-The factory ambience sound is from https://www.youtube.com/watch?v=RDFnNrAwXsQ
+The factory ambience sound by ofabra: https://freesound.org/people/ofabra/sounds/241250/ (CC0 1.0 license)
 
 Sound effects:
 - Bomb wind-up key sound:
