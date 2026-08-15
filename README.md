@@ -12,7 +12,6 @@ TODO:
 - Steam and bomb max adjustment based on screen size
 - Sound mixing
 - Clap every 100 points
-- Pause proper sound stopping
 - Credits and info
 
 # Credits

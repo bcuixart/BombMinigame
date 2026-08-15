@@ -1238,6 +1238,11 @@ void GameManager::ChangeBombHouseTypes()
     _bombHouseBottom->SetType(_roundValues.currentBombHouseBottomType, false);
 }
 
+bool GameManager::IsPaused() const
+{
+	return _state == ROUND_PAUSED || _state == ROUND_RESUMING;
+}
+
 bool GameManager::PlayerExited() const
 {
     return _playerExited;

@@ -75,9 +75,12 @@ void Bomb::Update(float deltaTime)
 	SetSoundPan(_windUpLoopSound, GameManager::instance->GetPan(_position));
 	if (!IsSoundPlaying(_windUpLoopSound)) PlaySound(_windUpLoopSound);
 
+	if (GameManager::instance->IsPaused()) SetSoundVolume(_windUpLoopSound, 0);
+	else SetSoundVolume(_windUpLoopSound, BOMB_WINDUP_LOOP_SOUND_VOLUME);
+
 	SetSoundPan(_fuseLoopSound, GameManager::instance->GetPan(_position));
 	float fuseSoundMultiplier = Clamp(1 - (_timeToExplode / BOMB_EXPLODE_FUSE_TIME), 0, 1);
-	if (!_didGameOver) SetSoundVolume(_fuseLoopSound, min(1.0f, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier));
+	if (!_didGameOver && !GameManager::instance->IsPaused()) SetSoundVolume(_fuseLoopSound, min(1.0f, BOMB_FUSE_LOOP_SOUND_VOLUME * fuseSoundMultiplier));
 	else SetSoundVolume(_fuseLoopSound, 0);
 
 	_fuseLoopSoundTime += deltaTime;

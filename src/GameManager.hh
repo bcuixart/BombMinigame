@@ -79,6 +79,7 @@ public:
 	void BombEntered(Bomb* obj, int _placedDirection);
 	void ExplodeBomb(Bomb* obj);
 
+	bool IsPaused() const;
 	bool PlayerExited() const;
 
 	bool IsGameOverCutscene() const;

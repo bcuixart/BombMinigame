@@ -140,6 +140,12 @@ void Pipe::Update(const float deltaTime)
     float steamHissT = Clamp((_steamValue - PIPE_STEAM_HISS_SOUND_STEAM_VALUE_MIN) /
         (PIPE_STEAM_HISS_SOUND_STEAM_VALUE_MAX - PIPE_STEAM_HISS_SOUND_STEAM_VALUE_MIN), 0.0f, 1.0f);
 
+	if (GameManager::instance->IsPaused())
+	{
+		steamT = 0.0f;
+		steamHissT = 0.0f;
+	}
+
     SetSoundVolume(_steamLoopSound, steamT);
     SetSoundVolume(_steamHissLoopSound, steamHissT);
 
