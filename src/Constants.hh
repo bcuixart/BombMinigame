@@ -83,6 +83,7 @@
 #define MAP_BG_COORD_RADIUS_Y (MAP_BG_COORD_SIZE_Y / 2.0f)
 
 #define DEBUG_DRAW_MAP_BOUNDS false
+#define DEBUG_DRAW_FPS false
 
 #define SPRTE_TO_COORD(a) ((float)(a) / (float)(MAP_SPRTE_SIZE) * (MAP_COORD_SIZE) - (MAP_COORD_RADIUS))
 

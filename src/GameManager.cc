@@ -819,7 +819,7 @@ void GameManager::Render(const float deltaTime)
 	else if (_state == ROUND_PAUSED) RenderRoundPaused();
 	else if (_state == ROUND_RESUMING) RenderRoundResuming();
 
-    DrawFPS(-500, -500);
+    if (DEBUG_DRAW_FPS) DrawFPS(-500, -500);
 
     EndMode2D();
     EndDrawing();
