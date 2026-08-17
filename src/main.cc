@@ -15,7 +15,8 @@ int main(int argc, char* argv[])
 		int wdth = atoi(argv[1]);
 		int hght = atoi(argv[2]);
 
-        InitWindow(wdth, hght, "Boom Boom Workshop");
+        if (wdth > 0 && hght > 0) InitWindow(wdth, hght, "Boom Boom Workshop");
+        else InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Boom Boom Workshop");
     }
     else 
     {

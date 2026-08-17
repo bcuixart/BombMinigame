@@ -80,9 +80,6 @@ private:
 
     Sound _steamLoopSound;
     Sound _steamHissLoopSound;
-
-    float _steamLoopSoundTimer;
-	float _steamHissLoopSoundTimer;
 };
 
 #endif

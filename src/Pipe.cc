@@ -31,9 +31,6 @@ Pipe::Pipe(const Vector2 p, const float r, const float s) :
     PlaySound(_steamLoopSound);
     SetSoundVolume(_steamHissLoopSound, 0.0f);
     PlaySound(_steamHissLoopSound);
-
-	_steamLoopSoundTimer = 0.0f;
-    _steamHissLoopSoundTimer = 0.0f;
 }
 
 Pipe::~Pipe() 
@@ -170,9 +167,11 @@ void Pipe::Update(const float deltaTime)
         _steamClouds.end());
 
 	_valveIndicatorRotation += PIPE_VALVE_INDICATOR_ROTATION_SPEED * deltaTime;
-	if (_valveIndicatorRotation >= 360.0f) _valveIndicatorRotation -= 360.0f;
+    if (_valveIndicatorRotation >= 360.0f) _valveIndicatorRotation -= 360.0f;
+    else if (_valveIndicatorRotation < 0.0f) _valveIndicatorRotation += 360.0f;
 
     _valveIndicatorColorT += deltaTime / PIPE_VALVE_INDICATOR_COLOR_CYCLE_TIME;
+    _valveIndicatorColorT = fmodf(_valveIndicatorColorT, 1.0f);
 }
 
 void Pipe::RenderSteamCloud(const SteamCloud& cloud, const float deltaTime) const
