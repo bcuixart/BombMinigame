@@ -265,7 +265,11 @@ void GameManager::StartReviveDecision()
     _pauseButtonHovered = false;
     _pauseButtonHoveredLastFrame = false;
 
-    InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), MAP_COORD_VER_MIN}, 0, 150, BOMB_REVIVE));
+    float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
+    int spawnPos = GetRandomValue(0, 1);
+
+    if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), verticalPos }, 0, 150, BOMB_REVIVE));
+    else InstantiateBomb(std::make_unique<Bomb>(Vector2{ GetBombSpawnPos(), verticalPos }, 0, 150, BOMB_REVIVE));
 }
 
 void GameManager::StartPointTally()
@@ -296,7 +300,14 @@ void GameManager::StartPointTally()
 
 void GameManager::UpdateMainMenu(const float deltaTime)
 {
-    if (_roundValues.spawnedBombTypes[BOMB_MENU] == 0) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), MAP_COORD_VER_MIN }, 0, 150, BOMB_MENU));
+    if (_roundValues.spawnedBombTypes[BOMB_MENU] == 0)
+    {
+        float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
+        int spawnPos = GetRandomValue(0, 1);
+
+        if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), verticalPos }, 0, 150, BOMB_MENU));
+        else InstantiateBomb(std::make_unique<Bomb>(Vector2{ GetBombSpawnPos(), verticalPos }, 0, 150, BOMB_MENU));
+    }
     
     HandleBombGrab();
 }
