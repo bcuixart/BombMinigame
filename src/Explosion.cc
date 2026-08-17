@@ -61,7 +61,7 @@ void Explosion::Render(const float deltaTime)
 
 	const float propSize = _scale / 4;
 	Vector2 propOrigin = { propSize / 2, propSize / 2 };
-	float propAlpha = 1.0f - animProgress * 2.0f;
+	float propAlpha = fmaxf(0.0f, 1.0f - animProgress * 2.0f);
 
 	for (int i = 0; i < EXPLOSION_PROPS_NUMBER; ++i) 
 	{

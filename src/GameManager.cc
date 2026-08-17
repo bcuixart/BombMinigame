@@ -1302,7 +1302,7 @@ void GameManager::GetSaveData()
 
 void GameManager::SaveData()
 {
-    std::string path = std::string(GetApplicationDirectory()) + "save_data.bbw";
+    std::string path = std::string(GetApplicationDirectory()) + SAVE_FILE_PATH;
 
     char buffer[16];
     sprintf(buffer, "%d", _highScore);
