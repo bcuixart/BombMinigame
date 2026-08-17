@@ -41,7 +41,7 @@
 #define ASSET_SOUND_BOMB_RELEASED_BOMB_HOUSE "Bomb_Released_BombHouse.mp3"
 #define ASSET_SOUND_BOMB_RELEASED_METAL "Bomb_Released_Metal.mp3"
 #define ASSET_SOUND_BOMB_WARNING "Bomb_Warning.wav"
-#define ASSET_SOUND_BOMBHOUSE_TRANSITION_FLASH "BombHouse_Transition_Flash.wav"
+#define ASSET_SOUND_BOMBHOUSE_TRANSITION_FLASH "BombHouse_Transition_Flash.mp3"
 #define ASSET_SOUND_PIPE_STEAM_LOOP "Pipe_Steam_Loop.mp3"
 #define ASSET_SOUND_PIPE_STEAM_HISS_LOOP "Pipe_Steam_Hiss_Loop.mp3"
 #define ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS 9
