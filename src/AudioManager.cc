@@ -40,7 +40,7 @@ AudioManager::AudioManager()
 
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
-	_currentPipeValveRotatePointSoundIndex = 0;
+	_currentPipeValveRotateSoundIndex = 0;
 	_currentPointSoundIndex = 0;
 	_currentPointTallySoundIndex = 0;
 
@@ -208,10 +208,10 @@ void AudioManager::PlayBombWarningSound(const float pan)
 
 void AudioManager::PlayPipeValveRotateSound()
 {
-	SetSoundPitch(_pipeValveRotateSound[_currentPipeValveRotatePointSoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
-	PlaySound(_pipeValveRotateSound[_currentPipeValveRotatePointSoundIndex]);
+	SetSoundPitch(_pipeValveRotateSound[_currentPipeValveRotateSoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
+	PlaySound(_pipeValveRotateSound[_currentPipeValveRotateSoundIndex]);
 
-	_currentPipeValveRotatePointSoundIndex = (_currentPipeValveRotatePointSoundIndex + 1) % ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS;
+	_currentPipeValveRotateSoundIndex = (_currentPipeValveRotateSoundIndex + 1) % ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS;
 }
 
 void AudioManager::PlayGameOverAlertSound()

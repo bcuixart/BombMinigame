@@ -75,7 +75,7 @@ private:
 	Sound _bombHouseTransitionFlashSound;
 
 	Sound _pipeValveRotateSound[ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS];
-	int _currentPipeValveRotatePointSoundIndex;
+	int _currentPipeValveRotateSoundIndex;
 
 	Sound _pointSound[ASSET_SOUND_POINT_SOUNDS];
 	int _currentPointSoundIndex;

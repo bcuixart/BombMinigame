@@ -304,13 +304,13 @@ void Bomb::CheckCollisionWith(Bomb& b)
 	if (b._collidedThisFrame || _collidedThisFrame) return;
 
 	Vector2 delta = Vector2Subtract(_position, b._position);
-	float dist = delta.x * delta.x + delta.y * delta.y;
+	float distSq = delta.x * delta.x + delta.y * delta.y;
 	float minDist = _radiusVisual + b._radiusVisual;
 
-	if (dist < minDist * minDist)
+	if (distSq < minDist * minDist)
 	{
 		GameManager::instance->audioManager->PlayBombCollisionSound(GameManager::instance->GetPan(_position));
-		ResolveCollisionWith(b, delta, sqrt(dist), minDist);
+		ResolveCollisionWith(b, delta, sqrt(distSq), minDist);
 	}
 }
 

@@ -53,6 +53,9 @@ GameManager::GameManager()
     _pointTallyCounterLast = 0;
     _pointTallySkipClicks = 0;
 
+    _reviveHouseTopType = BOMB_INVALID;
+    _reviveHouseBottomType = BOMB_INVALID;
+
 	_pauseResumeTicks = 0;
 	_pauseResumeTimer = 0.0f;
 
@@ -941,10 +944,6 @@ void GameManager::DrawScreenNumber(const int score, const Vector2 position, cons
     }
 
     int digits[4] = { 0 };
-    digits[0] = score / 1000;
-    digits[1] = (score / 100) % 10;
-    digits[2] = (score / 10) % 10;
-    digits[3] = score % 10;
 
     if (score == -1) // Show DEAD
     {
@@ -952,6 +951,13 @@ void GameManager::DrawScreenNumber(const int score, const Vector2 position, cons
         digits[1] = 11;
         digits[2] = 12;
         digits[3] = 10;
+    }
+    else
+    {
+        digits[0] = score / 1000;
+        digits[1] = (score / 100) % 10;
+        digits[2] = (score / 10) % 10;
+        digits[3] = score % 10;
     }
 
     for (int i = 0; i < 4; ++i)
