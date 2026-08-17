@@ -200,6 +200,11 @@ void GameManager::StartGame()
 
     _pauseButtonHovered = false;
     _pauseButtonHoveredLastFrame = false;
+
+    if (DEBUG_SPAWN_MAX_DEVICE_BOMBS_START)
+    {
+        for (int i = 0; i < GetDeviceMaxBombs(); ++i) SpawnBombRound();
+    }
 }
 
 void GameManager::StartGameRevive()
@@ -366,13 +371,9 @@ void GameManager::UpdateRound(const float deltaTime)
         _roundValues.nextBombSpawnTime = max(_roundValues.nextBombSpawnTime - ROUND_BOMB_SPAWN_TIME_INCREMENT, ROUND_BOMB_SPAWN_TIME_MIN);
         _roundValues.timeToSpawnNextBomb = _roundValues.nextBombSpawnTime;
 
-        if (_bombGameObjects.size() < (unsigned int)_roundValues.currentMaxBombs)
+        if (_bombGameObjects.size() < (unsigned int)_roundValues.currentMaxBombs && _bombGameObjects.size() < (unsigned int)GetDeviceMaxBombs())
         {
-            float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
-            int spawnPos = GetRandomValue(0, 1);
-
-            if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), verticalPos }, 0, 150, GetNewBombType()));
-            else InstantiateBomb(std::make_unique<Bomb>(Vector2{ GetBombSpawnPos(), verticalPos }, 0, 150, GetNewBombType()));
+            SpawnBombRound();
         }
     }
 
@@ -1026,6 +1027,15 @@ void GameManager::ExplodeBomb(Bomb* obj)
     }
 }
 
+void GameManager::SpawnBombRound()
+{
+    float verticalPos = (float)GetRandomValue(MAP_COORD_VER_MIN, MAP_COORD_VER_MAX);
+    int spawnPos = GetRandomValue(0, 1);
+
+    if (spawnPos == 1) InstantiateBomb(std::make_unique<Bomb>(Vector2{ -GetBombSpawnPos(), verticalPos }, 0, 150, GetNewBombType()));
+    else InstantiateBomb(std::make_unique<Bomb>(Vector2{ GetBombSpawnPos(), verticalPos }, 0, 150, GetNewBombType()));
+}
+
 void GameManager::HandleBombGrab()
 {
     if (_grabbedPipe != nullptr) return;
@@ -1081,6 +1091,14 @@ void GameManager::TryGrabBomb(const Vector2 mousePos)
             }
         }
     }
+}
+
+int GameManager::GetDeviceMaxBombs() const
+{
+    float visibleWidth = GetHorizontalBounds().y;
+    float t = visibleWidth / (float)MAP_COORD_HOR_MAX;
+
+    return (int)Lerp((float)ROUND_DEVICE_MAX_BOMBS_MIN, (float)ROUND_DEVICE_MAX_BOMBS_MAX, t);
 }
 
 void GameManager::CheckBombCollisions()

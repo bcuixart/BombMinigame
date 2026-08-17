@@ -303,7 +303,7 @@ void Pipe::SpawnSteamCloud()
     cloud.markedForDestroy = false;
     _steamClouds.push_back(cloud);
 
-    _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME;
+    _timeForNextSteamCloud = PIPE_STEAM_SPAWN_TIME * ((float)MAP_COORD_HOR_MAX / boundsX);
 }
 
 bool Pipe::WasClicked(const Vector2 mousePos) const 

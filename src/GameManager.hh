@@ -139,11 +139,14 @@ private:
 
 	void GameOver(Bomb* obj);
 
+	void SpawnBombRound();
 	void HandleBombGrab();
 	void TryGrabBomb(const Vector2 mousePos);
 	int GetBombReleasedState(Bomb* obj);
 
 	void HandlePipeGrab();
+
+	int GetDeviceMaxBombs() const;
 
 	void CheckBombCollisions();
 

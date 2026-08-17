@@ -9,7 +9,6 @@ I plan on eventually releasing this as a mobile game.
 
 TODO:
 - Bomb animation FPS
-- Steam and bomb max adjustment based on screen size
 - Sound mixing
 - Credits and info
 
