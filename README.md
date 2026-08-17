@@ -32,7 +32,7 @@ Sound effects:
 - Pipe steam hissing sound by mycompasstv: https://freesound.org/people/mycompasstv/sounds/678964/ (CC0 1.0 license)
 - Pipe valve rotate sounds by dilsun: https://freesound.org/people/dilsun/sounds/508281/ (CC0 1.0 license)
 - Screen beep sound by Ethraiel: https://freesound.org/people/Ethraiel/sounds/351569/ (CC0 1.0 license)
-- Dramatic drum sound: https://www.freesoundslibrary.com/dramatic-tension-cinematic-drums/ (CC BY 4.0 license, must include link and credit, and state no changes were made)
+- Dramatic drum sound by XHALE303: https://freesound.org/people/XHALE303/sounds/592039/ (CC0 1.0 license)
 - Game over alert sound by aquinn: https://opengameart.org/content/sirens-and-alarm-noise (CC0 1.0 license)
 - Game over jingle sound by oiboo: https://opengameart.org/content/game-over-bad-chest-sfx (CC0 1.0 license) 
 - Point sound by Bobjt: https://opengameart.org/content/gem-collect-sfx (CC0 1.0 license)

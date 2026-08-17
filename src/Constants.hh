@@ -52,7 +52,7 @@
 #define ASSET_SOUND_POINT "Point.mp3"
 #define ASSET_SOUND_POINT_TALLY "PointTally.mp3"
 #define ASSET_SOUND_APPLAUSE "Applause.mp3"
-#define ASSET_SOUND_DRAMATIC_DRUM "DramaticDrum.wav"
+#define ASSET_SOUND_DRAMATIC_DRUM "DramaticDrum.mp3"
 #define ASSET_SOUND_GAMEOVER_ALERT "GameOver_Alert.wav"
 #define ASSET_SOUND_GAMEOVER_JINGLE "GameOver_Jingle.wav"
 #define ASSET_SOUND_POINT_TALLY_END "PointTallyEnd.mp3"
