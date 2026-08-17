@@ -1006,6 +1006,8 @@ void GameManager::BombEntered(Bomb* obj, int _placedDirection)
         {
             _roundValues.score++;
             audioManager->PlayPointSound();
+
+            if (_roundValues.score % 100 == 0) audioManager->PlayApplauseSound();
         }
         DestroyBomb(obj);
     }

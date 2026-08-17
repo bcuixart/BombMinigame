@@ -37,6 +37,8 @@ public:
 	void PlayPointSound();
 	void PlayPointTallySound();
 
+	void PlayApplauseSound();
+
 	void PlayGameOverAlertSound();
 	void PlayGameOverJingleSound();
 
@@ -80,6 +82,8 @@ private:
 
 	Sound _pointTallySound[ASSET_SOUND_POINT_SOUNDS];
 	int _currentPointTallySoundIndex;
+
+	Sound _applauseSound;
 
 	Sound _dramaticDrumSound;
 	Sound _gameOverAlertSound;

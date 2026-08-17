@@ -11,7 +11,6 @@ TODO:
 - Bomb animation FPS
 - Steam and bomb max adjustment based on screen size
 - Sound mixing
-- Clap every 100 points
 - Credits and info
 
 # Credits
