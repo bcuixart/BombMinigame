@@ -154,7 +154,10 @@ private:
 	void ChangeBombHouseTypes();
 
 	float GetBombSpawnPos() const;
-	float GetSmallScreenPos() const;
+	float GetScreenBottomWorld() const;
+	float GetScreenRightWorld() const;
+	float GetSmallScreenPosX() const;
+	float GetSmallScreenPosY() const;
 	Rectangle GetPauseButtonRect() const;
 
 	void InstantiateExplosion(const Vector2 position);
