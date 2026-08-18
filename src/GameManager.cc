@@ -725,10 +725,13 @@ void GameManager::Render(const float deltaTime)
 
     float shakeIntensity = _screenShakeTrauma * _screenShakeTrauma;
 
+    float zoomForHeight = (float)height / MAP_COORD_SIZE;
+    float zoomForWidth = (float)width / MAP_COORD_HORIZONTAL_MIN_VIEWABLE_SIZE;
+
     _cam.target = { 0, 0 };
     _cam.offset = { width / 2.0f, height / 2.0f }; // Screen center
     _cam.rotation = sinf(_screenShakePhase) * SCREEN_SHAKE_MAX_ROTATION_DEGREES * shakeIntensity;
-    _cam.zoom = (float)height / MAP_COORD_SIZE;
+    _cam.zoom = fminf(zoomForHeight, zoomForWidth);
 
     BeginDrawing();
     BeginMode2D(_cam);
@@ -771,6 +774,8 @@ void GameManager::Render(const float deltaTime)
         DrawLine(boundsH.x, BOMBHOUSE_COORD_TOP_VER_POS, boundsH.y, BOMBHOUSE_COORD_TOP_VER_POS, BLUE);
 
         DrawRectangleLines(boundsH.x, MAP_COORD_VER_MIN, (boundsH.y - boundsH.x), (MAP_COORD_VER_MAX - MAP_COORD_VER_MIN), WHITE);
+
+		DrawRectangleLines(-MAP_COORD_HORIZONTAL_MIN_VIEWABLE_SIZE / 2.0f, -MAP_COORD_SIZE / 2.0f, MAP_COORD_HORIZONTAL_MIN_VIEWABLE_SIZE, MAP_COORD_SIZE, RED);
     }
 
     // Map fg
@@ -838,7 +843,7 @@ void GameManager::Render(const float deltaTime)
 	else if (_state == ROUND_PAUSED) RenderRoundPaused();
 	else if (_state == ROUND_RESUMING) RenderRoundResuming();
 
-    if (DEBUG_DRAW_FPS) DrawFPS(-500, -500);
+    if (DEBUG_DRAW_FPS) DrawFPS(0, -500);
 
     EndMode2D();
     EndDrawing();

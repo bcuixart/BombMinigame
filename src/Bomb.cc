@@ -129,9 +129,11 @@ void Bomb::Update_RandomMovement(const float deltaTime)
 	if (_position.y < MAP_COORD_VER_MIN) _movementDirection.y = 1;
 	else if (_position.y > MAP_COORD_VER_MAX) _movementDirection.y = -1;
 
-	// Constraint to max horizontal bounds
+	// Constraint to bounds
 	if (_position.x < MAP_COORD_HOR_MIN) _position.x = MAP_COORD_HOR_MIN;
 	if (_position.x > MAP_COORD_HOR_MAX) _position.x = MAP_COORD_HOR_MAX;
+	if (_position.y < MAP_COORD_VER_MIN) _position.y = MAP_COORD_VER_MIN;
+	if (_position.y > MAP_COORD_VER_MAX) _position.y = MAP_COORD_VER_MAX;
 
 	_animationIndex = BOMB_ANIM_INDEX_WALK_BOT_LEFT;
 	if (_movementDirection.x == 1 && _movementDirection.y == 1) _animationIndex = BOMB_ANIM_INDEX_WALK_BOT_RIGHT;
