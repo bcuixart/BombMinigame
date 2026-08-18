@@ -86,7 +86,8 @@ void BombHouse::Update(float deltaTime)
 
 	float animProgress = BOMBHOUSE_ANIMATION_SPEED * deltaTime;
 	_animationFrame += (_houseType == BOMBHOUSE_TOP) ? animProgress : -animProgress;
-	if (int(_animationFrame) >= BOMBHOUSE_ANIMATION_FRAMES) _animationFrame = 0;
+	if (_animationFrame >= BOMBHOUSE_ANIMATION_FRAMES) _animationFrame -= BOMBHOUSE_ANIMATION_FRAMES;
+	if (_animationFrame < 0.0f) _animationFrame += BOMBHOUSE_ANIMATION_FRAMES;
 
 	_wasScreenTransitionBrightLastFrame = _isScreenTransitionBright;
 }
