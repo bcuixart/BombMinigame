@@ -746,8 +746,10 @@ void GameManager::Render(const float deltaTime)
 
     // Map mg
     DrawTexturePro(
-        _sprMapMG, { 0, 0, MAP_BG_SPRITE_SIZE_X, MAP_BG_SPRITE_SIZE_Y },
-        { -MAP_BG_COORD_RADIUS_X, -MAP_BG_COORD_RADIUS_Y, MAP_BG_COORD_SIZE_X, MAP_BG_COORD_SIZE_Y },
+        _sprMapMG, { 0, 0, MAP_MG_SPRITE_SIZE_X, MAP_MG_SPRITE_SIZE_Y },
+        { MAP_BG_COORD_RADIUS_X - MAP_MG_COORD_SIZE_X,
+          -MAP_BG_COORD_RADIUS_Y,
+          MAP_MG_COORD_SIZE_X, MAP_MG_COORD_SIZE_Y },
         { 0, 0 }, 0.0f, WHITE
     );
 
@@ -773,8 +775,10 @@ void GameManager::Render(const float deltaTime)
 
     // Map fg
     DrawTexturePro(
-        _sprMapFG, { 0, 0, MAP_BG_SPRITE_SIZE_X, MAP_BG_SPRITE_SIZE_Y },
-        { -MAP_BG_COORD_RADIUS_X, -MAP_BG_COORD_RADIUS_Y, MAP_BG_COORD_SIZE_X, MAP_BG_COORD_SIZE_Y },
+        _sprMapFG, { 0, 0, MAP_FG_SPRITE_SIZE_X, MAP_FG_SPRITE_SIZE_Y },
+        { -MAP_BG_COORD_RADIUS_X,
+          MAP_BG_COORD_RADIUS_Y - MAP_FG_COORD_SIZE_Y,
+          MAP_FG_COORD_SIZE_X, MAP_FG_COORD_SIZE_Y },
         { 0, 0 }, 0.0f, WHITE
     );
 
