@@ -32,6 +32,8 @@ public:
 
 	void PlayBombHouseTransitionFlashSound();
 
+	void PlayExplosionSound(const float pan, const float volume);
+
 	void PlayPipeValveRotateSound();
 
 	void PlayPointSound();
@@ -53,9 +55,6 @@ public:
 	Sound GetBombFuseLoopSound();
 	void UnloadBombFuseLoopSound(Sound* sound);
 
-	Sound GetBombExplosionSound();
-	void UnloadBombExplosionSound(Sound* sound);
-
 	Sound GetPipeSteamLoopSound();
 	void UnloadPipeSteamLoopSound(Sound* sound);
 	Sound GetPipeSteamHissLoopSound();
@@ -73,6 +72,9 @@ private:
 	Sound _bombWarningSound;
 
 	Sound _bombHouseTransitionFlashSound;
+
+	Sound _explosionSound[ASSET_SOUND_EXPLOSION_SOUNDS];
+	int  _currentExplosionSoundIndex;
 
 	Sound _pipeValveRotateSound[ASSET_SOUND_PIPE_VALVE_ROTATE_SOUNDS];
 	int _currentPipeValveRotateSoundIndex;

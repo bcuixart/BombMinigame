@@ -23,8 +23,6 @@ private:
 	Vector2 _propsVelocities[EXPLOSION_PROPS_NUMBER];
 	float _propsRotations[EXPLOSION_PROPS_NUMBER];
 	float _propsRotationSpeeds[EXPLOSION_PROPS_NUMBER];
-
-	Sound _explosionSound;
 };
 
 #endif

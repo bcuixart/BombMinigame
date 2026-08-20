@@ -36,6 +36,7 @@
 #define ASSET_SOUND_BOMB_COLLISION_SUFFIX ".wav"
 #define ASSET_SOUND_BOMB_WINDUP_LOOP "Bomb_WindUp_Loop.wav"
 #define ASSET_SOUND_BOMB_FUSE_LOOP "Bomb_Fuse_Loop.wav"
+#define ASSET_SOUND_EXPLOSION_SOUNDS 10
 #define ASSET_SOUND_BOMB_EXPLOSION "Bomb_Explosion_000.wav"
 #define ASSET_SOUND_BOMB_GRABBED "Bomb_Grabbed.mp3"
 #define ASSET_SOUND_BOMB_RELEASED_BOMB_HOUSE "Bomb_Released_BombHouse.mp3"

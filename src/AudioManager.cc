@@ -27,6 +27,7 @@ AudioManager::AudioManager()
 	_bombReleasedMetalSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_RELEASED_METAL).c_str());
 	_bombWarningSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_WARNING).c_str());
 	_bombHouseTransitionFlashSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMBHOUSE_TRANSITION_FLASH).c_str());
+	for (int i = 0; i < ASSET_SOUND_EXPLOSION_SOUNDS; i++) _explosionSound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_EXPLOSION).c_str());
 	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) _pointSound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT).c_str());
 	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) _pointTallySound[i] = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_POINT_TALLY).c_str());
 	_gameOverAlertSound = LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_GAMEOVER_ALERT).c_str());
@@ -40,6 +41,7 @@ AudioManager::AudioManager()
 
 	_currentBombStepSoundIndex = 0;
 	_currentBombCollisionSoundIndex = 0;
+	_currentExplosionSoundIndex = 0;
 	_currentPipeValveRotateSoundIndex = 0;
 	_currentPointSoundIndex = 0;
 	_currentPointTallySoundIndex = 0;
@@ -62,6 +64,7 @@ AudioManager::~AudioManager()
 	UnloadSound(_bombReleasedMetalSound);
 	UnloadSound(_bombWarningSound);
 	UnloadSound(_bombHouseTransitionFlashSound);
+	for (int i = 0; i < ASSET_SOUND_EXPLOSION_SOUNDS; i++) UnloadSound(_explosionSound[i]);
 	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) UnloadSound(_pointSound[i]);
 	for (int i = 0; i < ASSET_SOUND_POINT_SOUNDS; i++) UnloadSound(_pointTallySound[i]);
 	UnloadSound(_applauseSound);
@@ -206,6 +209,16 @@ void AudioManager::PlayBombWarningSound(const float pan)
 	PlaySound(_bombWarningSound);
 }
 
+void AudioManager::PlayExplosionSound(const float pan, const float volume)
+{
+	_currentExplosionSoundIndex = (_currentExplosionSoundIndex + 1) % ASSET_SOUND_EXPLOSION_SOUNDS;
+
+	SetSoundPan(_explosionSound[_currentExplosionSoundIndex], pan);
+	SetSoundVolume(_explosionSound[_currentExplosionSoundIndex], volume);
+	SetSoundPitch(_explosionSound[_currentExplosionSoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
+	PlaySound(_explosionSound[_currentExplosionSoundIndex]);
+}
+
 void AudioManager::PlayPipeValveRotateSound()
 {
 	SetSoundPitch(_pipeValveRotateSound[_currentPipeValveRotateSoundIndex], float(GetRandomValue(90, 110)) / 100.0f);
@@ -250,16 +263,6 @@ Sound AudioManager::GetBombFuseLoopSound()
 }
 
 void AudioManager::UnloadBombFuseLoopSound(Sound* sound)
-{
-	UnloadSound(*sound);
-}
-
-Sound AudioManager::GetBombExplosionSound()
-{
-	return LoadSound((std::string(ASSETS_PATH) + ASSET_SOUNDS_PATH + ASSET_SOUND_BOMB_EXPLOSION).c_str());
-}
-
-void AudioManager::UnloadBombExplosionSound(Sound* sound)
 {
 	UnloadSound(*sound);
 }

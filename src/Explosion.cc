@@ -15,17 +15,12 @@ Explosion::Explosion(const Vector2 p, const float r, const float s) :
 		_propsRotationSpeeds[i] = float(GetRandomValue(-180, 180));
 	}
 
-	_explosionSound = GameManager::instance->audioManager->GetBombExplosionSound();
-	SetSoundVolume(_explosionSound, GameManager::instance->GetBombExplosionSoundVolume());
-	SetSoundPan(_explosionSound, GameManager::instance->GetPan(_position));
-	SetSoundPitch(_explosionSound, float(GetRandomValue(90, 110)) / 100.0f);
-
-	PlaySound(_explosionSound);
+	GameManager::instance->audioManager->PlayExplosionSound(GameManager::instance->GetPan(_position), GameManager::instance->GetBombExplosionSoundVolume());
 }
 
 Explosion::~Explosion()
 {
-	UnloadSound(_explosionSound);
+
 }
 
 void Explosion::Update(float deltaTime)
@@ -44,8 +39,7 @@ void Explosion::Update(float deltaTime)
 		}
 	}
 
-	// Twice as long for the sound to play out, since the sound is longer than the visual effect
-	if (_elapsedLifetime >= EXPLOSION_DURATION * 2.0f)
+	if (_elapsedLifetime >= EXPLOSION_DURATION)
 	{
 		GameManager::instance->DestroyExplosion(this);
 	}
