@@ -170,25 +170,39 @@ void Bomb::Update_Placed(const float deltaTime)
 	float volumeMultiplier;
 	if (_placedDirection == BOMB_PLACED_TOP)
 	{
-		volumeMultiplier = abs((-MAP_COORD_RADIUS) - _position.y);
-		volumeMultiplier /= abs(BOMBHOUSE_COORD_TOP_VER_POS - -MAP_COORD_RADIUS);
+		float screenTop = GameManager::instance->GetScreenTopWorld();
 
-		_position.y -= BOMB_MOVEMENT_SPEED * deltaTime;
-		_position.y = max(_position.y, (float) -MAP_COORD_RADIUS);
+		volumeMultiplier = abs(screenTop - _position.y);
+		volumeMultiplier /= abs(BOMBHOUSE_COORD_TOP_VER_POS - screenTop);
+
+		float referenceDistance = BOMBHOUSE_COORD_TOP_VER_POS - (-MAP_COORD_RADIUS);
+		float actualDistance = BOMBHOUSE_COORD_TOP_VER_POS - screenTop;
+		float speedMultiplier = actualDistance / referenceDistance;
+
+		_position.y -= BOMB_MOVEMENT_SPEED * speedMultiplier * deltaTime;
+		_position.y = max(_position.y, screenTop);
 	}
 	else
 	{
-		volumeMultiplier = abs(_position.y - (MAP_COORD_RADIUS));
-		volumeMultiplier /= abs(BOMBHOUSE_COORD_BOT_VER_POS - (MAP_COORD_RADIUS));
+		float screenBottom = GameManager::instance->GetScreenBottomWorld();
 
-		_position.y += BOMB_MOVEMENT_SPEED * deltaTime;
-		_position.y = min(_position.y, (float) MAP_COORD_RADIUS);
+		volumeMultiplier = abs(_position.y - screenBottom);
+		volumeMultiplier /= abs(BOMBHOUSE_COORD_BOT_VER_POS - screenBottom);
+
+		float referenceDistance = MAP_COORD_RADIUS - BOMBHOUSE_COORD_BOT_VER_POS;
+		float actualDistance = screenBottom - BOMBHOUSE_COORD_BOT_VER_POS;
+		float speedMultiplier = actualDistance / referenceDistance;
+
+		_position.y += BOMB_MOVEMENT_SPEED * speedMultiplier * deltaTime;
+		_position.y = min(_position.y, screenBottom);
 	}
 
 	volumeMultiplier = Clamp(volumeMultiplier, 0, 1);
 	SetSoundVolume(_windUpLoopSound, min(1.0f, BOMB_WINDUP_LOOP_SOUND_VOLUME * volumeMultiplier));
 
-	if (_position.y <= -MAP_COORD_RADIUS || _position.y >= MAP_COORD_RADIUS) GameManager::instance->BombEntered(this, this->_placedDirection);
+	if (_position.y <= GameManager::instance->GetScreenTopWorld() ||
+		_position.y >= GameManager::instance->GetScreenBottomWorld())
+		GameManager::instance->BombEntered(this, this->_placedDirection);
 }
 
 void Bomb::Render(const float deltaTime) 

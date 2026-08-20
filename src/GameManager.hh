@@ -87,6 +87,8 @@ public:
 	Vector2 GetWorldMousePos() const;
 
 	Vector2 GetHorizontalBounds() const;
+	float GetScreenBottomWorld() const;
+	float GetScreenTopWorld() const;
 
 	float GetPan(const Vector2& position) const;
 	float GetBombExplosionSoundVolume() const;
@@ -154,7 +156,6 @@ private:
 	void ChangeBombHouseTypes();
 
 	float GetBombSpawnPos() const;
-	float GetScreenBottomWorld() const;
 	float GetScreenRightWorld() const;
 	float GetSmallScreenPosX() const;
 	float GetSmallScreenPosY() const;

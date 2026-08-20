@@ -1191,6 +1191,11 @@ float GameManager::GetScreenBottomWorld() const
     return (GetScreenHeight() / 2.0f) / _cam.zoom;
 }
 
+float GameManager::GetScreenTopWorld() const
+{
+    return -(GetScreenHeight() / 2.0f) / _cam.zoom;
+}
+
 float GameManager::GetScreenRightWorld() const
 {
     return (GetScreenWidth() / 2.0f) / _cam.zoom;
