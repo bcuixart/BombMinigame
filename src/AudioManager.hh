@@ -71,6 +71,9 @@ private:
 	Sound _bombReleasedMetalSound;
 	Sound _bombWarningSound;
 
+	Sound _bombWindUpBaseSound;
+	Sound _bombFuseBaseSound;
+
 	Sound _bombHouseTransitionFlashSound;
 
 	Sound _explosionSound[ASSET_SOUND_EXPLOSION_SOUNDS];
