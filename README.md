@@ -7,11 +7,6 @@ There were plenty of great minimages in that game, but this one always stood out
 
 I plan on eventually releasing this as a mobile game.
 
-TODO:
-- Bomb animation FPS
-- Sound mixing
-- Credits and info
-
 # Credits
 All visual assets were made by me without using AI.
 The background was made from the ground up, using materials from Blenderkit.
