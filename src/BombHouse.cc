@@ -147,11 +147,11 @@ void BombHouse::RenderScreen() const
 
 void BombHouse::Render(const float deltaTime) 
 {
-	Rectangle dest = { _position.x, _position.y, _scale, _scale };
+	Rectangle dest = { _position.x, _position.y, _scale, _scale * 2.0f };
 	Vector2 origin = { _radius, _radius };
 	DrawTexturePro
 	(	GameManager::instance->sprBombHouse,
-		{ float(int(_animationFrame) * BOMBHOUSE_SPRITE_SIZE), 0, BOMBHOUSE_SPRITE_SIZE, BOMBHOUSE_SPRITE_SIZE }, // SOURCE
+		{ float(int(_animationFrame) * BOMBHOUSE_SPRITE_SIZE_X), 0, BOMBHOUSE_SPRITE_SIZE_X, BOMBHOUSE_SPRITE_SIZE_Y }, // SOURCE
 		dest, origin, 0, WHITE
 	);
 

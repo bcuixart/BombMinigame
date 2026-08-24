@@ -31,8 +31,8 @@ GameManager::GameManager()
 
 	audioManager = std::make_unique<AudioManager>();
 
-    _bombHouseTop = std::make_unique<BombHouse>(Vector2{ 0,-425 }, 0, 256, BOMBHOUSE_TOP);
-    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{ 0,425 }, 0, 256, BOMBHOUSE_BOTTOM);
+    _bombHouseTop = std::make_unique<BombHouse>(Vector2{ 0,-640 }, 0, 256, BOMBHOUSE_TOP);
+    _bombHouseBottom = std::make_unique<BombHouse>(Vector2{ 0,375 }, 0, 256, BOMBHOUSE_BOTTOM);
 
     _pipe = std::make_unique<Pipe>(Vector2 PIPE_POSITION, 0, 256);
 
