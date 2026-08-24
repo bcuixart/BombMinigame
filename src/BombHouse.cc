@@ -58,6 +58,8 @@ bool BombHouse::GetIsBombEnteredTypeValid(BombType t) const
 
 void BombHouse::Update(float deltaTime)
 {
+	deltaTime = fminf(deltaTime, 1.0f / 15.0f);
+
 	_lenienceTime -= deltaTime;
 
 	_isTransitioning = (_lenienceTime > 0 && _lenienceTime < BOMBHOUSE_LENIENCE_TIME);
@@ -149,9 +151,17 @@ void BombHouse::Render(const float deltaTime)
 {
 	Rectangle dest = { _position.x, _position.y, _scale, _scale * 2.0f };
 	Vector2 origin = { _radius, _radius };
+	// Animated part
 	DrawTexturePro
 	(	GameManager::instance->sprBombHouse,
 		{ float(int(_animationFrame) * BOMBHOUSE_SPRITE_SIZE_X), 0, BOMBHOUSE_SPRITE_SIZE_X, BOMBHOUSE_SPRITE_SIZE_Y }, // SOURCE
+		dest, origin, 0, WHITE
+	);
+
+	// Base on top
+	DrawTexturePro
+	(	GameManager::instance->sprBombHouse,
+		{ float(11 * BOMBHOUSE_SPRITE_SIZE_X), 0, BOMBHOUSE_SPRITE_SIZE_X, BOMBHOUSE_SPRITE_SIZE_Y }, // SOURCE
 		dest, origin, 0, WHITE
 	);
 
