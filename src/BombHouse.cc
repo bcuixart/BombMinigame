@@ -137,13 +137,12 @@ void BombHouse::RenderScreen() const
 	else // Regular
 	{
 		DrawTexturePro
-		(	GameManager::instance->sprBombHouseScreen,
-			{ 
-				float(_screenSprite * BOMBHOUSE_SCREEN_SPRITE_SIZE),
-				0, BOMBHOUSE_SCREEN_SPRITE_SIZE, BOMBHOUSE_SCREEN_SPRITE_SIZE }, // SOURCE
+		(   GameManager::instance->sprBombHouseScreen,
+			{ float(_screenSprite * BOMBHOUSE_SCREEN_SPRITE_SIZE) + 0.5f, 0.5f,
+			  BOMBHOUSE_SCREEN_SPRITE_SIZE - 1.0f, BOMBHOUSE_SCREEN_SPRITE_SIZE - 1.0f },
 			dest, origin, 0, WHITE
-		);		
-	}	
+		);
+	}
 }
 
 void BombHouse::Render(const float deltaTime) 
